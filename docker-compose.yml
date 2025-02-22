@@ -30,3 +30,21 @@ services:
     volumes:
       - ./database/data:/var/lib/postgresql/data
       # - ./database/schema:/docker-entrypoint-initdb.d
+
+  php:
+    build:
+      context: docker/build
+      dockerfile: Dockerfile.php
+    container_name: php-container
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./docker/containers/php:/home/vscode
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
