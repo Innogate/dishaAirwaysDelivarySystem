@@ -1,0 +1,223 @@
+{
+    "users":{
+        "id": {
+            "type": "varchar",
+            "primary": true
+        },
+        "email": {
+            "type": "varchar",
+            "unique": true,
+            "not null": true
+        },
+        "password": {
+            "type": "varchar",
+            "not null": true
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true
+        },
+        "updatedAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
+                                                                                                                                                              
+    },
+    "usersInfo":{
+        "id": {
+            "type": "varchar",
+            "primary": true,
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "firstName": {
+            "type": "varchar",
+            "not null": true
+        },
+        "lastName": {
+            "type": "varchar",
+            "not null": true
+        },
+        "phone": {
+            "type": "varchar",
+            "not null": true
+        },
+        "address": {
+            "type": "varchar",
+            "not null": true
+        },
+        "email":{
+            "type": "varchar",
+            "not null": true
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "updatedAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
+    },
+    "brachs":{
+        "id": {
+            "type": "sirial",
+            "autoincrement": true,
+            "primary": true,
+            "not null": true
+        },
+        "name": {
+            "type": "varchar",
+            "not null": true
+        },
+        "brachCode":{
+            "type": "varchar",
+            "not null": true
+        },
+        "brachHead":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "brachCity":{
+            "type": "varchar",
+            "not null": true
+        },
+        "brachState":{
+            "type": "varchar",
+            "not null": true
+        },
+        "brachCountry":{
+            "type": "varchar",
+            "not null": true
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "updatedAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
+    },
+    "pages":{
+        "id": {
+            "type": "sirial",
+            "autoincrement": true,
+            "primary": true,
+            "not null": true
+        },
+        "name": {
+            "type": "varchar",
+            "not null": true
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "updatedAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
+    },
+    "permissions":{
+        "id": {
+            "type": "sirial",
+            "autoincrement": true,
+            "primary": true,
+            "not null": true
+        },
+        "pageId": {
+            "type": "sirial",
+            "not null": true,
+            "foreignKey": "pages.id"
+        },
+        "userId":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "updatedAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
+    },
+    "employees":{
+        "eid": {
+            "type": "sirial",
+            "autoincrement": true,
+            "primary": true,
+            "not null": true
+        },
+        "userId": {
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "updatedAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
+    }
+}

@@ -24,12 +24,12 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - ./database/data:/var/lib/postgresql/data
-      # - ./database/schema:/docker-entrypoint-initdb.d
+      - ./database/template:/docker-entrypoint-initdb.d
 
   php:
     build:
