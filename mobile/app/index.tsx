@@ -160,20 +160,21 @@
 // export default index;
 
 
-import React from 'react';
+import React, { useState} from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { enverment } from './enverment';
 // import "nativewind"; // Ensure NativeWind is installed
 import "../global.css"
 
 // ✅ Form Validation Schema
 const loginSchema = yup.object().shape({
-  email: yup.string().email("Invalid email format").required("Email is required"),
-  password: yup.string().min(6, "At least 6 characters required").required("Password is required"),
+  email: yup.string().required("User ID is required"),
+  password: yup.string().min(4, "At least 6 characters required").required("Password is required"),
 });
 
 const LoginScreen = () => {
@@ -186,9 +187,32 @@ const LoginScreen = () => {
 
   // ✅ Handle Login
   const handleLogin = async (data) => {
-    console.log("Submitted Data:", data);
-    await AsyncStorage.setItem('isLoggedIn', 'true');
-    router.replace('tabs');
+    const url = enverment.API_URL + '/login';
+
+    const header = {
+      'Content-Type': 'application/json',
+    }
+
+    const body = JSON.stringify({
+      "id": data.email,
+      "passwd": data.password
+    });
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: header,
+        body: body
+      })
+      const response = await res.json();
+      console.log(response);
+    } catch (error) {}
+
+    
+
+    // console.log("Submitted Data:", data);
+    // await AsyncStorage.setItem('isLoggedIn', 'true');
+    // router.replace('tabs');
   };
 
   return (
