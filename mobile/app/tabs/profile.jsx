@@ -1,10 +1,20 @@
 import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function ProfileScreen() {
+
+const Profile = () => {  
+  const router = useRouter();
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("isLoggedIn"); // Clear login state
+    router.replace("/"); // Redirect to login page
+  };
+
+
   return (
     <View className="flex-1 items-center  bg-gray-100">
       {/* Profile Picture */}
-      <View className="relative w-24 h-24 my-9 rounded-full">
+      <View className="relative w-32 h-32 bg-black mt-4 rounded-full">
         <Image
           source={require("../../assets/images/react-logo.png")} // Local image
           style={{ width: 96, height: 96, resizeMode: "cover", borderRadius: 10 }}
@@ -15,14 +25,16 @@ export default function ProfileScreen() {
       </View>
 
       {/* Profile Form */}
-      <View className="w-full max-w-md p-6 rounded-lg ">
-        <View className="space-y-4">
+      <View className="w-full max-w-md p-6 pt-2 h-full rounded-lg bg-cyan-400 rounded-t-[6%]">
+      <Text className="text-white text-center my-4">Amit Maity</Text>
+
+        <View className="space-y-4 p-4 bg-white rounded-2xl">
           {/* First Name */}
           <View>
             <Text className="text-gray-600">First name</Text>
             <TextInput
               placeholder="Apolade"
-              className="w-full p-3 mt-1 border rounded-lg focus:border-black"
+              className="w-full p-3 mt-1 border rounded-lg"
             />
           </View>
 
@@ -63,7 +75,42 @@ export default function ProfileScreen() {
             <Text className="text-white text-center">Save changes</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity className="w-full mt-4 p-3 bg-red-800 rounded-lg" onPress={handleLogout}>
+            <Text className="text-white text-center">Log Out</Text>
+          </TouchableOpacity>
       </View>
     </View>
   );
-}
+};
+
+
+export default Profile;
+
+
+// import { View, Text, TouchableOpacity } from "react-native";
+// import { useRouter } from "expo-router";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+// import "../global.css";
+
+// const Profile = () => {
+//   const router = useRouter();
+
+//   const handleLogout = async () => {
+//     await AsyncStorage.removeItem("isLoggedIn"); // Clear login state
+//     router.replace("/"); // Redirect to login page
+//   };
+
+//   return (
+//     <View className="flex-1 items-center justify-center">
+//       <Text className="text-2xl font-bold text-cyan-700">Profile Page</Text>
+//       <TouchableOpacity
+//         className="mt-4 px-6 py-2 bg-red-500 rounded-full"
+//         onPress={handleLogout}>
+//         <Text className="text-white text-lg">Logout</Text>
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
+
+// export default Profile;
+
