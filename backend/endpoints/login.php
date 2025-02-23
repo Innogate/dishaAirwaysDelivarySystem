@@ -14,7 +14,6 @@
             $response = new ApiResponse(200, "Success", ["token" => $jwt->generateToken(["user_id" => $user['id']])]);
             $response->toJson();
         } else {
-            http_response_code(401);
             $response = new ApiResponse(401, "Invalid credentials");
             $response->toJson();
         }

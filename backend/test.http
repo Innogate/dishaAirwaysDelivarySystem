@@ -1,13 +1,22 @@
 @apiUrl = http://localhost:8000
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiSU5XSzAwQTAwMDAxIn0.kiiHSJnop6qsdep7ZoJeZTTlknMMJfKCR1lhXfZu55U
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version
 Content-Type: application/json
 
-### login
-POST {{apiUrl}}/login
+
+### Login with the created user
+# @name login
+POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
     "id": "INWK00A00001",
     "passwd": "1234"
 }
+
+
+### VERIFY
+GET {{apiUrl}}/verify
+Content-Type: application/json
+Authorization: Bearer {{token}}
