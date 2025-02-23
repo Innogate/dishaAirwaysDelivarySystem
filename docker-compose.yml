@@ -37,6 +37,7 @@ services:
       dockerfile: Dockerfile.php
     container_name: php-container
     restart: unless-stopped
+    command: "bash start.sh"
     ports:
       - "8000:8000"
     volumes:
