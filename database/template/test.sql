@@ -25,7 +25,7 @@ SET default_table_access_method = heap;
 -- Name: brachs; Type: TABLE; Schema: public; Owner: test
 --
 
-CREATE TABLE IF NOT EXISTS public.brachs (
+CREATE TABLE public.brachs (
     id integer NOT NULL,
     name character varying NOT NULL,
     brachcode character varying NOT NULL,
@@ -68,7 +68,7 @@ ALTER SEQUENCE public.brachs_id_seq OWNED BY public.brachs.id;
 -- Name: employees; Type: TABLE; Schema: public; Owner: test
 --
 
-CREATE TABLE IF NOT EXISTS public.employees (
+CREATE TABLE public.employees (
     eid integer NOT NULL,
     userid character varying NOT NULL,
     createdat timestamp without time zone DEFAULT now(),
@@ -144,7 +144,7 @@ ALTER SEQUENCE public.pages_id_seq OWNED BY public.pages.id;
 -- Name: permissions; Type: TABLE; Schema: public; Owner: test
 --
 
-CREATE TABLE IF NOT EXISTS public.permissions (
+CREATE TABLE public.permissions (
     id integer NOT NULL,
     pageid integer NOT NULL,
     userid character varying NOT NULL,
@@ -183,7 +183,7 @@ ALTER SEQUENCE public.permissions_id_seq OWNED BY public.permissions.id;
 -- Name: users; Type: TABLE; Schema: public; Owner: test
 --
 
-CREATE TABLE IF NOT EXISTS public.users (
+CREATE TABLE public.users (
     id character varying NOT NULL,
     email character varying NOT NULL,
     password character varying NOT NULL,
@@ -200,7 +200,7 @@ ALTER TABLE public.users OWNER TO test;
 -- Name: usersinfo; Type: TABLE; Schema: public; Owner: test
 --
 
-CREATE TABLE IF NOT EXISTS public.usersinfo (
+CREATE TABLE public.usersinfo (
     id character varying NOT NULL,
     firstname character varying NOT NULL,
     lastname character varying NOT NULL,
@@ -242,6 +242,83 @@ ALTER TABLE ONLY public.pages ALTER COLUMN id SET DEFAULT nextval('public.pages_
 --
 
 ALTER TABLE ONLY public.permissions ALTER COLUMN id SET DEFAULT nextval('public.permissions_id_seq'::regclass);
+
+
+--
+-- Data for Name: brachs; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.brachs (id, name, brachcode, brachhead, brachcity, brachstate, brachcountry, createdat, createdby, updatedat, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: employees; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.employees (eid, userid, createdat, createdby, updatedat, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pages; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.pages (id, name, createdat, createdby, updatedat, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permissions; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.permissions (id, pageid, userid, createdat, createdby, updatedat, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.users (id, email, password, createdat, createdby, updatedat, status) FROM stdin;
+INWK00A00001	test@email.com	1234	2025-02-23 11:42:53.388154	0	2025-02-23 11:42:53.388154	t
+\.
+
+
+--
+-- Data for Name: usersinfo; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.usersinfo (id, firstname, lastname, phone, address, email, createdat, createdby, updatedat, status) FROM stdin;
+\.
+
+
+--
+-- Name: brachs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.brachs_id_seq', 1, false);
+
+
+--
+-- Name: employees_eid_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.employees_eid_seq', 1, false);
+
+
+--
+-- Name: pages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.pages_id_seq', 1, false);
+
+
+--
+-- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.permissions_id_seq', 1, false);
 
 
 --
