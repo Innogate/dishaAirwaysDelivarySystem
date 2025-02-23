@@ -11,10 +11,12 @@
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         // password_verify
         if ($user && $data['passwd'] == $user['password']) {
-            echo json_encode(["token" => $jwt->generateToken(["user_id" => $user['id']])]);
+            $response = new ApiResponse(200, "Success", ["token" => "value"]);
+            $response->toJson();
         } else {
             http_response_code(401);
-            echo json_encode(["error" => "Invalid credentials"]);
+            $response = new ApiResponse(401, "Invalid credentials", []);
+            $response->toJson();
         }
     });    
 ?>
