@@ -9,7 +9,7 @@ export default function BottomNav() {
 
   const routes = [
     { key: "home", title: "Home", icon: "home-outline", activeIcon: "home", path: "/" },
-    { key: "booking", title: "Booking", icon: "book-outline", activeIcon: "book", path: "/booking" },
+    { key: "booking", title: "Booking", icon: "book-outline", activeIcon: "book", path: "/pages/booking" },
     { key: "create", title: "Create", icon: "add-circle-outline", activeIcon: "add-circle", path: "/create" },
     { key: "profile", title: "Profile", icon: "person-outline", activeIcon: "person", path: "/profile" },
   ];
