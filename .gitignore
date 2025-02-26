@@ -1,5 +1,6 @@
 docker/containers/react-native/*
 database/data/*
+database/data
 database/data/.*
 .env
 composer.lock
