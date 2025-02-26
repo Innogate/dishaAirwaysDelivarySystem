@@ -9,13 +9,20 @@
         $data = json_decode(file_get_contents("php://input"), true);
         $stmt = $db->query("SELECT * FROM users WHERE id = ?", [$data['id']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user) {
+            $response = new ApiResponse(401, "User ID not matched");
+            $response->toJson();
+            return;
+        }
         // password_verify
-        if ($user && $data['passwd'] == $user['password']) {
+        if ($data['passwd'] == $user['password']) {
             $response = new ApiResponse(200, "Success", ["token" => $jwt->generateToken(["user_id" => $user['id']])]);
             $response->toJson();
+            return;
         } else {
-            $response = new ApiResponse(401, "Invalid credentials");
+            $response = new ApiResponse(401, "Password not matched");
             $response->toJson();
+            return;
         }
     });    
 ?>
