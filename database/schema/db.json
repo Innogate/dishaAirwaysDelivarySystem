@@ -219,5 +219,118 @@
             "type": "boolean",
             "default": "true"
         }
+    },
+    "contaner":{
+        "id": {
+            "type": "sirial",
+            "autoincrement": true,
+            "primary": true,
+            "not null": true
+        },
+        "bag_no":{
+            "type": "varchar",
+            "not null": true
+        },
+        "name": {
+            "type": "varchar",
+            "not null": true
+        },
+        "agentid":{
+            "type": "varchar",
+            "not null": true
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        }
+    },
+    "packages":{
+        "id": {
+            "type": "sting",
+            "primary": true,
+            "not null": true
+        },
+        "contaner_id":{
+            "type": "sirial",
+            "not null": false,
+            "foreignKey": "contaner.id"
+        },
+        "count":{
+            "type": "integer",
+            "not null": true
+        },
+        "value":{
+            "type": "integer",
+            "not null": true
+        },
+        "contains":{
+            "type": "varchar",
+            "not null": true
+        },
+        "charges":{
+            "type": "integer",
+            "not null": true
+        },
+        "shipper":{
+            "type": "varchar",
+            "not null": true
+        },
+        "CGST":{
+            "type": "integer",
+            "not null": true
+        },
+        "SGST":{
+            "type": "integer",
+            "not null": true
+        },
+        "IGST":{
+            "type": "integer",
+            "not null": true
+        },
+        "createdAt": {
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
+    },
+    "booking":{
+        "id": {
+            "type": "sirial",
+            "autoincrement": true,
+            "primary": true,
+            "not null": true
+        },
+        "packages_id":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "packages.id"
+        },
+        "createdAt":{
+            "type": "timestamp",
+            "default": "now()"
+        },
+        "createdBy":{
+            "type": "varchar",
+            "not null": true,
+            "foreignKey": "users.id"
+        },
+        "status": {
+            "type": "boolean",
+            "default": "true"
+        }
     }
+    
 }

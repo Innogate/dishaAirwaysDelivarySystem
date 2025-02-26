@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
--- Dumped by pg_dump version 17.2 (Debian 17.2-1+b2)
+-- Dumped by pg_dump version 17.3 (Debian 17.3-3)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,6 +20,43 @@ SET row_security = off;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: booking; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.booking (
+    id integer NOT NULL,
+    packages_id character varying NOT NULL,
+    createdat timestamp without time zone DEFAULT now(),
+    createdby character varying NOT NULL,
+    status boolean DEFAULT true
+);
+
+
+ALTER TABLE public.booking OWNER TO test;
+
+--
+-- Name: booking_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.booking_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.booking_id_seq OWNER TO test;
+
+--
+-- Name: booking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.booking_id_seq OWNED BY public.booking.id;
+
 
 --
 -- Name: brachs; Type: TABLE; Schema: public; Owner: test
@@ -65,6 +102,87 @@ ALTER SEQUENCE public.brachs_id_seq OWNED BY public.brachs.id;
 
 
 --
+-- Name: branches; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.branches (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    branchcode character varying NOT NULL,
+    branchhead character varying NOT NULL,
+    branchcity character varying NOT NULL,
+    branchstate character varying NOT NULL,
+    branchcountry character varying NOT NULL,
+    createdat timestamp without time zone DEFAULT now(),
+    createdby character varying NOT NULL,
+    updatedat timestamp without time zone DEFAULT now(),
+    status boolean DEFAULT true
+);
+
+
+ALTER TABLE public.branches OWNER TO test;
+
+--
+-- Name: branches_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.branches_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.branches_id_seq OWNER TO test;
+
+--
+-- Name: branches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.branches_id_seq OWNED BY public.branches.id;
+
+
+--
+-- Name: containers; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.containers (
+    id integer NOT NULL,
+    bag_no character varying NOT NULL,
+    name character varying NOT NULL,
+    agentid character varying NOT NULL,
+    createdat timestamp without time zone DEFAULT now(),
+    createdby character varying NOT NULL
+);
+
+
+ALTER TABLE public.containers OWNER TO test;
+
+--
+-- Name: containers_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.containers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.containers_id_seq OWNER TO test;
+
+--
+-- Name: containers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.containers_id_seq OWNED BY public.containers.id;
+
+
+--
 -- Name: employees; Type: TABLE; Schema: public; Owner: test
 --
 
@@ -100,6 +218,51 @@ ALTER SEQUENCE public.employees_eid_seq OWNER TO test;
 --
 
 ALTER SEQUENCE public.employees_eid_seq OWNED BY public.employees.eid;
+
+
+--
+-- Name: packages; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.packages (
+    id character varying NOT NULL,
+    container_id integer NOT NULL,
+    count integer NOT NULL,
+    value integer NOT NULL,
+    contains character varying NOT NULL,
+    charges integer NOT NULL,
+    shipper character varying NOT NULL,
+    cgst integer NOT NULL,
+    sgst integer NOT NULL,
+    igst integer NOT NULL,
+    createdat timestamp without time zone DEFAULT now(),
+    createdby character varying NOT NULL,
+    status boolean DEFAULT true
+);
+
+
+ALTER TABLE public.packages OWNER TO test;
+
+--
+-- Name: packages_container_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.packages_container_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.packages_container_id_seq OWNER TO test;
+
+--
+-- Name: packages_container_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.packages_container_id_seq OWNED BY public.packages.container_id;
 
 
 --
@@ -217,6 +380,13 @@ CREATE TABLE public.usersinfo (
 ALTER TABLE public.usersinfo OWNER TO test;
 
 --
+-- Name: booking id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.booking ALTER COLUMN id SET DEFAULT nextval('public.booking_id_seq'::regclass);
+
+
+--
 -- Name: brachs id; Type: DEFAULT; Schema: public; Owner: test
 --
 
@@ -224,10 +394,31 @@ ALTER TABLE ONLY public.brachs ALTER COLUMN id SET DEFAULT nextval('public.brach
 
 
 --
+-- Name: branches id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branches ALTER COLUMN id SET DEFAULT nextval('public.branches_id_seq'::regclass);
+
+
+--
+-- Name: containers id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.containers ALTER COLUMN id SET DEFAULT nextval('public.containers_id_seq'::regclass);
+
+
+--
 -- Name: employees eid; Type: DEFAULT; Schema: public; Owner: test
 --
 
 ALTER TABLE ONLY public.employees ALTER COLUMN eid SET DEFAULT nextval('public.employees_eid_seq'::regclass);
+
+
+--
+-- Name: packages container_id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.packages ALTER COLUMN container_id SET DEFAULT nextval('public.packages_container_id_seq'::regclass);
 
 
 --
@@ -245,6 +436,14 @@ ALTER TABLE ONLY public.permissions ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Data for Name: booking; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.booking (id, packages_id, createdat, createdby, status) FROM stdin;
+\.
+
+
+--
 -- Data for Name: brachs; Type: TABLE DATA; Schema: public; Owner: test
 --
 
@@ -253,10 +452,34 @@ COPY public.brachs (id, name, brachcode, brachhead, brachcity, brachstate, brach
 
 
 --
+-- Data for Name: branches; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.branches (id, name, branchcode, branchhead, branchcity, branchstate, branchcountry, createdat, createdby, updatedat, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: containers; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.containers (id, bag_no, name, agentid, createdat, createdby) FROM stdin;
+\.
+
+
+--
 -- Data for Name: employees; Type: TABLE DATA; Schema: public; Owner: test
 --
 
 COPY public.employees (eid, userid, createdat, createdby, updatedat, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: packages; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.packages (id, container_id, count, value, contains, charges, shipper, cgst, sgst, igst, createdat, createdby, status) FROM stdin;
 \.
 
 
@@ -294,6 +517,13 @@ COPY public.usersinfo (id, firstname, lastname, phone, address, email, createdat
 
 
 --
+-- Name: booking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.booking_id_seq', 1, false);
+
+
+--
 -- Name: brachs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
@@ -301,10 +531,31 @@ SELECT pg_catalog.setval('public.brachs_id_seq', 1, false);
 
 
 --
+-- Name: branches_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.branches_id_seq', 1, false);
+
+
+--
+-- Name: containers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.containers_id_seq', 1, false);
+
+
+--
 -- Name: employees_eid_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
 SELECT pg_catalog.setval('public.employees_eid_seq', 1, false);
+
+
+--
+-- Name: packages_container_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.packages_container_id_seq', 1, false);
 
 
 --
@@ -322,6 +573,14 @@ SELECT pg_catalog.setval('public.permissions_id_seq', 1, false);
 
 
 --
+-- Name: booking booking_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.booking
+    ADD CONSTRAINT booking_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: brachs brachs_pkey; Type: CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -330,11 +589,35 @@ ALTER TABLE ONLY public.brachs
 
 
 --
+-- Name: branches branches_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branches
+    ADD CONSTRAINT branches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: containers containers_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.containers
+    ADD CONSTRAINT containers_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: employees employees_pkey; Type: CONSTRAINT; Schema: public; Owner: test
 --
 
 ALTER TABLE ONLY public.employees
     ADD CONSTRAINT employees_pkey PRIMARY KEY (eid);
+
+
+--
+-- Name: packages packages_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.packages
+    ADD CONSTRAINT packages_pkey PRIMARY KEY (id);
 
 
 --
@@ -378,6 +661,22 @@ ALTER TABLE ONLY public.usersinfo
 
 
 --
+-- Name: booking booking_createdby_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.booking
+    ADD CONSTRAINT booking_createdby_fkey FOREIGN KEY (createdby) REFERENCES public.users(id);
+
+
+--
+-- Name: booking booking_packages_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.booking
+    ADD CONSTRAINT booking_packages_id_fkey FOREIGN KEY (packages_id) REFERENCES public.packages(id);
+
+
+--
 -- Name: brachs brachs_brachhead_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -394,6 +693,30 @@ ALTER TABLE ONLY public.brachs
 
 
 --
+-- Name: branches branches_branchhead_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branches
+    ADD CONSTRAINT branches_branchhead_fkey FOREIGN KEY (branchhead) REFERENCES public.users(id);
+
+
+--
+-- Name: branches branches_createdby_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branches
+    ADD CONSTRAINT branches_createdby_fkey FOREIGN KEY (createdby) REFERENCES public.users(id);
+
+
+--
+-- Name: containers containers_createdby_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.containers
+    ADD CONSTRAINT containers_createdby_fkey FOREIGN KEY (createdby) REFERENCES public.users(id);
+
+
+--
 -- Name: employees employees_createdby_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -407,6 +730,22 @@ ALTER TABLE ONLY public.employees
 
 ALTER TABLE ONLY public.employees
     ADD CONSTRAINT employees_userid_fkey FOREIGN KEY (userid) REFERENCES public.users(id);
+
+
+--
+-- Name: packages packages_container_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.packages
+    ADD CONSTRAINT packages_container_id_fkey FOREIGN KEY (container_id) REFERENCES public.containers(id);
+
+
+--
+-- Name: packages packages_createdby_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.packages
+    ADD CONSTRAINT packages_createdby_fkey FOREIGN KEY (createdby) REFERENCES public.users(id);
 
 
 --
