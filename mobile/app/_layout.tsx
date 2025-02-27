@@ -1,30 +1,29 @@
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import TopBar from './components/TopBar';
 import BottomNav from './components/BottomNav';
 import { View, StyleSheet } from 'react-native';
 
 export default function Layout() {
-  const pathSegments = window.location.pathname.split('/');
+  const pathname = usePathname(); // Get the current route path
+  const pathSegments = pathname.split('/');
   const lastSegment = pathSegments[pathSegments.length - 1] || pathSegments[pathSegments.length - 2];
 
   function buttomNave() {
     if (lastSegment === 'login') {
-      return;
+      return null;
     }
-    return (<BottomNav />);
+    return <BottomNav />;
   }
 
   function topBar() {
     if (lastSegment === 'login') {
-      return;
+      return null;
     }
-    return (<TopBar />);
+    return <TopBar />;
   }
-  
 
   return (
     <View style={styles.container}>
-
       {topBar()}
 
       {/* Page Content (Acts like <router-outlet>) */}
@@ -33,7 +32,6 @@ export default function Layout() {
       </View>
 
       {buttomNave()}
-      
     </View>
   );
 }
