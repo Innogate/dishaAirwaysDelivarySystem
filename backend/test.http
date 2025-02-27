@@ -1,5 +1,5 @@
 @apiUrl = http://localhost:8000
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiSU5XSzAwQTAwMDAxIn0.kiiHSJnop6qsdep7ZoJeZTTlknMMJfKCR1lhXfZu55U
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiSU5XQktPTDBBQjAwMDEifQ.W4q6awtgwWZt2otWrikZpiVQY7r57TvixbCKhCnpcTQ
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version
 Content-Type: application/json
@@ -18,5 +18,10 @@ Content-Type: application/json
 
 ### VERIFY
 GET {{apiUrl}}/verify
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+#### BOOKING
+GET {{apiUrl}}/booking
 Content-Type: application/json
 Authorization: Bearer {{token}}
