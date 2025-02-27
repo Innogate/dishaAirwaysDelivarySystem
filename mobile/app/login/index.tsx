@@ -5,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import globalStorage from '../components/GlobalStorage';
 // import { enverment } from './enverment';
 // import "../global.css"
 const loginSchema = yup.object().shape({
@@ -13,6 +14,7 @@ const loginSchema = yup.object().shape({
 });
 
 const LoginScreen = () => {
+  globalStorage.setTemp("pageTitle","Login")
   const router = useRouter();
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(loginSchema),
