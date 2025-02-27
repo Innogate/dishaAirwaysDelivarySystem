@@ -6,7 +6,7 @@ import { useRouter } from "expo-router"; // ✅ Import from expo-router
 const { width } = Dimensions.get("window");
 
 const menuItems = [
-  { id: 1, title: "Booking", icon: "shopping-cart", screen: "/booking" }, // ✅ Correct path
+  { id: 1, title: "Booking", icon: "shopping-cart", screen: "/pages/booking" }, // ✅ Correct path
   { id: 2, title: "Selling", icon: "store" },
   { id: 3, title: "Trades", icon: "briefcase" },
   { id: 4, title: "Videos", icon: "play-circle" },
