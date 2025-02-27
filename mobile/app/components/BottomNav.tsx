@@ -1,34 +1,50 @@
-import { View, TouchableOpacity, Text } from "react-native";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, Pressable } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function BottomNav() {
+const BottomNav = () => {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const routes = [
-    { key: "home", title: "Home", icon: "home-outline", activeIcon: "home", path: "/" },
-    { key: "booking", title: "Booking", icon: "book-outline", activeIcon: "book", path: "/pages/booking" },
-    { key: "create", title: "Create", icon: "add-circle-outline", activeIcon: "add-circle", path: "/create" },
-    { key: "profile", title: "Profile", icon: "person-outline", activeIcon: "person", path: "/profile" },
-  ];
-
-  const handleTabPress = (index: number) => {
+  function setActive(index: number, path: string) {
     setActiveIndex(index);
-    router.push(routes[index].path);
-  };
+    router.push(path);
+  }
 
   return (
-    <View className="flex-row absolute bottom-3 left-5 right-5 bg-white rounded-2xl shadow-lg h-16 items-center justify-around">
-      {routes.map((route, i) => (
-        <TouchableOpacity key={route.key} className="items-center" onPress={() => handleTabPress(i)}>
-          <Ionicons name={activeIndex === i ? route.activeIcon : route.icon} size={24} color={activeIndex === i ? "#0d9488" : "#6b7280"} />
-          <Text className={`text-xs mt-1 ${activeIndex === i ? "text-teal-600 font-bold" : "text-gray-500"}`}>
-            {route.title}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    <View className="flex-row justify-around bg-white py-3 border-t border-gray-200">
+      {/* Home */}
+      <Pressable 
+        className="items-center" 
+        onPress={() => setActive(0, "/home")} 
+        android_ripple={{ borderless: true, radius: 0 }}
+      >
+        <Ionicons name={activeIndex === 0 ? "home" : "home-outline"} size={24} color={activeIndex === 0 ? "#0d9488" : "#6b7280"} />
+        <Text className={`text-xs mt-1 ${activeIndex === 0 ? "text-teal-600 font-bold" : "text-gray-500"}`}>Home</Text>
+      </Pressable>
+
+      {/* Booking */}
+      <Pressable 
+        className="items-center" 
+        onPress={() => setActive(1, "/booking")} 
+        android_ripple={{ borderless: true, radius: 0 }}
+      >
+        <Ionicons name={activeIndex === 1 ? "book" : "book-outline"} size={24} color={activeIndex === 1 ? "#0d9488" : "#6b7280"} />
+        <Text className={`text-xs mt-1 ${activeIndex === 1 ? "text-teal-600 font-bold" : "text-gray-500"}`}>Booking</Text>
+      </Pressable>
+
+      {/* Profile */}
+      <Pressable 
+        className="items-center" 
+        onPress={() => setActive(2, "/login")} 
+        android_ripple={{ borderless: true, radius: 0 }}
+      >
+        <Ionicons name={activeIndex === 2 ? "person" : "person-outline"} size={24} color={activeIndex === 2 ? "#0d9488" : "#6b7280"} />
+        <Text className={`text-xs mt-1 ${activeIndex === 2 ? "text-teal-600 font-bold" : "text-gray-500"}`}>Profile</Text>
+      </Pressable>
     </View>
   );
-}
+};
+
+export default BottomNav;
