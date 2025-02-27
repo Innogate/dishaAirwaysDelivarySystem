@@ -6,7 +6,7 @@ import * as yup from 'yup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import globalStorage from '../components/GlobalStorage';
-// import { enverment } from './enverment';
+import { environment } from '../environment/environment';
 // import "../global.css"
 const loginSchema = yup.object().shape({
   email: yup.string().required("User ID is required"),
