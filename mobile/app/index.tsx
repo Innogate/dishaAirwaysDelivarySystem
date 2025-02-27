@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { View, Text } from "react-native";
 import { useRouter, useRootNavigationState } from "expo-router";
+import globalStorage from "./components/GlobalStorage";
 import '../global.css'
 export default function LandingScreen() {
   const router = useRouter();
   const navigationState = useRootNavigationState();
-
+  globalStorage.setTemp("pageTitle","Login")
   useEffect(() => {
     if (navigationState?.key) {
       // router.push("/login");

@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
-
+import globalStorage from './GlobalStorage';
 export default function TopBar() {
+  let title = globalStorage.getValue('pageTitle');
   return (
     <View style={styles.topBar}>
-      <Text style={styles.title}>My App</Text>
+      <Text style={styles.title}>{title}</Text>
     </View>
   );
 }
