@@ -4,7 +4,7 @@
             "type": "varchar",
             "primary": true
         },
-        "email": {
+        "moible": {
             "type": "varchar",
             "unique": true,
             "not null": true
@@ -43,10 +43,6 @@
             "not null": true
         },
         "lastName": {
-            "type": "varchar",
-            "not null": true
-        },
-        "phone": {
             "type": "varchar",
             "not null": true
         },
@@ -166,6 +162,10 @@
             "type": "sirial",
             "not null": true,
             "foreignKey": "pages.id"
+        },
+        "permitioncode":{
+            "type": "varchar",
+            "not null": true
         },
         "userId":{
             "type": "varchar",

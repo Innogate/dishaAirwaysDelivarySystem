@@ -59,49 +59,6 @@ ALTER SEQUENCE public.booking_id_seq OWNED BY public.booking.id;
 
 
 --
--- Name: brachs; Type: TABLE; Schema: public; Owner: test
---
-
-CREATE TABLE public.brachs (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    brachcode character varying NOT NULL,
-    brachhead character varying NOT NULL,
-    brachcity character varying NOT NULL,
-    brachstate character varying NOT NULL,
-    brachcountry character varying NOT NULL,
-    createdat timestamp without time zone DEFAULT now(),
-    createdby character varying NOT NULL,
-    updatedat timestamp without time zone DEFAULT now(),
-    status boolean DEFAULT true
-);
-
-
-ALTER TABLE public.brachs OWNER TO test;
-
---
--- Name: brachs_id_seq; Type: SEQUENCE; Schema: public; Owner: test
---
-
-CREATE SEQUENCE public.brachs_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.brachs_id_seq OWNER TO test;
-
---
--- Name: brachs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
---
-
-ALTER SEQUENCE public.brachs_id_seq OWNED BY public.brachs.id;
-
-
---
 -- Name: branches; Type: TABLE; Schema: public; Owner: test
 --
 
@@ -311,6 +268,7 @@ CREATE TABLE public.permissions (
     id integer NOT NULL,
     pageid integer NOT NULL,
     userid character varying NOT NULL,
+    permitioncode character varying NOT NULL,
     createdat timestamp without time zone DEFAULT now(),
     createdby character varying NOT NULL,
     updatedat timestamp without time zone DEFAULT now(),
@@ -348,7 +306,7 @@ ALTER SEQUENCE public.permissions_id_seq OWNED BY public.permissions.id;
 
 CREATE TABLE public.users (
     id character varying NOT NULL,
-    email character varying NOT NULL,
+    mobile character varying NOT NULL,
     password character varying NOT NULL,
     createdat timestamp without time zone DEFAULT now(),
     createdby character varying NOT NULL,
@@ -367,7 +325,6 @@ CREATE TABLE public.usersinfo (
     id character varying NOT NULL,
     firstname character varying NOT NULL,
     lastname character varying NOT NULL,
-    phone character varying NOT NULL,
     address character varying NOT NULL,
     email character varying NOT NULL,
     createdat timestamp without time zone DEFAULT now(),
@@ -384,13 +341,6 @@ ALTER TABLE public.usersinfo OWNER TO test;
 --
 
 ALTER TABLE ONLY public.booking ALTER COLUMN id SET DEFAULT nextval('public.booking_id_seq'::regclass);
-
-
---
--- Name: brachs id; Type: DEFAULT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.brachs ALTER COLUMN id SET DEFAULT nextval('public.brachs_id_seq'::regclass);
 
 
 --
@@ -444,18 +394,12 @@ COPY public.booking (id, packages_id, createdat, createdby, status) FROM stdin;
 
 
 --
--- Data for Name: brachs; Type: TABLE DATA; Schema: public; Owner: test
---
-
-COPY public.brachs (id, name, brachcode, brachhead, brachcity, brachstate, brachcountry, createdat, createdby, updatedat, status) FROM stdin;
-\.
-
-
---
 -- Data for Name: branches; Type: TABLE DATA; Schema: public; Owner: test
 --
 
 COPY public.branches (id, name, branchcode, branchhead, branchcity, branchstate, branchcountry, createdat, createdby, updatedat, status) FROM stdin;
+1	Kolkata	001	INWBKOL0AB0001	Kolkata	WB	IN	2025-02-27 09:58:26.827704	INWBKOL0AB0001	2025-02-27 09:58:26.827704	t
+3	Kharagpur	002	INWBKOL0AB0001	Kharagpur	WB	IN	2025-02-27 10:00:34.086258	INWBKOL0AB0001	2025-02-27 10:00:34.086258	t
 \.
 
 
@@ -488,6 +432,7 @@ COPY public.packages (id, container_id, count, value, contains, charges, shipper
 --
 
 COPY public.pages (id, name, createdat, createdby, updatedat, status) FROM stdin;
+1	booking	2025-02-27 09:57:08.248952	INWBKOL0AB0001	2025-02-27 09:57:08.248952	t
 \.
 
 
@@ -495,7 +440,8 @@ COPY public.pages (id, name, createdat, createdby, updatedat, status) FROM stdin
 -- Data for Name: permissions; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.permissions (id, pageid, userid, createdat, createdby, updatedat, status) FROM stdin;
+COPY public.permissions (id, pageid, userid, permitioncode, createdat, createdby, updatedat, status) FROM stdin;
+2	1	INWBKOL0AB0001	1111	2025-02-27 09:57:16.370977	INWBKOL0AB0001	2025-02-27 09:57:16.370977	t
 \.
 
 
@@ -503,8 +449,8 @@ COPY public.permissions (id, pageid, userid, createdat, createdby, updatedat, st
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.users (id, email, password, createdat, createdby, updatedat, status) FROM stdin;
-INWK00A00001	test@email.com	1234	2025-02-23 11:42:53.388154	0	2025-02-23 11:42:53.388154	t
+COPY public.users (id, mobile, password, createdat, createdby, updatedat, status) FROM stdin;
+INWBKOL0AB0001	1234567890	1234	2025-02-27 09:51:21.398873	0	2025-02-27 09:51:21.398873	t
 \.
 
 
@@ -512,7 +458,8 @@ INWK00A00001	test@email.com	1234	2025-02-23 11:42:53.388154	0	2025-02-23 11:42:5
 -- Data for Name: usersinfo; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.usersinfo (id, firstname, lastname, phone, address, email, createdat, createdby, updatedat, status) FROM stdin;
+COPY public.usersinfo (id, firstname, lastname, address, email, createdat, createdby, updatedat, status) FROM stdin;
+INWBKOL0AB0001	Admin	Account	NO	email@email.com	2025-02-27 09:54:00.697788	INWBKOL0AB0001	2025-02-27 09:54:00.697788	t
 \.
 
 
@@ -524,17 +471,10 @@ SELECT pg_catalog.setval('public.booking_id_seq', 1, false);
 
 
 --
--- Name: brachs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
---
-
-SELECT pg_catalog.setval('public.brachs_id_seq', 1, false);
-
-
---
 -- Name: branches_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.branches_id_seq', 1, false);
+SELECT pg_catalog.setval('public.branches_id_seq', 3, true);
 
 
 --
@@ -562,14 +502,14 @@ SELECT pg_catalog.setval('public.packages_container_id_seq', 1, false);
 -- Name: pages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.pages_id_seq', 1, false);
+SELECT pg_catalog.setval('public.pages_id_seq', 1, true);
 
 
 --
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.permissions_id_seq', 1, false);
+SELECT pg_catalog.setval('public.permissions_id_seq', 2, true);
 
 
 --
@@ -578,14 +518,6 @@ SELECT pg_catalog.setval('public.permissions_id_seq', 1, false);
 
 ALTER TABLE ONLY public.booking
     ADD CONSTRAINT booking_pkey PRIMARY KEY (id);
-
-
---
--- Name: brachs brachs_pkey; Type: CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.brachs
-    ADD CONSTRAINT brachs_pkey PRIMARY KEY (id);
 
 
 --
@@ -637,11 +569,11 @@ ALTER TABLE ONLY public.permissions
 
 
 --
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: test
+-- Name: users users_mobile_key; Type: CONSTRAINT; Schema: public; Owner: test
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_email_key UNIQUE (email);
+    ADD CONSTRAINT users_mobile_key UNIQUE (mobile);
 
 
 --
@@ -674,22 +606,6 @@ ALTER TABLE ONLY public.booking
 
 ALTER TABLE ONLY public.booking
     ADD CONSTRAINT booking_packages_id_fkey FOREIGN KEY (packages_id) REFERENCES public.packages(id);
-
-
---
--- Name: brachs brachs_brachhead_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.brachs
-    ADD CONSTRAINT brachs_brachhead_fkey FOREIGN KEY (brachhead) REFERENCES public.users(id);
-
-
---
--- Name: brachs brachs_createdby_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.brachs
-    ADD CONSTRAINT brachs_createdby_fkey FOREIGN KEY (createdby) REFERENCES public.users(id);
 
 
 --

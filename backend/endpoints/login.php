@@ -7,7 +7,7 @@
         $db = new Database();
         $jwt = new JwtHandler();
         $data = json_decode(file_get_contents("php://input"), true);
-        $stmt = $db->query("SELECT * FROM users WHERE id = ?", [$data['id']]);
+        $stmt = $db->query("SELECT * FROM users WHERE id = ? OR mobile = ?", [$data['id'], $data['id']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$user) {
             $response = new ApiResponse(401, "User ID not matched");

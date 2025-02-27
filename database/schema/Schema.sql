@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR PRIMARY KEY,
-    email VARCHAR NOT NULL UNIQUE,
+    mobile VARCHAR NOT NULL UNIQUE,
     password VARCHAR NOT NULL,
     createdAt TIMESTAMP DEFAULT now(),
     createdBy VARCHAR NOT NULL,
@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS usersInfo (
     id VARCHAR PRIMARY KEY REFERENCES users(id),
     firstName VARCHAR NOT NULL,
     lastName VARCHAR NOT NULL,
-    phone VARCHAR NOT NULL,
     address VARCHAR NOT NULL,
     email VARCHAR NOT NULL,
     createdAt TIMESTAMP DEFAULT now(),
@@ -48,6 +47,7 @@ CREATE TABLE IF NOT EXISTS permissions (
     id SERIAL PRIMARY KEY,
     pageId INTEGER NOT NULL REFERENCES pages(id),
     userId VARCHAR NOT NULL REFERENCES users(id),
+    permitioncode VARCHAR NOT NULL,
     createdAt TIMESTAMP DEFAULT now(),
     createdBy VARCHAR NOT NULL REFERENCES users(id),
     updatedAt TIMESTAMP DEFAULT now(),
