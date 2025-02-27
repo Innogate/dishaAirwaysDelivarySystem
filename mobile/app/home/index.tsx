@@ -7,7 +7,7 @@ const { width } = Dimensions.get("window");
 
 const menuItems = [
   { id: 1, title: "Booking", icon: "shopping-cart", screen: "/pages/booking" }, // ✅ Correct path
-  { id: 2, title: "Selling", icon: "store" },
+  { id: 2, title: "Booking Status", icon: "store", screen: "/pages/bookingstatus" },
   { id: 3, title: "Trades", icon: "briefcase" },
   { id: 4, title: "Videos", icon: "play-circle" },
   { id: 5, title: "Deals", icon: "percent" },
