@@ -11,11 +11,7 @@ const menuItems = [
   { id: 3, title: "Trades", icon: "briefcase" },
   { id: 4, title: "Videos", icon: "play-circle" },
   { id: 5, title: "Deals", icon: "percent" },
-<<<<<<< Updated upstream
-  { id: 6, title: "Case Study", icon: "book-open" },
-=======
   { id: 6, title: "Master", icon: "book-open",  screen: "/pages/master" },
->>>>>>> Stashed changes
   { id: 7, title: "Research", icon: "search" },
   { id: 8, title: "Finance", icon: "money-bill-wave" },
 ];
