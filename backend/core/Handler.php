@@ -7,7 +7,7 @@
             $permission = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$permission || !isset($permission['permission_code'])) {
-                $response = new ApiResponse(401,"Unauthorized access", "", 300);
+                $response = new ApiResponse(401,"Don't have access this page", "", 300);
                 $response->toJson();
             }
             if ($permission['permission_code'] == "11111") {

@@ -103,12 +103,14 @@ global $pageID;
         try {
             $db->beginTransaction();
             
-            $stmt = $db->query("SELECT id FROM companies WHERE id = ?", [$company_id]);
-            if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
+            $stmt = $db->query("SELECT id,contact_no FROM companies WHERE id = ?", [$company_id]);
+            $company_info = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$company_info) {
                 (new ApiResponse(404, "Company not found."))->toJson();
                 return;
             }
             
+            $db->query("DELETE FROM user WHERE mobile = ?", [$company_info["contact_no"]]);
             $db->query("DELETE FROM companies WHERE id = ?", [$company_id]);
             
             $db->commit();

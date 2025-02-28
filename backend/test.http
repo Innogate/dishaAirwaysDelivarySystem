@@ -35,7 +35,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "mobile": "9876543210",
+    "mobile": "9876543212",
     "password": "securePass123",
     "first_name": "John",
     "last_name": "Doe",
@@ -51,7 +51,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": "1"
+    "user_id": "2"
 }
 
 #### GET ALL STATES
@@ -96,7 +96,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "city_name": "Madnipur",
+    "city_name": "Kharagpur",
     "state_id": 1
 }
 
@@ -106,7 +106,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "city_id": "1"
+    "city_id": "2"
 }
 
 #### GET ALL COMPANIES
@@ -144,4 +144,77 @@ Authorization: Bearer {{token}}
 
 {
     "company_id": "1"
+}
+
+
+### Get Branches (Pagination)
+POST {{apiUrl}}/master/branches
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "from": 0
+}
+
+### Create a New Branch
+POST {{apiUrl}}/master/branches/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "company_id": 1,
+    "name": "New Branch",
+    "address": "123 Street, City",
+    "alias_name": "Nbranch",
+    "city_id": 1,
+    "state_id": 1,
+    "pin_code": "123456",
+    "contact_no": "9876543210",
+    "email": "branch@example.com",
+    "gst_no": 9090,
+    "cin_no": 9090,
+    "udyam_no": 9090,
+    "logo": "u"
+}
+
+### Delete a Branch
+POST {{apiUrl}}/master/branches/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "branch_id": 5
+}
+
+
+### Fetch Employees
+POST {{apiUrl}}/master/employees
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "from": 0
+}
+
+### Create New Employee
+POST {{apiUrl}}/master/employees/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "user_id": "3",
+  "address": "123 Main St",
+  "adhara_no": "123456789012",
+  "joining_date": "2025-02-28",
+  "branch_id": "5",
+  "first_name": "John"
+}
+
+### Delete Employee
+POST {{apiUrl}}/master/employees/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "employee_id": 1
 }
