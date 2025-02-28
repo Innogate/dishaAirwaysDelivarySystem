@@ -1,6 +1,9 @@
 @apiUrl = http://localhost:8000
 @token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI
+<<<<<<< HEAD
 
+=======
+>>>>>>> ba880b0 (states and citis master)
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version
 Content-Type: application/json
@@ -20,12 +23,18 @@ GET {{apiUrl}}/verify
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
+<<<<<<< HEAD
 #### GET ALL USERS
 POST {{apiUrl}}/master/users
+=======
+#### GET ALL STATES
+POST {{apiUrl}}/master/states
+>>>>>>> ba880b0 (states and citis master)
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
+<<<<<<< HEAD
     "from": 0
 }
 
@@ -60,6 +69,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
+=======
+>>>>>>> ba880b0 (states and citis master)
     "from":0
 }
 
@@ -72,16 +83,28 @@ Authorization: Bearer {{token}}
     "state_name": "West Bengal"
 }
 
+<<<<<<< HEAD
 #### DELETE STATE
+=======
+#### ADD NEW STATE
+>>>>>>> ba880b0 (states and citis master)
 POST {{apiUrl}}/master/states/delete
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
+<<<<<<< HEAD
     "state_id": "1"
 }
 
 #### GET ALL CITIES
+=======
+    "state_id": "1",
+}
+
+
+#### GET ALL Cities
+>>>>>>> ba880b0 (states and citis master)
 POST {{apiUrl}}/master/cities
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -90,21 +113,38 @@ Authorization: Bearer {{token}}
     "from":0
 }
 
+<<<<<<< HEAD
 #### ADD NEW CITY
+=======
+#### ADD NEW Cities
+>>>>>>> ba880b0 (states and citis master)
 POST {{apiUrl}}/master/cities/new
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
+<<<<<<< HEAD
     "city_name": "Madnipur",
     "state_id": 1
 }
 
 #### DELETE CITY
+=======
+    "city_name": "Kolkata",
+    "state_id": 1
+}
+
+#### ADD NEW Cities
+>>>>>>> ba880b0 (states and citis master)
 POST {{apiUrl}}/master/cities/delete
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
+<<<<<<< HEAD
     "city_id": "1"
 }
+=======
+    "city_id": "1",
+}
+>>>>>>> ba880b0 (states and citis master)

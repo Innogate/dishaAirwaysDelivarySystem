@@ -673,7 +673,10 @@ COPY public.pages (id, name, created_at, created_by, updated_at, status) FROM st
 1	booking	2025-02-28 15:40:18.355518	1	2025-02-28 15:40:18.355518	t
 2	states	2025-02-28 15:40:30.739977	1	2025-02-28 15:40:30.739977	t
 3	cities	2025-02-28 16:33:08.449284	1	2025-02-28 16:33:08.449284	t
+<<<<<<< HEAD
 4	users	2025-02-28 16:51:44.044371	1	2025-02-28 16:51:44.044371	t
+=======
+>>>>>>> ba880b0 (states and citis master)
 \.
 
 
@@ -685,7 +688,10 @@ COPY public.permissions (id, page_id, permission_code, user_id, created_at, crea
 1	1	11111	1	2025-02-28 15:41:45.639858	1	2025-02-28 15:41:45.639858	t
 2	2	11111	1	2025-02-28 15:42:02.220213	1	2025-02-28 15:42:02.220213	t
 3	3	11111	1	2025-02-28 16:34:06.950874	1	2025-02-28 16:34:06.950874	t
+<<<<<<< HEAD
 4	4	11111	1	2025-02-28 16:52:33.101131	1	2025-02-28 16:52:33.101131	t
+=======
+>>>>>>> ba880b0 (states and citis master)
 \.
 
 
@@ -769,14 +775,22 @@ SELECT pg_catalog.setval('public.packages_id_seq', 1, false);
 -- Name: pages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
+<<<<<<< HEAD
 SELECT pg_catalog.setval('public.pages_id_seq', 5, true);
+=======
+SELECT pg_catalog.setval('public.pages_id_seq', 4, true);
+>>>>>>> ba880b0 (states and citis master)
 
 
 --
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
+<<<<<<< HEAD
 SELECT pg_catalog.setval('public.permissions_id_seq', 4, true);
+=======
+SELECT pg_catalog.setval('public.permissions_id_seq', 3, true);
+>>>>>>> ba880b0 (states and citis master)
 
 
 --
