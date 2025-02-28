@@ -17,11 +17,7 @@
 
         $db = new Database();
         $stmt = $db->query("SELECT * FROM states LIMIT 10 OFFSET ?", [$data["from"]]);
-<<<<<<< HEAD
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
-=======
-        $list = $stmt->fetch(PDO::FETCH_ASSOC);
->>>>>>> ba880b0 (states and citis master)
         if (!$list) {
             $list = [];
         }
