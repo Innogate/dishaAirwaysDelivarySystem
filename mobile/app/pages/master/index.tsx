@@ -6,9 +6,9 @@ import { useRouter } from "expo-router"; // ✅ Import from expo-router
 const { width } = Dimensions.get("window");
 
 const menuItems = [
-  { id: 1, title: "Booking", icon: "shopping-cart", screen: "/pages/booking" }, // ✅ Correct path
-  { id: 2, title: "Booking Status", icon: "store", screen: "/pages/bookingstatus" },
-  { id: 3, title: "Master", icon: "book-open", screen: "/pages/master/" },
+  { id: 1, title: "Company Master", icon: "users", screen: "/pages/master/company_master" }, // ✅ Correct path
+  { id: 2, title: "Branch Master", icon: "building", screen: "/pages/master/branch_master" },
+  { id: 3, title: "Employee Master", icon: "book-open", screen: "/pages/master/employee_master" },
 ];
 
 const MenuGrid = () => {
