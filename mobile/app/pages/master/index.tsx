@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useRouter } from "expo-router"; // ✅ Import from expo-router
-// import booking from "./booking";
+import { useRouter } from "expo-router";
 const { width } = Dimensions.get("window");
 
 const menuItems = [
-  { id: 1, title: "Company Master", icon: "users", screen: "/pages/master/company_master" }, // ✅ Correct path
+  { id: 1, title: "Company Master", icon: "users", screen: "/pages/master/company_master" },
   { id: 2, title: "Branch Master", icon: "building", screen: "/pages/master/branch_master" },
   { id: 3, title: "Employee Master", icon: "book-open", screen: "/pages/master/employee_master" },
+  { id: 4, title: "User Master", icon: "book-open", screen: "/pages/master/user_master" },
+  { id: 5, title: "States Master", icon: "book-open", screen: "/pages/master/states_master" },
+  { id: 6, title: "City Master", icon: "book-open", screen: "/pages/master/city_master" },
 ];
 
 const MenuGrid = () => {
   const [selected, setSelected] = useState(1);
-  const router = useRouter(); // ✅ Use router for navigation
+  const router = useRouter();
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f3f4f6", padding: 16 }}>
@@ -29,7 +31,7 @@ const MenuGrid = () => {
               onPress={() => {
                 setSelected(item.id);
                 if (item.screen) {
-                  router.push(item.screen as any); // ✅ Navigate correctly
+                  router.push(item.screen as any);
                   console.log("Navigating to:", item.screen);
                   // router.push(booking);
                 }
