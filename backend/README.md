@@ -2,7 +2,10 @@
 ## 101 : Invalid Tokon
 # login : 200
 # Permition: 300
-## 301 : Dont have read permition
-## 302 : Dont have Write permition
-## 303 : Dont Have Update permition
-## 304 : Dont Have Delete permition
+
+
+# PAGE IDS
+1. Booking
+2. States
+3. Cities
+4. Users

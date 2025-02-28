@@ -2,175 +2,179 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     mobile VARCHAR NOT NULL UNIQUE,
     password VARCHAR NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy VARCHAR NOT NULL,
-    updatedAt TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE userInfo (
+CREATE TABLE user_info (
     id SERIAL PRIMARY KEY NOT NULL,
-    firstName VARCHAR NOT NULL,
-    lastName VARCHAR NOT NULL,
+    first_name VARCHAR NOT NULL,
+    last_name VARCHAR NOT NULL,
     gender VARCHAR NOT NULL,
-    birthDate TIMESTAMP NOT NULL,
+    birth_date TIMESTAMP NOT NULL,
     address VARCHAR NOT NULL,
     email VARCHAR NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    updatedAt TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (createdBy) REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (id) REFERENCES users(id)
 );
-
 
 CREATE TABLE states (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    FOREIGN KEY (createdBy) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE cities (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NOT NULL,
-    state SERIAL NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    FOREIGN KEY (createdBy) REFERENCES users(id),
-    FOREIGN KEY (state) REFERENCES states(id)
+    state_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (state_id) REFERENCES states(id)
 );
 
 CREATE TABLE companies (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NOT NULL,
     address VARCHAR NOT NULL,
-    city SERIAL NOT NULL,
-    state SERIAL NOT NULL,
-    pinCode VARCHAR NOT NULL,
-    companyContactNo VARCHAR NOT NULL,
-    companyEmail VARCHAR NOT NULL,
-    companyGSTNo VARCHAR NOT NULL,
-    companyCINNo VARCHAR NOT NULL,
-    companyUdyamNo VARCHAR NOT NULL,
-    companyLogo BYTEA NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    updatedAt TIMESTAMP DEFAULT NOW(),
+    city_id INT NOT NULL,
+    state_id INT NOT NULL,
+    pin_code VARCHAR NOT NULL,
+    contact_no VARCHAR NOT NULL,
+    email VARCHAR NOT NULL,
+    gst_no VARCHAR NOT NULL,
+    cin_no VARCHAR NOT NULL,
+    udyam_no VARCHAR NOT NULL,
+    logo BYTEA NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (city) REFERENCES cities(id),
-    FOREIGN KEY (state) REFERENCES states(id)
+    FOREIGN KEY (city_id) REFERENCES cities(id),
+    FOREIGN KEY (state_id) REFERENCES states(id)
 );
 
 CREATE TABLE branches (
     id SERIAL PRIMARY KEY NOT NULL,
-    branchName VARCHAR NOT NULL,
-    branchAliasName VARCHAR NOT NULL,
-    branchAddress VARCHAR NOT NULL,
-    branchCity SERIAL NOT NULL,
-    branchestate SERIAL NOT NULL,
-    branchPinCode VARCHAR NOT NULL,
-    branchContactNo VARCHAR NOT NULL,
-    branchEmailId VARCHAR NOT NULL,
-    branchGSTNo VARCHAR NOT NULL,
-    branchCINNo VARCHAR NOT NULL,
-    branchUdyamNo VARCHAR NOT NULL,
-    branchLogo BYTEA NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    updatedAt TIMESTAMP DEFAULT NOW(),
+    name VARCHAR NOT NULL,
+    alias_name VARCHAR NOT NULL,
+    address VARCHAR NOT NULL,
+    city_id INT NOT NULL,
+    state_id INT NOT NULL,
+    company_id INT NOT NULL,
+    pin_code VARCHAR NOT NULL,
+    contact_no VARCHAR NOT NULL,
+    email VARCHAR NOT NULL,
+    gst_no VARCHAR NOT NULL,
+    cin_no VARCHAR NOT NULL,
+    udyam_no VARCHAR NOT NULL,
+    logo BYTEA NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (branchCity) REFERENCES cities(id),
-    FOREIGN KEY (branchestate) REFERENCES states(id)
+    FOREIGN KEY (city_id) REFERENCES cities(id),
+    FOREIGN KEY (state_id) REFERENCES states(id),
+    FOREIGN KEY (company_id) REFERENCES companies(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE pages (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    updatedAt TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (createdBy) REFERENCES users(id)
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE permissions (
     id SERIAL PRIMARY KEY NOT NULL,
-    pageId SERIAL NOT NULL,
-    permissionCode VARCHAR NOT NULL,
-    userId SERIAL NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    updatedAt TIMESTAMP DEFAULT NOW(),
+    page_id INT NOT NULL,
+    permission_code VARCHAR NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (pageId) REFERENCES pages(id),
-    FOREIGN KEY (userId) REFERENCES users(id),
-    FOREIGN KEY (createdBy) REFERENCES users(id)
+    FOREIGN KEY (page_id) REFERENCES pages(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE employees (
-    eid SERIAL PRIMARY KEY NOT NULL,
-    userId SERIAL NOT NULL,
+    id SERIAL PRIMARY KEY NOT NULL,
+    user_id INT NOT NULL,
     address VARCHAR NOT NULL,
-    aadhaarNo VARCHAR NOT NULL,
-    joiningDate TIMESTAMP DEFAULT NOW(),
-    createdAt TIMESTAMP DEFAULT NOW(),
+    aadhar_no VARCHAR NOT NULL,
+    joining_date TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
+    branch_id INT NOT NULL,
     type VARCHAR NOT NULL,
-    createdBy SERIAL NOT NULL,
-    updatedAt TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (userId) REFERENCES users(id),
-    FOREIGN KEY (createdBy) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (branch_id) REFERENCES branches(id)
 );
 
-CREATE TABLE container (
+CREATE TABLE containers (
     id SERIAL PRIMARY KEY NOT NULL,
     bag_no VARCHAR NOT NULL,
     name VARCHAR NOT NULL,
-    agentid VARCHAR NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
-    FOREIGN KEY (createdBy) REFERENCES users(id)
+    agent_id VARCHAR NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE packages (
     id SERIAL PRIMARY KEY NOT NULL,
-    container_id SERIAL NOT NULL,
+    container_id INT NOT NULL,
     count INTEGER NOT NULL,
     value INTEGER NOT NULL,
-    contains VARCHAR NOT NULL,
+    contents VARCHAR NOT NULL,
     charges INTEGER NOT NULL,
     shipper VARCHAR NOT NULL,
-    CGST INTEGER NOT NULL,
-    SGST INTEGER NOT NULL,
-    IGST INTEGER NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
+    cgst INTEGER NOT NULL,
+    sgst INTEGER NOT NULL,
+    igst INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (container_id) REFERENCES container(id),
-    FOREIGN KEY (createdBy) REFERENCES users(id)
+    FOREIGN KEY (container_id) REFERENCES containers(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
-CREATE TABLE booking (
+CREATE TABLE bookings (
     id SERIAL PRIMARY KEY NOT NULL,
-    branchId SERIAL NOT NULL,
-    slipNo VARCHAR NOT NULL,
-    consgineeName VARCHAR NOT NULL,
-    consgineeMbile VARCHAR NOT NULL,
-    consingnorName VARCHAR NOT NULL,
-    consingnorMbile VARCHAR NOT NULL,
-    transportMode VARCHAR NOT NULL,
-    packages_id SERIAL NOT NULL,
-    paidType VARCHAR NOT NULL,
-    desinationCityId SERIAL NOT NULL,
-    destinationBranchId SERIAL NOT NULL,
-    createdAt TIMESTAMP DEFAULT NOW(),
-    createdBy SERIAL NOT NULL,
+    branch_id INT NOT NULL,
+    slip_no VARCHAR NOT NULL,
+    consignee_name VARCHAR NOT NULL,
+    consignee_mobile VARCHAR NOT NULL,
+    consignor_name VARCHAR NOT NULL,
+    consignor_mobile VARCHAR NOT NULL,
+    transport_mode VARCHAR NOT NULL,
+    package_id INT NOT NULL,
+    paid_type VARCHAR NOT NULL,
+    destination_city_id INT NOT NULL,
+    destination_branch_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (branchId) REFERENCES branches(id),
-    FOREIGN KEY (packages_id) REFERENCES packages(id),
-    FOREIGN KEY (desinationCityId) REFERENCES cities(id),
-    FOREIGN KEY (destinationBranchId) REFERENCES branches(id),
-    FOREIGN KEY (createdBy) REFERENCES users(id)
+    FOREIGN KEY (branch_id) REFERENCES branches(id),
+    FOREIGN KEY (package_id) REFERENCES packages(id),
+    FOREIGN KEY (destination_city_id) REFERENCES cities(id),
+    FOREIGN KEY (destination_branch_id) REFERENCES branches(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );

@@ -1,5 +1,5 @@
 @apiUrl = http://localhost:8000
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiSU5XQktPTDBBQjAwMDEifQ.W4q6awtgwWZt2otWrikZpiVQY7r57TvixbCKhCnpcTQ
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version
 Content-Type: application/json
@@ -21,7 +21,58 @@ GET {{apiUrl}}/verify
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-#### BOOKING
-GET {{apiUrl}}/booking
+#### GET ALL STATES
+POST {{apiUrl}}/master/states
 Content-Type: application/json
 Authorization: Bearer {{token}}
+
+{
+    "from":0
+}
+
+#### ADD NEW STATE
+POST {{apiUrl}}/master/states/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "state_name": "West Bengal"
+}
+
+#### ADD NEW STATE
+POST {{apiUrl}}/master/states/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "state_id": "1",
+}
+
+
+#### GET ALL Cities
+POST {{apiUrl}}/master/cities
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "from":0
+}
+
+#### ADD NEW Cities
+POST {{apiUrl}}/master/cities/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_name": "Madnipur",
+    "state_id": 1
+}
+
+#### ADD NEW Cities
+POST {{apiUrl}}/master/cities/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_id": "1",
+}
