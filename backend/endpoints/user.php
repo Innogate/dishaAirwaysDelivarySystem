@@ -53,7 +53,7 @@ $router->add('POST', '/master/users/new', function () {
         }
         
         $stmt = $db->query("INSERT INTO users (mobile, password, created_by) VALUES (?, ?, ?) RETURNING id", 
-            [$data["mobile"], password_hash($data["password"], PASSWORD_BCRYPT), $_info->user_id]
+            [$data["mobile"], $data["password"], $_info->user_id]
         );
         $user_id = $stmt->fetchColumn();
 

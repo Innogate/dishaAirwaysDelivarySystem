@@ -51,7 +51,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": "2"
+    "user_id": "1"
 }
 
 #### GET ALL STATES
@@ -107,4 +107,41 @@ Authorization: Bearer {{token}}
 
 {
     "city_id": "1"
+}
+
+#### GET ALL COMPANIES
+POST {{apiUrl}}/master/companies
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "from": 0
+}
+
+#### ADD NEW COMPANY
+POST {{apiUrl}}/master/companies/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Tech Corp",
+    "address": "456 Business Park",
+    "city_id": 1,
+    "state_id": 1,
+    "pin_code": "700001",
+    "contact_no": "9876543211",
+    "email": "info@techcorp.com",
+    "gst_no": "29ABCDE1234F1Z5",
+    "cin_no": "U12345WB2023PTC123456",
+    "udyam_no": "UDYAM-WB-2023-123456",
+    "logo": "base64_encoded_string"
+}
+
+#### DELETE COMPANY
+POST {{apiUrl}}/master/companies/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "company_id": "1"
 }

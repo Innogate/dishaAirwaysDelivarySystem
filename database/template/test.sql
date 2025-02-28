@@ -674,6 +674,7 @@ COPY public.pages (id, name, created_at, created_by, updated_at, status) FROM st
 2	states	2025-02-28 15:40:30.739977	1	2025-02-28 15:40:30.739977	t
 3	cities	2025-02-28 16:33:08.449284	1	2025-02-28 16:33:08.449284	t
 4	users	2025-02-28 16:51:44.044371	1	2025-02-28 16:51:44.044371	t
+5	companies	2025-02-28 17:32:57.121273	1	2025-02-28 17:32:57.121273	t
 \.
 
 
@@ -686,6 +687,7 @@ COPY public.permissions (id, page_id, permission_code, user_id, created_at, crea
 2	2	11111	1	2025-02-28 15:42:02.220213	1	2025-02-28 15:42:02.220213	t
 3	3	11111	1	2025-02-28 16:34:06.950874	1	2025-02-28 16:34:06.950874	t
 4	4	11111	1	2025-02-28 16:52:33.101131	1	2025-02-28 16:52:33.101131	t
+5	5	11111	1	2025-02-28 17:33:37.666721	1	2025-02-28 17:33:37.666721	t
 \.
 
 
@@ -769,14 +771,14 @@ SELECT pg_catalog.setval('public.packages_id_seq', 1, false);
 -- Name: pages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.pages_id_seq', 5, true);
+SELECT pg_catalog.setval('public.pages_id_seq', 6, true);
 
 
 --
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.permissions_id_seq', 4, true);
+SELECT pg_catalog.setval('public.permissions_id_seq', 5, true);
 
 
 --
