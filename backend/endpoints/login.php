@@ -10,7 +10,7 @@
         $stmt = $db->query("SELECT * FROM users WHERE mobile = ?", [ $data['id']]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$user) {
-            $response = new ApiResponse(401, "User ID not matched");
+            $response = new ApiResponse(401, "User ID not matched", 201);
             $response->toJson();
             return;
         }
@@ -20,7 +20,7 @@
             $response->toJson();
             return;
         } else {
-            $response = new ApiResponse(401, "Password not matched");
+            $response = new ApiResponse(401, "Password not matched", 202);
             $response->toJson();
             return;
         }
