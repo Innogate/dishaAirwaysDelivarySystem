@@ -12,9 +12,9 @@ export default function TopBar() {
 const styles = StyleSheet.create({
   topBar: {
     height: 50,
-    backgroundColor: '#6200ee',
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: { color: 'white', fontSize: 18 },
+  title: { color: 'black', fontSize: 18 },
 });

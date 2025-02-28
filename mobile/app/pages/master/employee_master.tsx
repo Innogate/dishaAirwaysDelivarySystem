@@ -8,27 +8,19 @@ import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
 
 // Define the validation schema
 const schema = yup.object().shape({
-  Company_Name: yup.string().required('Company Name is required'),
-  Company_Address: yup.string().required('Company Address is required'),
-  Company_City: yup.string().required('Company City is required'),
-  Company_Pincode: yup.string()
-    .required('Company Pincode is required')
-    .matches(/^[0-9]{6}$/, 'Invalid Pincode'),
-  phoneNumber: yup.string()
-    .required('Company Phone Number is required')
-    .matches(/^[0-9]{10}$/, 'Invalid phone number'),
-  Company_Email: yup.string()
-    .email('Invalid email format')
-    .required('Company Email is required'),
-  Company_GST: yup.string().required('Company GST No is required'),
-  Company_CIN: yup.string().required('Company CIN No is required'),
-  Company_Udyam: yup.string().notRequired(), // Optional field
-  logo: yup.mixed().required('Branch Logo is required'), // Logo field
+  Employee_Name: yup.string().required('Employee Name is required'),
+  Employee_Address: yup.string().required('Employee Address is required'),
+  Employee_phoneNumber: yup.string()
+  .required('Employee Phone Number is required')
+  .matches(/^[0-9]{10}$/, 'Invalid phone number'),
+  Employee_AadharNo: yup.string()
+    .required('Employee Aadhar is required')
+    .matches(/^[0-9]{12}$/, 'Invalid Aadhar number'),
 });
 
 const screenHeight = Dimensions.get("window").height; // Get screen height
 
-const BranchMaster = () => {
+const EmployeeMaster = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(500)).current; // Persist animation value
   const startY = useRef(0); // Store touch start position
@@ -190,198 +182,80 @@ const BranchMaster = () => {
           >
             <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80, minHeight: screenHeight * 0.6 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               <Text style={styles.dateText}>Date: {new Date().toLocaleDateString()}</Text>
+
               <View className="gap-2">
-                {/* Branch Name */}
                 <Controller
                   control={control}
-                  name="Company_Name"
+                  name="Employee_Name"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="Branch Name"
+                        label="Employee Name"
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
                         style={stylesx.input}
                       />
-                      {errors.Company_Name && <Text style={styles.errorText}>{errors.Company_Name.message}</Text>}
+                      {errors.Employee_Name && <Text style={styles.errorText}>{errors.Employee_Name.message}</Text>}
                     </View>
                   )}
                 />
 
-                {/* Branch Address */}
                 <Controller
                   control={control}
-                  name="Company_Address"
+                  name="Employee_Address"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="Branch Address"
+                        label="Employ Address"
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
                         style={stylesx.input}
                       />
-                      {errors.Company_Address && <Text style={styles.errorText}>{errors.Company_Address.message}</Text>}
+                      {errors.Employee_Address && <Text style={styles.errorText}>{errors.Employee_Address.message}</Text>}
                     </View>
                   )}
                 />
 
-                <View style={stylesin.container} className="gap-2">
-                  {/* Branch City */}
-                  <Controller
-                    control={control}
-                    name="Company_City"
-                    render={({ field: { onChange, value } }) => (
-                      <View style={stylesin.inputContainer}>
-                        <TextInput
-                          label="Branch City"
-                          mode='outlined'
-                          value={value}
-                          onChangeText={onChange}
-                          style={stylesin.input}
-                        />
-                        {errors.Company_City && <Text style={styles.errorText}>{errors.Company_City.message}</Text>}
-                      </View>
-                    )}
-                  />
-
-                  {/* Branch Pincode */}
-                  <Controller
-                    control={control}
-                    name="Company_Pincode"
-                    render={({ field: { onChange, value } }) => (
-                      <View style={stylesin.inputContainer}>
-                        <TextInput
-                          label="Branch Pincode"
-                          mode='outlined'
-                          value={value}
-                          onChangeText={onChange}
-                          style={stylesin.input}
-                        />
-                        {errors.Company_Pincode && <Text style={styles.errorText}>{errors.Company_Pincode.message}</Text>}
-                      </View>
-                    )}
-                  />
-                </View>
-
-                {/* Branch Short Name */}
+                {/* Company Phone Number */}
                 <Controller
                   control={control}
-                  name="Branch_ShortName"
+                  name="Employee_phoneNumber"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="Branch Short Name"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={stylesx.input}
-                      />
-                      {errors.Branch_ShortName && <Text style={styles.errorText}>{errors.Branch_ShortName.message}</Text>}
-                    </View>
-                  )}
-                />
-
-                {/* Branch Contact No */}
-                <Controller
-                  control={control}
-                  name="Branch_Contact_No"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Branch Contact No"
+                        label="Employee Phone Number"
                         mode='outlined'
                         keyboardType="numeric"
                         value={value}
                         onChangeText={onChange}
                         style={stylesx.input}
                       />
-                      {errors.Branch_Contact_No && <Text style={styles.errorText}>{errors.Branch_Contact_No.message}</Text>}
+                      {errors.Employee_phoneNumber && <Text style={styles.errorText}>{errors. Employee_phoneNumber.message}</Text>}
                     </View>
                   )}
                 />
 
-                {/* Branch Email */}
+
                 <Controller
                   control={control}
-                  name="Branch_Email"
+                  name="Employee_AadharNo"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="Branch Email"
+                        label="Employ Aadhar No"
                         mode='outlined'
                         value={value}
                         onChangeText={onChange}
                         style={stylesx.input}
                       />
-                      {errors.Branch_Email && <Text style={styles.errorText}>{errors.Branch_Email.message}</Text>}
+                      {errors.Employee_AadharNo && <Text style={styles.errorText}>{errors.Employee_AadharNo.message}</Text>}
                     </View>
                   )}
                 />
 
-                {/* Branch GST No */}
-                <Controller
-                  control={control}
-                  name="Branches_GST_No"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Branch GST No"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={stylesx.input}
-                      />
-                      {errors.Branches_GST_No && <Text style={styles.errorText}>{errors.Branches_GST_No.message}</Text>}
-                    </View>
-                  )}
-                />
-
-                {/* Branch CIN No */}
-                <Controller
-                  control={control}
-                  name="Branch_CIN_No"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Branch CIN No"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={stylesx.input}
-                      />
-                      {errors.Branch_CIN_No && <Text style={styles.errorText}>{errors.Branch_CIN_No.message}</Text>}
-                    </View>
-                  )}
-                />
-
-                {/* Branch Udyam No */}
-                <Controller
-                  control={control}
-                  name="Branch_Udyam_No"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Branch Udyam No"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={stylesx.input}
-                      />
-                      {errors.Branch_Udyam_No && <Text style={styles.errorText}>{errors.Branch_Udyam_No.message}</Text>}
-                    </View>
-                  )}
-                />
-
-                {/* Branch Logo Upload Field */}
-                <View>
-                  <TouchableOpacity onPress={handleLogoUpload} style={styles.button}>
-                    <Text style={styles.buttonText}>{logoUri ? 'Change Logo' : 'Upload Logo'}</Text>
-                  </TouchableOpacity>
-                  {errors.logo && <Text style={styles.errorText}>{errors.logo.message}</Text>}
-                  {logoUri && <Text style={styles.logoText}>Logo uploaded: {logoUri}</Text>}
-                </View>
+                
 
                 {/* Submit Button */}
                 <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
@@ -527,4 +401,15 @@ const stylesx = StyleSheet.create({
   },
 });
 
-export default BranchMaster;
+export default EmployeeMaster;
+
+
+
+
+
+
+
+
+
+
+
