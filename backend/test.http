@@ -224,6 +224,15 @@ Authorization: Bearer {{token}}
     "from": 0
 }
 
+### Get Branch BY ID
+POST {{apiUrl}}/master/branches
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "brach_id": 0
+}
+
 ### Create a New Branch
 POST {{apiUrl}}/master/branches/new
 Content-Type: application/json

@@ -8,6 +8,7 @@
 
     $pageID = 6; // Change page ID for branch master
 
+    // GET ALL BRANCH
     $router->add('POST', '/master/branches', function () {
         global $pageID;
         $jwt = new JwtHandler();
@@ -16,7 +17,7 @@
         $handler->validatePermission($pageID, $_info->user_id, "r");
 
         $data = json_decode(file_get_contents("php://input"), true);
-
+        $handler->validateInput($data, ["from"]);
         $db = new Database();
         $stmt = $db->query("SELECT * FROM branches LIMIT 10 OFFSET ?", [$data["from"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -24,6 +25,27 @@
         (new ApiResponse(200, "Success", $list))->toJson();
     });
 
+    // GET ALL BRANCH BY ID
+    $router->add('POST', '/master/branches/byId', function () {
+        global $pageID;
+        $jwt = new JwtHandler();
+        $handler = new Handler();
+        $_info = $jwt->validate();
+        $handler->validatePermission($pageID, $_info->user_id, "r");
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        $handler->validateInput($data, ["branch_id"]);
+        $db = new Database();
+        $stmt = $db->query("SELECT * FROM branches WHERE branch_id = ?", [$data["branch_id"]]);
+        $list = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$list) {
+            (new ApiResponse(400, "Invalid BRANCH ID", "", 400))->toJson();
+        }
+
+        (new ApiResponse(200, "Success", $list))->toJson();
+    });
+
+    // ADD NEW BRANCH
     $router->add('POST', '/master/branches/new', function () {
         global $pageID;
         $jwt = new JwtHandler();
@@ -33,13 +55,7 @@
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        $requiredFields = ["company_id", "name", "address", "alias_name", "city_id", "state_id", "pin_code", "contact_no", "email", "gst_no", "cin_no", "udyam_no", "logo"];
-        foreach ($requiredFields as $field) {
-            if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                (new ApiResponse(400, "All fields are required."))->toJson();
-                return;
-            }
-        }
+        $handler->validateInput($data, ["company_id", "name", "address", "alias_name", "city_id", "state_id", "pin_code", "contact_no", "email", "gst_no", "cin_no", "udyam_no", "logo"]);
 
         $db = new Database();
 
@@ -77,6 +93,7 @@
         }
     });
 
+    // DELETE BRANCH BY ID
     $router->add('POST', '/master/branches/delete', function () {
         global $pageID;
         $jwt = new JwtHandler();
@@ -85,11 +102,7 @@
         $handler->validatePermission($pageID, $_info->user_id, "d");
 
         $data = json_decode(file_get_contents("php://input"), true);
-
-        if (!isset($data["branch_id"]) || !is_numeric($data["branch_id"])) {
-            (new ApiResponse(400, "Invalid branch ID."))->toJson();
-            return;
-        }
+        $handler->validateInput($data, ["branch_id"]);
 
         $branch_id = (int) $data["branch_id"];
         $db = new Database();
