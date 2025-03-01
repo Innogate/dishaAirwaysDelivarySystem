@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,9 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { MaterialIcons } from "@expo/vector-icons";
+import { environment } from "@/app/environment/environment";
+import { tokens } from "react-native-paper/lib/typescript/styles/themes/v3/tokens";
+import globalStorage from "@/app/components/GlobalStorage";
 
 // Validation Schema
 const schema = yup.object().shape({
@@ -29,20 +32,18 @@ const StatesMaster = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenHeight)).current;
   const startY = useRef(0);
-  const [branches, setBranches] = useState([
-    { id: 1, States_Name: "ABC Corp" },
-  ]);
-  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [States, setStates] = useState([]);
+  const [selectedStates, setselectedStates] = useState(null);
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
   // Open Modal for Add / Edit
-  const openModal = (branch = null) => {
-    setSelectedBranch(branch);
+  const openModal = (States = null) => {
+    setselectedStates(States);
     slideAnim.setValue(screenHeight);
     setModalVisible(true);
-    if (branch) setValue("States_Name", branch.States_Name);
+    if (States) setValue("States_Name", States.States_Name);
     
     Animated.timing(slideAnim, {
       toValue: 0,
@@ -60,7 +61,7 @@ const StatesMaster = () => {
     }).start(() => {
       setModalVisible(false);
       reset();
-      setSelectedBranch(null);
+      setselectedStates(null);
     });
   };
 
@@ -75,25 +76,97 @@ const StatesMaster = () => {
     },
   });
 
+  // Get all states
+  const getAllStates = async () => {
+    const token =
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+  
+    if (token) {
+      const url = environment.apiUrl + "/master/states";
+      const header = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const body = JSON.stringify({
+        from: 0,
+      });
+  
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: header,
+          body: body,
+        });
+  
+        const resJson = await res.json();
+        console.log("Response JSON:", resJson);
+  
+        if (res.status === 200) {
+          // Extract 'id' and 'name' from the 'body' array
+          const formattedStates = resJson.body.map((state) => ({
+            id: state.id,
+            States_Name: state.name,
+          }));
+          setStates(formattedStates);
+        } else {
+          Alert.alert("Error", resJson.message || "Failed to fetch states.");
+        }
+      } catch (error) {
+        Alert.alert("Error", "Server Error");
+        console.error("Fetch error:", error);
+      }
+    }
+  };
+  
+  
+
+  useEffect(() => {
+    getAllStates(); // Fetch data on page load
+  }, []);
+
+
   // Submit Form (Add / Edit)
-  const onSubmit = (data) => {
-    if (selectedBranch) {
-      setBranches(
-        branches.map((branch) =>
-          branch.id === selectedBranch.id ? { ...branch, States_Name: data.States_Name } : branch
-        )
-      );
+  const onSubmit = async (data:any) => {
+    if (selectedStates) {
+      console.log(selectedStates);
       Alert.alert("Updated!", "State updated successfully.");
     } else {
-      const newBranch = { id: Date.now(), ...data };
-      setBranches([...branches, newBranch]);
-      Alert.alert("Added!", "New state added successfully.");
+
+      const url = environment.apiUrl + '/master/states/new';
+      // const token = globalStorage.getValue('token');
+      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+      const header = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}` 
+        };
+      const body = JSON.stringify({
+        "state_name": data.States_Name
+      });
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: header,
+          body: body,
+        });
+        const resJson = await res.json();
+        if (res.status === 200) {
+          Alert.alert("Success", resJson.message);
+          getAllStates();
+        } else if (res.status === 409){
+          Alert.alert("Error", resJson.message);
+        }else{
+          Alert.alert("Error", "Failed to Add state.");
+        }
+      }catch{
+          Alert.alert("Error", "Server Error");
+      }
     }
     closeModal();
   };
 
   // Delete State
-  const deleteBranch = (id) => {
+  const deleteStates = async (id:number) => {
+    console.log(id);
     Alert.alert(
       "Confirm Delete",
       "Are you sure you want to delete this state?",
@@ -101,26 +174,60 @@ const StatesMaster = () => {
         { text: "Cancel", style: "cancel" },
         {
           text: "OK",
-          onPress: () => {
-            setBranches((prevBranches) =>
-              prevBranches.filter((branch) => branch.id !== id)
-            );
+          onPress: async () => {
+            const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+            if (token) {
+              const url = environment.apiUrl + '/master/states/delete';
+              const headers = {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              };
+              const body = JSON.stringify({
+                "state_id": id
+              });
+
+  
+              try {
+                const response = await fetch(url, {
+                  method: "POST",
+                  headers: headers,
+                  body: body,
+                });
+  
+                const resJson = await response.json();
+                console.log("Delete Response:", resJson);
+  
+                if (response.status === 200 && resJson.error_code === 0) {
+                  // Remove deleted state from UI
+                  setStates((prevStates) =>
+                    prevStates.filter((state) => state.id !== id)
+                  );
+                  Alert.alert("Success", "State deleted successfully!");
+                } else {
+                  Alert.alert("Error", resJson.message || "Failed to delete state.");
+                }
+              } catch (error) {
+                Alert.alert("Error", "Server Error");
+                console.error("Delete error:", error);
+              }
+            }
           },
         },
       ]
     );
   };
+  
 
-  const renderBranchItem = ({ item }) => (
-    <TouchableOpacity onPress={() => setSelectedBranch(item)}>
-      <View style={styles.branchItem}>
-        <Text style={styles.branchTitle}>{item.States_Name}</Text>
-        {selectedBranch?.id === item.id && (
+  const renderStatesItem = ({ item }) => (
+    <TouchableOpacity onPress={() => setselectedStates(item)}>
+      <View style={styles.StatesItem}>
+        <Text style={styles.StatesTitle}>{item.States_Name}</Text>
+        {selectedStates?.id === item.id && (
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={() => openModal(item)}>
               <MaterialIcons name="edit" size={24} color="blue" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => deleteBranch(item.id)}>
+            <TouchableOpacity onPress={() => deleteStates(item.id)}>
               <MaterialIcons name="delete" size={24} color="red" />
             </TouchableOpacity>
           </View>
@@ -132,8 +239,8 @@ const StatesMaster = () => {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={branches}
-        renderItem={renderBranchItem}
+        data={States}
+        renderItem={renderStatesItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContainer}
       />
@@ -163,7 +270,7 @@ const StatesMaster = () => {
                   )}
                 />
                 <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-                  <Text style={styles.buttonText}>{selectedBranch ? "UPDATE" : "ADD"}</Text>
+                  <Text style={styles.buttonText}>{selectedStates ? "UPDATE" : "ADD"}</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -222,7 +329,7 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-  branchItem: {
+  StatesItem: {
     backgroundColor: "#fff",
     padding: 15,
     marginVertical: 10,
@@ -238,7 +345,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  branchTitle: {
+  StatesTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
