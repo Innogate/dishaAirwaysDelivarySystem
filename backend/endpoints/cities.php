@@ -29,6 +29,52 @@
         $response->toJson();
     });
 
+    // Get city by id
+    $router->add('POST', '/master/cities/byId', function () {
+        global $pageID;
+        $jwt = new JwtHandler();
+        $handler = new Handler();
+        $_info = $jwt->validate();
+        $handler->validatePermission($pageID, $_info->user_id, "r");
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if(!isset($data["city_id"])){
+            (new ApiResponse(400,"city_id require", $data))->toJson();
+        }
+
+        $db = new Database();
+        $stmt = $db->query("SELECT * FROM cities WHERE id = ?", [$data["city_id"]]);
+        $list = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$list) {
+            $response = new ApiResponse(400, "Invalid City ID", "", 400);
+            $response->toJson();
+        }
+
+        $response = new ApiResponse(200, "Success", $list);
+        $response->toJson();
+    });
+
+    $router->add('POST', '/master/cities/byStateId', function () {
+        global $pageID;
+        $jwt = new JwtHandler();
+        $handler = new Handler();
+        $_info = $jwt->validate();
+        $handler->validatePermission($pageID, $_info->user_id, "r");
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $db = new Database();
+        $stmt = $db->query("SELECT * FROM cities WHERE state_id = ? LIMIT 10 OFFSET ?", [$data["state_id"], $data["from"]]);
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
+        if (!$list) {
+            $list = [];
+        }
+
+        $response = new ApiResponse(200, "Success", $list);
+        $response->toJson();
+    });
+
     // Add a new city
     $router->add('POST', '/master/cities/new', function () {
         global $pageID;

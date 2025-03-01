@@ -26,6 +26,25 @@
         $response->toJson();
     });
 
+    $router->add('POST', '/master/states/byId', function () {
+        global $pageID;
+        $jwt = new JwtHandler();
+        $handler = new Handler();
+        $_info = $jwt->validate();
+        $handler->validatePermission($pageID, $_info->user_id, "r"); // check user permit or not for this page
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $db = new Database();
+        $stmt = $db->query("SELECT * FROM states WHERE id = ? LIMIT 10 OFFSET ?", [$data["state_id"], $data["from"]]);
+        $list = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$list) {
+            $list = [];
+        }
+
+        $response = new ApiResponse(200, "Success", $list);
+        $response->toJson();
+    });
+
     $router->add('POST', '/master/states/new', function () {
         global $pageID;
         $jwt = new JwtHandler();

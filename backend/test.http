@@ -63,6 +63,16 @@ Authorization: Bearer {{token}}
     "from":0
 }
 
+#### GET ALL STATES
+POST {{apiUrl}}/master/states/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "from":0,
+    "state_id": 1
+}
+
 #### ADD NEW STATE
 POST {{apiUrl}}/master/states/new
 Content-Type: application/json
@@ -88,6 +98,27 @@ Authorization: Bearer {{token}}
 
 {
     "from":0
+}
+
+#### GET CITY By id
+POST {{apiUrl}}/master/cities/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_id": 1
+}
+
+
+
+#### GET CITIES BY STATE ID
+POST {{apiUrl}}/master/cities/byStateId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "from":0,
+    "state_id": 1
 }
 
 #### ADD NEW CITY
