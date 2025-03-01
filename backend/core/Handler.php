@@ -42,5 +42,19 @@
                     break;
             }
         }
+
+        public static function validateInput($data, $requiredFields) {
+            if (!is_array($data) || array_keys($data) === range(0, count($data) - 1)) {
+                (new ApiResponse(400, "Invalid input format. Expected an object."))->toJson();
+                exit;
+            }
+            
+            foreach ($requiredFields as $field) {
+                if (!isset($data[$field])) {
+                    (new ApiResponse(400, "Missing required field: $field"))->toJson();
+                    exit;
+                }
+            }
+        }
     }
 ?>
