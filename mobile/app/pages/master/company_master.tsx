@@ -1,87 +1,220 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet, Animated, Modal, PanResponder, Dimensions, FlatList } from 'react-native';
-import { TextInput, FAB } from 'react-native-paper'; // Import FAB from react-native-paper
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet, Animated, Modal, PanResponder, Dimensions, FlatList, Image, TouchableWithoutFeedback } from 'react-native';
+import { TextInput, FAB } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
+import * as ImagePicker from 'expo-image-picker';
+import { Picker } from '@react-native-picker/picker';
+import { environment } from '@/app/environment/environment';
 
 // Define the validation schema
 const schema = yup.object().shape({
-    Company_Name: yup.string().required('Company Name is required'),
-    Company_Address: yup.string().required('Company Address is required'),
-    Company_City: yup.string().required('Company City is required'),
-    Company_Pincode: yup.string()
-      .required('Company Pincode is required')
-      .matches(/^[0-9]{6}$/, 'Invalid Pincode'),
-    phoneNumber: yup.string()
-      .required('Company Phone Number is required')
-      .matches(/^[0-9]{10}$/, 'Invalid phone number'),
-    Company_Email: yup.string()
-      .email('Invalid email format')
-      .required('Company Email is required'),
-    Company_GST: yup.string().required('Company GST No is required'),
-    Company_CIN: yup.string().required('Company CIN No is required'),
-    Company_Udyam: yup.string().notRequired(), // Optional field
+  Company_Name: yup.string().required('Company Name is required'),
+  Company_Address: yup.string().required('Company Address is required'),
+  Company_City: yup.string().required('Company City is required'),
+  Company_States: yup.string().required('Company State is required'),
+  Company_Pincode: yup.string()
+    .required('Company Pincode is required')
+    .matches(/^[0-9]{6}$/, 'Invalid Pincode'),
+  phoneNumber: yup.string()
+    .required('Company Phone Number is required')
+    .matches(/^[0-9]{10}$/, 'Invalid phone number'),
+  Company_Email: yup.string()
+    .email('Invalid email format')
+    .required('Company Email is required'),
+  Company_GST: yup.string().required('Company GST No is required'),
+  Company_CIN: yup.string().required('Company CIN No is required'),
+  Company_Udyam: yup.string().notRequired(), // Optional field
+  Company_Logo: yup.string().required('Company Logo'),
 });
 
-const screenHeight = Dimensions.get("window").height; // Get screen height
 
-const BranchMaster = () => {
+const screenHeight = Dimensions.get("window").height;
+
+const BranchMaster = ( ) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(500)).current; // Persist animation value
-  const startY = useRef(0); // Store touch start position
+  const slideAnim = useRef(new Animated.Value(screenHeight)).current;
+  const startY = useRef(0);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [branches, setBranches] = useState([]);
 
-  // Initialize with static values
-  const [branches, setBranches] = useState([
-    {
-      Company_Name: "ABC Corp",
-      Company_Address: "123 Main St",
-      Company_City: "New York",
-      Company_Pincode: "10001",
-      phoneNumber: "1234567890",
-      Company_Email: "contact@abccorp.com",
-      Company_GST: "GST123456",
-      Company_CIN: "CIN123456",
-      Company_Udyam: "Udyam123456",
-      logo: "https://example.com/logo1.png"
-    },
-    {
-      Company_Name: "XYZ Ltd",
-      Company_Address: "456 Elm St",
-      Company_City: "Los Angeles",
-      Company_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Company_Email: "info@xyzltd.com",
-      Company_GST: "GST654321",
-      Company_CIN: "CIN654321",
-      Company_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
-    },
-    {
-      Company_Name: "XYZ Ltd",
-      Company_Address: "456 Elm St",
-      Company_City: "Los Angeles",
-      Company_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Company_Email: "info@xyzltd.com",
-      Company_GST: "GST654321",
-      Company_CIN: "CIN654321",
-      Company_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
+  // gate all states
+  const [statesList, setStatesList] = useState([]);
+  const getAllStates = useCallback(async () => {
+    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+    if (token) {
+      const url = `${environment.apiUrl}/master/states`;
+      const header = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const body = JSON.stringify({ from: 0 });
+
+      try {
+        const res = await fetch(url, { method: "POST", headers: header, body });
+        const resJson = await res.json();
+        if (res.status === 200) {
+          const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
+            id: state.id,
+            States_Name: state.name,
+          }));
+          setStatesList(formattedStates);
+        } else {
+          Alert.alert("Error", resJson.message || "Failed to fetch states.");
+        }
+      } catch (error) {
+        Alert.alert("Error", "Server Error");
+        console.error("Fetch error:", error);
+      }
     }
-  ]);
+  }, []);
+  useEffect(() => {
+    getAllStates();
+    getAllCompanies();
+  }, [getAllStates]);
+
+  // get all city by states id
+  const [cityList, setcityList] = useState([]);
+  const handleStateChange = async (selectedValue: any) => {
+    console.log("Selected State ID:", selectedValue);
+    if (selectedValue) {
+      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+      if (token) {
+        const url = `${environment.apiUrl}/master/cities/byStateId`;
+        const header = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const body = JSON.stringify({ from: 0, state_id: selectedValue });
+        try {
+          const res = await fetch(url, { method: "POST", headers: header, body });
+          const resJson = await res.json();
+          if (res.status === 200) {
+            const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
+              id: state.id,
+              city_name: state.name,
+            }));
+            setcityList(formattedStates);
+          } else {
+            Alert.alert("Error", resJson.message || "Failed to fetch states.");
+          }
+        } catch (error) {
+          Alert.alert("Error", "Server Error");
+          console.error("Fetch error:", error);
+        }
+
+      }
+    };
+  }
+
+  // Gate all company
+  const [companyList, setCompanyList] = useState([]);
+  const getAllCompanies = async () => {
+    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+    if (token) {
+      const url = `${environment.apiUrl}/master/companies`;
+      const header = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const body = JSON.stringify({ from: 0 });
+      try {
+        const res = await fetch(url, { method: "POST", headers: header, body });
+        const resJson = await res.json();
+        if (res.status === 200) {
+          const formattedStates = resJson.body.map((company: { id: any; name: any; address: any; pin_code: any; contact_no: any; email: any; gst_no: any; cin_no: any; udyam_no: any }) => ({
+            id: company.id,
+            name: company.name,
+            address: company.address,
+            // city_id: 1,
+            // state_id: 1,
+            pin_code: company.pin_code,
+            contact_no: company.contact_no,
+            email: company.email,
+            gst_no: company.gst_no,
+            cin_no: company.cin_no,
+            udyam_no: company.udyam_no
+          }));
+          setCompanyList(formattedStates);
+        } else {
+          Alert.alert("Error", resJson.message || "Failed to fetch states.");
+        }
+      } catch (error) {
+        Alert.alert("Error", "Server Error");
+        console.error("Fetch error:", error);
+      }
+
+
+    }
+  }
+
+
+  // Create a new Company
+  const onSubmit = async (data: any) => {
+    const newCompany = { ...data, logo: selectedImage };
+    
+    if (newCompany) {
+      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+      
+      if (token) {
+        const url = `${environment.apiUrl}/master/companies/new`;
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const body = JSON.stringify({
+          name: newCompany.Company_Name,
+          address: newCompany.Company_Address,
+          city_id: newCompany.Company_City,
+          state_id: newCompany.Company_States,
+          pin_code: newCompany.Company_Pincode,
+          contact_no: newCompany.phoneNumber,
+          email: newCompany.Company_Email,
+          gst_no: newCompany.Company_GST,
+          cin_no: newCompany.Company_CIN,
+          udyam_no: newCompany.Company_Udyam,
+          logo: "base64_encoded_string"
+        });
+  
+        try {
+          const res = await fetch(url, { method: "POST", headers, body });
+          const resJson = await res.json();
+  
+          if (res.status === 200) {
+            Alert.alert("Success", "Company Created Successfully");
+  
+            // Refresh the company list
+            getAllCompanies();
+  
+            // Reset the form fields
+            reset(); // Reset the form after successful submission
+          } else {
+            console.log(resJson);
+            Alert.alert("Error", resJson.message || "Failed to create company.");
+          }
+        } catch (error) {
+          Alert.alert("Error", "Server Error");
+          console.error("Fetch error:", error);
+        }
+      }
+    }
+  
+    // Close the modal after form submission
+    closeModal();
+  };
+  
 
   const openModal = () => {
     slideAnim.setValue(screenHeight);
-    setModalVisible(true); // Set modal visible first
+    setModalVisible(true);
     setTimeout(() => {
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 300,
         useNativeDriver: true,
       }).start();
-    }, 10); // Small delay to prevent flicker
+    }, 10);
   };
 
   const closeModal = () => {
@@ -92,37 +225,24 @@ const BranchMaster = () => {
     }).start(() => setModalVisible(false));
   };
 
-  // PanResponder to detect swipe gestures
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderGrant: (_, gestureState) => {
-      startY.current = gestureState.y0; // Capture start position
+      startY.current = gestureState.y0;
     },
     onPanResponderRelease: (_, gestureState) => {
       const endY = gestureState.moveY;
       if (endY - startY.current > 100) {
-        // If swipe down distance is significant, close modal
         closeModal();
       }
     },
   });
 
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { control, handleSubmit, setValue,reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const [logoUri, setLogoUri] = useState(null); // State to hold the logo URI
-
-  const onSubmit = async (data) => {
-    // If no errors, proceed with form submission
-    const newBranch = { ...data, logo: logoUri };
-    setBranches([...branches, newBranch]); // Add new branch to the list
-    Alert.alert('Form Submitted', JSON.stringify(newBranch, null, 2));
-    closeModal(); // Close the modal after submission
-  };
-
-  const handleLogoUpload = async () => {
-    // Request permission to access the media library
+  const handleImageUpload = async (onChange: any) => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
@@ -130,50 +250,36 @@ const BranchMaster = () => {
       return;
     }
 
-    // Launch the image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 1,
     });
 
     if (!result.canceled) {
-      setLogoUri(result.uri); // Set the logo URI
-      setValue('logo', result); // Set the logo in form state
+      const uri = result.assets[0].uri;
+      setSelectedImage(uri);
+      onChange(uri); // Update form field
     }
   };
 
   const renderBranchItem = ({ item }) => (
-    // <View style={styles.branchItem}>
-    <View className="bg-white p-4 mb-3 rounded-lg shadow-md border border-gray-200">
-      <Text className="text-black font-semibold text-lg">
-        Order #: <Text className="text-blue-600">{item.Company_Name}</Text>
-      </Text>
-      <Text className="text-gray-500">{item.Company_Name}</Text>
-
-      <View className="flex-row justify-between items-center mt-2">
-        <View className="bg-gray-200 px-3 py-1 rounded-full">
-          <Text className="text-gray-700">{item.Company_Name}</Text>
-        </View>
-        <Text className="text-lg font-bold">{item.Company_Name}</Text>
-        {/* <TouchableOpacity
-                    className={`px-4 py-1 rounded-full ${order.status === "Shipped" ? "bg-purple-100 border border-purple-600" : "bg-orange-100 border border-orange-500"
-                        }`}
-                >
-                    <Text className={order.status === "Shipped" ? "text-purple-600" : "text-orange-600"}>{order.status}</Text>
-                </TouchableOpacity> */}
-      </View>
+    <View style={styles.branchItem}>
+      <Text style={styles.branchTitle}>{item.name}</Text>
+      <Text style={styles.branchText}>{item.address}</Text>
+      {item.logo && (
+        <Image source={{ uri: item.logo }} style={{ width: 50, height: 50 }} />
+      )}
     </View>
-    // {/* </View> */}
   );
 
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={branches}
+        data={companyList}  // Use `companyList` instead of `branches`
         renderItem={renderBranchItem}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()} // Use unique `id` instead of index
         contentContainerStyle={styles.listContainer}
       />
       <FAB
@@ -184,182 +290,209 @@ const BranchMaster = () => {
       <Modal transparent visible={modalVisible} animationType="none">
         <View style={styles.modalContainer}>
           <Animated.View
-            {...panResponder.panHandlers} // Attach gesture detection
+            {...panResponder.panHandlers}
             style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}
           >
             <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80, minHeight: screenHeight * 0.6 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-              <Text style={styles.dateText}>Date: {new Date().toLocaleDateString()}</Text>
-              <View className="gap-2">
-        {/* Company Name */}
-        <Controller
-          control={control}
-          name="Company_Name"
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                label="Company Name"
-                mode="outlined"
-                value={value}
-                onChangeText={onChange}
-                style={stylesx.input}
-              />
-              {errors.Company_Name && <Text style={styles.errorText}>{errors.Company_Name.message}</Text>}
-            </View>
-          )}
-        />
-        
-        {/* Company Address */}
-        <Controller
-          control={control}
-          name="Company_Address"
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                label="Company Address"
-                mode="outlined"
-                value={value}
-                onChangeText={onChange}
-                style={stylesx.input}
-              />
-              {errors.Company_Address && <Text style={styles.errorText}>{errors.Company_Address.message}</Text>}
-            </View>
-          )}
-        />
-        
-        <View style={stylesin.container} className="gap-2">
-          {/* Company City */}
-          <Controller
-            control={control}
-            name="Company_City"
-            render={({ field: { onChange, value } }) => (
-              <View style={stylesin.inputContainer}>
-                <TextInput
-                  label="Company City"
-                  mode='outlined'
-                  value={value}
-                  onChangeText={onChange}
-                  style={stylesin.input}
+              <View style={{ gap: 2 }}>
+                <Controller
+                  control={control}
+                  name="Company_Name"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company Name"
+                        mode="outlined"
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Company_Name && <Text style={styles.errorText}>{errors.Company_Name.message}</Text>}
+                    </View>
+                  )}
                 />
-                {errors.Company_City && <Text style={styles.errorText}>{errors.Company_City.message}</Text>}
-              </View>
-            )}
-          />
-          
-          {/* Company Pincode */}
-          <Controller
-            control={control}
-            name="Company_Pincode"
-            render={({ field: { onChange, value } }) => (
-              <View style={stylesin.inputContainer}>
-                <TextInput
-                  label="Company Pincode"
-                  mode='outlined'
-                  value={value}
-                  onChangeText={onChange}
-                  style={stylesin.input}
+                <Controller
+                  control={control}
+                  name="Company_Address"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company Address"
+                        mode="outlined"
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Company_Address && <Text style={styles.errorText}>{errors.Company_Address.message}</Text>}
+                    </View>
+                  )}
                 />
-                {errors.Company_Pincode && <Text style={styles.errorText}>{errors.Company_Pincode.message}</Text>}
+
+
+                <Controller
+                  control={control}
+                  name="Company_States"
+                  render={({ field: { onChange, value } }) => (
+                    <View className="border">
+                      <Picker
+                        selectedValue={value}
+                        onValueChange={(selectedValue) => {
+                          handleStateChange(selectedValue);
+                          onChange(selectedValue); // Update form state
+                        }}
+                      >
+                        <Picker.Item label="Select a State" value="" />
+                        {statesList.map((state) => (
+                          <Picker.Item key={state.id} label={state.States_Name} value={state.id} />
+                        ))}
+                      </Picker>
+                      {errors.Company_States && <Text style={styles.errorText}>{errors.Company_States.message}</Text>}
+                    </View>
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="Company_City"
+                  render={({ field: { onChange, value } }) => (
+                    <View style={{ borderWidth: 1, padding: 0, margin: 0 }}>
+                      <Picker
+                        selectedValue={value}
+                        onValueChange={(selectedValue) => onChange(selectedValue)}
+                        style={{ margin: 0, padding: 0 }}
+                      >
+                        <Picker.Item label="Select a City" value="" />
+                        {cityList.map((city) => (
+                          <Picker.Item key={city.id} label={city.city_name} value={city.id} />
+                        ))}
+                      </Picker>
+                      {errors.Company_City && <Text style={styles.errorText}>{errors.Company_City.message}</Text>}
+                    </View>
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="Company_Pincode"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company Pincode"
+                        mode='outlined'
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Company_Pincode && <Text style={styles.errorText}>{errors.Company_Pincode.message}</Text>}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name="phoneNumber"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company Phone Number"
+                        mode='outlined'
+                        keyboardType="numeric"
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name="Company_Email"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company Email"
+                        mode='outlined'
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Company_Email && <Text style={styles.errorText}>{errors.Company_Email.message}</Text>}
+                    </View>
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="Company_GST"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company GST No"
+                        mode='outlined'
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Company_GST && <Text style={styles.errorText}>{errors.Company_GST.message}</Text>}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name="Company_CIN"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company CIN No"
+                        mode='outlined'
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Company_CIN && <Text style={styles.errorText}>{errors.Company_CIN.message}</Text>}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name="Company_Udyam"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Company Udyam No"
+                        mode='outlined'
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Company_Udyam && <Text style={styles.errorText}>{errors.Company_Udyam.message}</Text>}
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name="Company_Logo"
+                  render={({ field: { onChange, value } }) => (
+                    <View style={{ alignItems: 'center', marginVertical: 10 }}>
+                      {selectedImage || value ? (
+                        <Image source={{ uri: selectedImage || value }} style={{ width: 100, height: 100, borderRadius: 10 }} />
+                      ) : (
+                        <Text>No Image Selected</Text>
+                      )}
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => handleImageUpload(onChange)}
+                      >
+                        <Text style={styles.buttonText}>Upload Image</Text>
+                      </TouchableOpacity>
+                      {errors.Company_Logo && <Text style={styles.errorText}>{errors.Company_Logo.message}</Text>}
+                    </View>
+                  )}
+                />
+                <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
+                  <Text style={styles.buttonText}>SUBMIT</Text>
+                </TouchableOpacity>
               </View>
-            )}
-          />
-        </View>
-
-        {/* Company Phone Number */}
-        <Controller
-          control={control}
-          name="phoneNumber"
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                label="Company Phone Number"
-                mode='outlined'
-                keyboardType="numeric"
-                value={value}
-                onChangeText={onChange}
-                style={stylesx.input}
-              />
-              {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>}
-            </View>
-          )}
-        />
-
-        {/* Company Email */}
-        <Controller
-          control={control}
-          name="Company_Email"
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                label="Company Email"
-                mode='outlined'
-                value={value}
-                onChangeText={onChange}
-                style={stylesx.input}
-              />
-              {errors.Company_Email && <Text style={styles.errorText}>{errors.Company_Email.message}</Text>}
-            </View>
-          )}
-        />
-        
-        {/* Company GST No */}
-        <Controller
-          control={control}
-          name="Company_GST"
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                label="Company GST No"
-                mode='outlined'
-                value={value}
-                onChangeText={onChange}
-                style={stylesx.input}
-              />
-              {errors.Company_GST && <Text style={styles.errorText}>{errors.Company_GST.message}</Text>}
-            </View>
-          )}
-        />
-
-        {/* Company CIN No */}
-        <Controller
-          control={control}
-          name="Company_CIN"
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                label="Company CIN No"
-                mode='outlined'
-                value={value}
-                onChangeText={onChange}
-                style={stylesx.input}
-              />
-              {errors.Company_CIN && <Text style={styles.errorText}>{errors.Company_CIN.message}</Text>}
-            </View>
-          )}
-        />
-
-        {/* Company Udyam No */}
-        <Controller
-          control={control}
-          name="Company_Udyam"
-          render={({ field: { onChange, value } }) => (
-            <View>
-              <TextInput
-                label="Company Udyam No"
-                mode='outlined'
-                value={value}
-                onChangeText={onChange}
-                style={stylesx.input}
-              />
-              {errors.Company_Udyam && <Text style={styles.errorText}>{errors.Company_Udyam.message}</Text>}
-            </View>
-          )}
-        />
-
-        {/* Submit Button */}
-        <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-          <Text style={styles.buttonText}>SUBMIT</Text>
-        </TouchableOpacity>
-      </View>
             </ScrollView>
           </Animated.View>
         </View>
@@ -368,16 +501,49 @@ const BranchMaster = () => {
   );
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Styles
 const styles = StyleSheet.create({
   input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    backgroundColor: 'white',
+    borderRadius: 8,
+    height: 40,
+    fontSize: 12,
   },
   button: {
     backgroundColor: '#009688',
@@ -447,12 +613,6 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 2,
   },
-
-
-  // dateText: {
-  //     fontSize: 14,
-  //     marginBottom: 10,
-  // },
 });
 
 
@@ -468,11 +628,7 @@ const stylesin = StyleSheet.create({
     minWidth: "45%", // Ensures proper spacing
     maxWidth: "50%",
   },
-  input: {
-    borderRadius: 8,
-    height: 40,
-    fontSize: 12,
-  },
+
   errorInput: {
     borderColor: "red", // Changes only the border color
     borderBlockColor: 1,
@@ -498,5 +654,6 @@ const stylesx = StyleSheet.create({
     paddingHorizontal: 0,
   },
 });
+
 
 export default BranchMaster;
