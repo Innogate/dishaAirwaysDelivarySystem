@@ -19,7 +19,7 @@
         $data = json_decode(file_get_contents("php://input"), true);
         $handler->validateInput($data, ["from"]);
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM branches LIMIT 10 OFFSET ?", [$data["from"]]);
+        $stmt = $db->query("SELECT id, name, alias_name, address, city_id, state_id, pin_code, contact_no, email, company_id, gst_no, cin_no, udyam_no, logo FROM branches LIMIT 10 OFFSET ?", [$data["from"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         (new ApiResponse(200, "Success", $list))->toJson();
@@ -36,7 +36,7 @@
         $data = json_decode(file_get_contents("php://input"), true);
         $handler->validateInput($data, ["branch_id"]);
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM branches WHERE branch_id = ?", [$data["branch_id"]]);
+        $stmt = $db->query("SELECT id, name, alias_name, address, city_id, state_id, pin_code, contact_no, email, company_id, gst_no, cin_no, udyam_no, logo FROM branches WHERE branch_id = ?", [$data["branch_id"]]);
         $list = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$list) {
             (new ApiResponse(400, "Invalid BRANCH ID", "", 400))->toJson();
