@@ -16,7 +16,7 @@ const MenuGrid = () => {
   const router = useRouter(); // ✅ Use router for navigation
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f3f4f6", padding: 16 }}>
+    <View style={{ flex: 1,padding: 16 }} className="bg-slate-100">
       <Text style={{ fontSize: 18, fontWeight: "bold", color: "#4b5563", marginBottom: 10 }}>
         Choose your area
       </Text>
