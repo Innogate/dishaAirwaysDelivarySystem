@@ -1,80 +1,49 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet, Animated, Modal, PanResponder, Dimensions, FlatList } from 'react-native';
-import { TextInput, FAB } from 'react-native-paper'; // Import FAB from react-native-paper
+import { TextInput, FAB, Button } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
+import * as ImagePicker from 'expo-image-picker';
+import { Picker } from '@react-native-picker/picker'; // Import Picker for gender selection
 
 // Define the validation schema
 const schema = yup.object().shape({
   Employee_Name: yup.string().required('Employee Name is required'),
   Employee_Address: yup.string().required('Employee Address is required'),
   Employee_phoneNumber: yup.string()
-  .required('Employee Phone Number is required')
-  .matches(/^[0-9]{10}$/, 'Invalid phone number'),
+    .required('Employee Phone Number is required')
+    .matches(/^[0-9]{10}$/, 'Invalid phone number'),
   Employee_AadharNo: yup.string()
     .required('Employee Aadhar is required')
     .matches(/^[0-9]{12}$/, 'Invalid Aadhar number'),
+  Join_Date: yup.string().required('Join Date is required').matches(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+  Date_of_Birth: yup.string().required('Date of Birth is required').matches(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+  Gender: yup.string().required('Gender is required'),
 });
 
-const screenHeight = Dimensions.get("window").height; // Get screen height
+const screenHeight = Dimensions.get("window").height;
 
 const EmployeeMaster = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(500)).current; // Persist animation value
-  const startY = useRef(0); // Store touch start position
+  const slideAnim = useRef(new Animated.Value(500)).current;
+  const startY = useRef(0);
 
-  // Initialize with static values
-  const [branches, setBranches] = useState([
-    {
-      Company_Name: "ABC Corp",
-      Company_Address: "123 Main St",
-      Company_City: "New York",
-      Company_Pincode: "10001",
-      phoneNumber: "1234567890",
-      Company_Email: "contact@abccorp.com",
-      Company_GST: "GST123456",
-      Company_CIN: "CIN123456",
-      Company_Udyam: "Udyam123456",
-      logo: "https://example.com/logo1.png"
-    },
-    {
-      Company_Name: "XYZ Ltd",
-      Company_Address: "456 Elm St",
-      Company_City: "Los Angeles",
-      Company_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Company_Email: "info@xyzltd.com",
-      Company_GST: "GST654321",
-      Company_CIN: "CIN654321",
-      Company_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
-    },
-    {
-      Company_Name: "XYZ Ltd",
-      Company_Address: "456 Elm St",
-      Company_City: "Los Angeles",
-      Company_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Company_Email: "info@xyzltd.com",
-      Company_GST: "GST654321",
-      Company_CIN: "CIN654321",
-      Company_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
-    }
-  ]);
+  const [branches, setBranches] = useState([]);
+  const [joinDate, setJoinDate] = useState('');
+  const [dob, setDob] = useState('');
+  const [gender, setGender] = useState('');
 
   const openModal = () => {
     slideAnim.setValue(screenHeight);
-    setModalVisible(true); // Set modal visible first
+    setModalVisible(true);
     setTimeout(() => {
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 300,
         useNativeDriver: true,
       }).start();
-    }, 10); // Small delay to prevent flicker
+    }, 10);
   };
 
   const closeModal = () => {
@@ -85,16 +54,14 @@ const EmployeeMaster = () => {
     }).start(() => setModalVisible(false));
   };
 
-  // PanResponder to detect swipe gestures
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderGrant: (_, gestureState) => {
-      startY.current = gestureState.y0; // Capture start position
+      startY.current = gestureState.y0;
     },
     onPanResponderRelease: (_, gestureState) => {
       const endY = gestureState.moveY;
       if (endY - startY.current > 100) {
-        // If swipe down distance is significant, close modal
         closeModal();
       }
     },
@@ -104,26 +71,20 @@ const EmployeeMaster = () => {
     resolver: yupResolver(schema),
   });
 
-  const [logoUri, setLogoUri] = useState(null); // State to hold the logo URI
-
   const onSubmit = async (data) => {
-    // If no errors, proceed with form submission
-    const newBranch = { ...data, logo: logoUri };
-    setBranches([...branches, newBranch]); // Add new branch to the list
-    Alert.alert('Form Submitted', JSON.stringify(newBranch, null, 2));
-    closeModal(); // Close the modal after submission
+    // const newBranch = { ...data, Join_Date: joinDate, Date_of_Birth: dob, Gender: gender };
+    // setBranches([...branches, newBranch]);
+    // Alert.alert('Form Submitted', JSON.stringify(newBranch, null, 2));
+    // closeModal();
   };
 
   const handleLogoUpload = async () => {
-    // Request permission to access the media library
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
     if (permissionResult.granted === false) {
       alert("Permission to access camera roll is required!");
       return;
     }
 
-    // Launch the image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -132,33 +93,20 @@ const EmployeeMaster = () => {
     });
 
     if (!result.canceled) {
-      setLogoUri(result.uri); // Set the logo URI
-      setValue('logo', result); // Set the logo in form state
+      setValue('logo', result.uri);
     }
   };
 
   const renderBranchItem = ({ item }) => (
-    // <View style={styles.branchItem}>
-    <View className="bg-white p-4 mb-3 rounded-lg shadow-md border border-gray-200">
-      <Text className="text-black font-semibold text-lg">
-        Order #: <Text className="text-blue-600">{item.Company_Name}</Text>
-      </Text>
-      <Text className="text-gray-500">{item.Company_Name}</Text>
-
-      <View className="flex-row justify-between items-center mt-2">
-        <View className="bg-gray-200 px-3 py-1 rounded-full">
-          <Text className="text-gray-700">{item.Company_Name}</Text>
-        </View>
-        <Text className="text-lg font-bold">{item.Company_Name}</Text>
-        {/* <TouchableOpacity
-                    className={`px-4 py-1 rounded-full ${order.status === "Shipped" ? "bg-purple-100 border border-purple-600" : "bg-orange-100 border border-orange-500"
-                        }`}
-                >
-                    <Text className={order.status === "Shipped" ? "text-purple-600" : "text-orange-600"}>{order.status}</Text>
-                </TouchableOpacity> */}
-      </View>
+    <View style={styles.branchItem}>
+      <Text style={styles.branchTitle}>Employee Name: <Text style={styles.branchText}>{item.Employee_Name}</Text></Text>
+      <Text style={styles.branchText}>Address: {item.Employee_Address}</Text>
+      <Text style={styles.branchText}>Phone: {item.Employee_phoneNumber}</Text>
+      <Text style={styles.branchText}>Aadhar: {item.Employee_AadharNo}</Text>
+      <Text style={styles.branchText}>Join Date: {item.Join_Date}</Text>
+      <Text style={styles.branchText}>Date of Birth: {item.Date_of_Birth}</Text>
+      <Text style={styles.branchText}>Gender: {item.Gender}</Text>
     </View>
-    // {/* </View> */}
   );
 
   return (
@@ -177,7 +125,7 @@ const EmployeeMaster = () => {
       <Modal transparent visible={modalVisible} animationType="none">
         <View style={styles.modalContainer}>
           <Animated.View
-            {...panResponder.panHandlers} // Attach gesture detection
+            {...panResponder.panHandlers}
             style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}
           >
             <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80, minHeight: screenHeight * 0.6 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
@@ -194,7 +142,7 @@ const EmployeeMaster = () => {
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Employee_Name && <Text style={styles.errorText}>{errors.Employee_Name.message}</Text>}
                     </View>
@@ -207,18 +155,17 @@ const EmployeeMaster = () => {
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="Employ Address"
+                        label="Employee Address"
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Employee_Address && <Text style={styles.errorText}>{errors.Employee_Address.message}</Text>}
                     </View>
                   )}
                 />
 
-                {/* Company Phone Number */}
                 <Controller
                   control={control}
                   name="Employee_phoneNumber"
@@ -230,13 +177,12 @@ const EmployeeMaster = () => {
                         keyboardType="numeric"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
-                      {errors.Employee_phoneNumber && <Text style={styles.errorText}>{errors. Employee_phoneNumber.message}</Text>}
+                      {errors.Employee_phoneNumber && <Text style={styles.errorText}>{errors.Employee_phoneNumber.message}</Text>}
                     </View>
                   )}
                 />
-
 
                 <Controller
                   control={control}
@@ -244,20 +190,75 @@ const EmployeeMaster = () => {
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="Employ Aadhar No"
+                        label="Employee Aadhar No"
                         mode='outlined'
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Employee_AadharNo && <Text style={styles.errorText}>{errors.Employee_AadharNo.message}</Text>}
                     </View>
                   )}
                 />
 
-                
+                {/* Join Date Input */}
+                <Controller
+                  control={control}
+                  name="Join_Date"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        mode='outlined'
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                        label="Join Date (YYYY-MM-DD)"
+                      />
+                      {errors.Join_Date && <Text style={styles.errorText}>{errors.Join_Date.message}</Text>}
+                    </View>
+                  )}
+                />
 
-                {/* Submit Button */}
+                {/* Date of Birth Input */}
+                <Controller
+                  control={control}
+                  name="Date_of_Birth"
+                  render={({ field: { onChange, value } }) => (
+                <View>
+                  <TextInput
+                    mode='outlined'
+                    value={value}
+                    onChangeText={onChange}
+                    style={styles.input}
+                    label="Date of Birth (YYYY-MM-DD)"
+                  />
+                  {errors.Date_of_Birth && <Text style={styles.errorText}>{errors.Date_of_Birth.message}</Text>}
+                </View>
+                  )}
+                />
+
+                {/* Gender Selection */}
+                <Controller
+                  control={control}
+                  name="Gender"
+                  render={({ field: { onChange, value } }) => (
+                <View>
+                  <Text style={styles.label}>Gender</Text>
+                  <Picker
+                    selectedValue={value}
+                    onValueChange={onChange}
+                    style={styles.input}
+                  >
+                    <Picker.Item label="Select Gender" value="" />
+                    <Picker.Item label="Male" value="Male" />
+                    <Picker.Item label="Female" value="Female" />
+                    <Picker.Item label="Other" value="Other" />
+                  </Picker>
+                  {errors.Gender && <Text style={styles.errorText}>{errors.Gender.message}</Text>}
+                </View>
+                  )}
+                  />
+
                 <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
                   <Text style={styles.buttonText}>SUBMIT</Text>
                 </TouchableOpacity>
@@ -273,13 +274,15 @@ const EmployeeMaster = () => {
 // Styles
 const styles = StyleSheet.create({
   input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    backgroundColor: 'white',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    margin: 0,
+    fontSize: 10,
+    height: 40,
+  },
+  inputContent: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
   },
   button: {
     backgroundColor: '#009688',
@@ -296,11 +299,6 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 12,
     marginTop: 5,
-  },
-  logoText: {
-    marginTop: 5,
-    fontSize: 12,
-    color: 'green',
   },
   fab: {
     position: 'absolute',
@@ -334,7 +332,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3, // Android shadow
+    elevation: 3,
     borderWidth: 1,
     borderColor: '#ddd',
   },
@@ -349,67 +347,10 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 2,
   },
-
-
-  // dateText: {
-  //     fontSize: 14,
-  //     marginBottom: 10,
-  // },
-});
-
-
-const stylesin = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  inputContainer: {
-    flex: 1,
-    minWidth: "45%", // Ensures proper spacing
-    maxWidth: "50%",
-  },
-  input: {
-    borderRadius: 8,
-    height: 40,
-    fontSize: 12,
-  },
-  errorInput: {
-    borderColor: "red", // Changes only the border color
-    borderBlockColor: 1,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 10,
-    textAlign: "left",
-  },
-});
-
-
-const stylesx = StyleSheet.create({
-  input: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    margin: 0,
-    fontSize: 10,
-    height: 40,
-  },
-  inputContent: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
+  label: {
+    marginVertical: 5,
+    fontSize: 16,
   },
 });
 
 export default EmployeeMaster;
-
-
-
-
-
-
-
-
-
-
-

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet, Animated, Modal, PanResponder, Dimensions, FlatList, Image, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet, Animated, Modal, PanResponder, Dimensions, FlatList, Image } from 'react-native';
 import { TextInput, FAB } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import * as FileSystem from 'expo-file-system';
 import { environment } from '@/app/environment/environment';
 
 // Define the validation schema
@@ -29,20 +30,19 @@ const schema = yup.object().shape({
   Company_Logo: yup.string().required('Company Logo'),
 });
 
-
 const screenHeight = Dimensions.get("window").height;
 
-const BranchMaster = ( ) => {
+const BranchMaster = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(screenHeight)).current;
   const startY = useRef(0);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [branches, setBranches] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // gate all states
+  // Get all states
   const [statesList, setStatesList] = useState([]);
   const getAllStates = useCallback(async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+       const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
     if (token) {
       const url = `${environment.apiUrl}/master/states`;
       const header = {
@@ -55,7 +55,7 @@ const BranchMaster = ( ) => {
         const res = await fetch(url, { method: "POST", headers: header, body });
         const resJson = await res.json();
         if (res.status === 200) {
-          const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
+          const formattedStates = resJson.body.map((state) => ({
             id: state.id,
             States_Name: state.name,
           }));
@@ -69,17 +69,17 @@ const BranchMaster = ( ) => {
       }
     }
   }, []);
+
   useEffect(() => {
     getAllStates();
     getAllCompanies();
   }, [getAllStates]);
 
-  // get all city by states id
-  const [cityList, setcityList] = useState([]);
-  const handleStateChange = async (selectedValue: any) => {
-    console.log("Selected State ID:", selectedValue);
+  // Get all cities by state id
+  const [cityList, setCityList] = useState([]);
+  const handleStateChange = async (selectedValue) => {
     if (selectedValue) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+         const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
       if (token) {
         const url = `${environment.apiUrl}/master/cities/byStateId`;
         const header = {
@@ -91,27 +91,26 @@ const BranchMaster = ( ) => {
           const res = await fetch(url, { method: "POST", headers: header, body });
           const resJson = await res.json();
           if (res.status === 200) {
-            const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
-              id: state.id,
-              city_name: state.name,
+            const formattedCities = resJson.body.map((city) => ({
+              id: city.id,
+              city_name: city.name,
             }));
-            setcityList(formattedStates);
+            setCityList(formattedCities);
           } else {
-            Alert.alert("Error", resJson.message || "Failed to fetch states.");
+            Alert.alert("Error", resJson.message || "Failed to fetch cities.");
           }
         } catch (error) {
           Alert.alert("Error", "Server Error");
           console.error("Fetch error:", error);
         }
-
       }
-    };
-  }
+    }
+  };
 
-  // Gate all company
+  // Get all companies
   const [companyList, setCompanyList] = useState([]);
   const getAllCompanies = async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+       const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
     if (token) {
       const url = `${environment.apiUrl}/master/companies`;
       const header = {
@@ -123,40 +122,36 @@ const BranchMaster = ( ) => {
         const res = await fetch(url, { method: "POST", headers: header, body });
         const resJson = await res.json();
         if (res.status === 200) {
-          const formattedStates = resJson.body.map((company: { id: any; name: any; address: any; pin_code: any; contact_no: any; email: any; gst_no: any; cin_no: any; udyam_no: any }) => ({
+          const formattedCompanies = resJson.body.map((company) => ({
             id: company.id,
             name: company.name,
             address: company.address,
-            // city_id: 1,
-            // state_id: 1,
             pin_code: company.pin_code,
             contact_no: company.contact_no,
             email: company.email,
             gst_no: company.gst_no,
             cin_no: company.cin_no,
-            udyam_no: company.udyam_no
+            udyam_no: company.udyam_no,
+            logo: company.logo // Assuming the logo URL is in the response
           }));
-          setCompanyList(formattedStates);
+          setCompanyList(formattedCompanies);
         } else {
-          Alert.alert("Error", resJson.message || "Failed to fetch states.");
+          Alert.alert("Error", resJson.message || "Failed to fetch companies.");
         }
       } catch (error) {
         Alert.alert("Error", "Server Error");
         console.error("Fetch error:", error);
       }
-
-
     }
-  }
-
+  };
 
   // Create a new Company
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data) => {
     const newCompany = { ...data, logo: selectedImage };
-    
+
     if (newCompany) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
-      
+         const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+
       if (token) {
         const url = `${environment.apiUrl}/master/companies/new`;
         const headers = {
@@ -174,36 +169,34 @@ const BranchMaster = ( ) => {
           gst_no: newCompany.Company_GST,
           cin_no: newCompany.Company_CIN,
           udyam_no: newCompany.Company_Udyam,
-          logo: "base64_encoded_string"
+          logo: newCompany.Company_Logo, // Use the base64 string here
         });
-  
+
+        setLoading(true);
         try {
           const res = await fetch(url, { method: "POST", headers, body });
           const resJson = await res.json();
-  
+
           if (res.status === 200) {
             Alert.alert("Success", "Company Created Successfully");
-  
-            // Refresh the company list
             getAllCompanies();
-  
-            // Reset the form fields
             reset(); // Reset the form after successful submission
+            setSelectedImage(null); // Reset the image state
           } else {
-            console.log(resJson);
             Alert.alert("Error", resJson.message || "Failed to create company.");
           }
         } catch (error) {
           Alert.alert("Error", "Server Error");
           console.error("Fetch error:", error);
+        } finally {
+          setLoading(false);
         }
       }
     }
-  
+
     // Close the modal after form submission
     closeModal();
   };
-  
 
   const openModal = () => {
     slideAnim.setValue(screenHeight);
@@ -238,11 +231,11 @@ const BranchMaster = ( ) => {
     },
   });
 
-  const { control, handleSubmit, setValue,reset, formState: { errors } } = useForm({
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const handleImageUpload = async (onChange: any) => {
+  const handleImageUpload = async (onChange) => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
@@ -259,18 +252,21 @@ const BranchMaster = ( ) => {
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-      setSelectedImage(uri);
-      onChange(uri); // Update form field
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      setSelectedImage(base64);
+      onChange(base64); // Update form field with base64 string
     }
   };
 
   const renderBranchItem = ({ item }) => (
+    console.log(item),
     <View style={styles.branchItem}>
       <Text style={styles.branchTitle}>{item.name}</Text>
-      <Text style={styles.branchText}>{item.address}</Text>
+      <Text style={styles.branchText}>{item.address}</Text>       
       {item.logo && (
-        <Image source={{ uri: item.logo }} style={{ width: 50, height: 50 }} />
-      )}
+        <Image source={{ uri: item.logo }} style={{ width: 100, height: 100 }} />      )}
     </View>
   );
 
@@ -327,7 +323,6 @@ const BranchMaster = ( ) => {
                     </View>
                   )}
                 />
-
 
                 <Controller
                   control={control}
@@ -489,8 +484,8 @@ const BranchMaster = ( ) => {
                     </View>
                   )}
                 />
-                <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-                  <Text style={styles.buttonText}>SUBMIT</Text>
+                <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)} disabled={loading}>
+                  <Text style={styles.buttonText}>{loading ? 'Submitting...' : 'SUBMIT'}</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -500,43 +495,6 @@ const BranchMaster = ( ) => {
     </View>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Styles
 const styles = StyleSheet.create({
@@ -614,46 +572,5 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 });
-
-
-const stylesin = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  inputContainer: {
-    flex: 1,
-    minWidth: "45%", // Ensures proper spacing
-    maxWidth: "50%",
-  },
-
-  errorInput: {
-    borderColor: "red", // Changes only the border color
-    borderBlockColor: 1,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 10,
-    textAlign: "left",
-  },
-});
-
-
-const stylesx = StyleSheet.create({
-  input: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    margin: 0,
-    fontSize: 10,
-    height: 40,
-  },
-  inputContent: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-  },
-});
-
 
 export default BranchMaster;

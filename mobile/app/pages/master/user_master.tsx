@@ -1,80 +1,45 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet, Animated, Modal, PanResponder, Dimensions, FlatList } from 'react-native';
-import { TextInput, FAB } from 'react-native-paper'; // Import FAB from react-native-paper
+import { TextInput, FAB } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
+import { environment } from '@/app/environment/environment';
 
 // Define the validation schema
 const schema = yup.object().shape({
-  Employee_Name: yup.string().required('Employee Name is required'),
+  Employee_FName: yup.string().required('Employee First Name is required'),
+  Employee_LName: yup.string().required('Employee Last Name is required'),
   Employee_Address: yup.string().required('Employee Address is required'),
   Employee_phoneNumber: yup.string()
-  .required('Employee Phone Number is required')
-  .matches(/^[0-9]{10}$/, 'Invalid phone number'),
-  Employee_AadharNo: yup.string()
-    .required('Employee Aadhar is required')
-    .matches(/^[0-9]{12}$/, 'Invalid Aadhar number'),
+    .required('Employee Phone Number is required')
+    .matches(/^[0-9]{10}$/, 'Invalid phone number'),
+  password: yup.string()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters'),
+  gender: yup.string().required('Gender is required'),
+  birth_date: yup.string().required('Birth Date is required').matches(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+  email: yup.string().email('Invalid email format').required('Email is required'),
 });
 
-const screenHeight = Dimensions.get("window").height; // Get screen height
+const screenHeight = Dimensions.get("window").height;
 
 const EmployeeMaster = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const slideAnim = useRef(new Animated.Value(500)).current; // Persist animation value
-  const startY = useRef(0); // Store touch start position
+  const slideAnim = useRef(new Animated.Value(500)).current;
+  const startY = useRef(0);
 
-  // Initialize with static values
-  const [branches, setBranches] = useState([
-    {
-      Company_Name: "ABC Corp",
-      Company_Address: "123 Main St",
-      Company_City: "New York",
-      Company_Pincode: "10001",
-      phoneNumber: "1234567890",
-      Company_Email: "contact@abccorp.com",
-      Company_GST: "GST123456",
-      Company_CIN: "CIN123456",
-      Company_Udyam: "Udyam123456",
-      logo: "https://example.com/logo1.png"
-    },
-    {
-      Company_Name: "XYZ Ltd",
-      Company_Address: "456 Elm St",
-      Company_City: "Los Angeles",
-      Company_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Company_Email: "info@xyzltd.com",
-      Company_GST: "GST654321",
-      Company_CIN: "CIN654321",
-      Company_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
-    },
-    {
-      Company_Name: "XYZ Ltd",
-      Company_Address: "456 Elm St",
-      Company_City: "Los Angeles",
-      Company_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Company_Email: "info@xyzltd.com",
-      Company_GST: "GST654321",
-      Company_CIN: "CIN654321",
-      Company_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
-    }
-  ]);
-
+  const [User, setUser] = useState([]);
   const openModal = () => {
     slideAnim.setValue(screenHeight);
-    setModalVisible(true); // Set modal visible first
+    setModalVisible(true);
     setTimeout(() => {
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 300,
         useNativeDriver: true,
       }).start();
-    }, 10); // Small delay to prevent flicker
+    }, 10);
   };
 
   const closeModal = () => {
@@ -85,86 +50,132 @@ const EmployeeMaster = () => {
     }).start(() => setModalVisible(false));
   };
 
-  // PanResponder to detect swipe gestures
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderGrant: (_, gestureState) => {
-      startY.current = gestureState.y0; // Capture start position
+      startY.current = gestureState.y0;
     },
     onPanResponderRelease: (_, gestureState) => {
       const endY = gestureState.moveY;
       if (endY - startY.current > 100) {
-        // If swipe down distance is significant, close modal
         closeModal();
       }
     },
   });
 
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
-
-  const [logoUri, setLogoUri] = useState(null); // State to hold the logo URI
-
+ // Create User
   const onSubmit = async (data) => {
-    // If no errors, proceed with form submission
-    const newBranch = { ...data, logo: logoUri };
-    setBranches([...branches, newBranch]); // Add new branch to the list
-    Alert.alert('Form Submitted', JSON.stringify(newBranch, null, 2));
-    closeModal(); // Close the modal after submission
+    console.log('Form submitted with data:', data); // Log the submitted data
+    if (data) {
+      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+      if (token) {
+        const url = `${environment.apiUrl}/master/users/new`;
+        const header = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const body = JSON.stringify({
+          mobile: data.Employee_phoneNumber,
+          password: data.password,
+          first_name: data.Employee_FName,
+          last_name: data.Employee_LName,
+          gender: data.gender,
+          birth_date: data.birth_date,
+          address: data.Employee_Address,
+          email: data.email
+
+        });
+        try {
+          const res = await fetch(url, { method: "POST", headers: header, body });
+          const resJson = await res.json();
+          if (res.status === 200) {
+            Alert.alert("Success", resJson.message);
+            closeModal(); // Close the modal after successful creation
+            reset(); // Reset the form state
+          } else {
+            Alert.alert("Error", resJson.message || "Failed to fetch states.");
+          }
+        } catch (error) {
+          Alert.alert("Error", "Server Error");
+          console.error("Fetch error:", error);
+        }
+
+      }
+    }
   };
 
-  const handleLogoUpload = async () => {
-    // Request permission to access the media library
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+ // Gate all Users
+ const getAllUser = async () => {
+  const token =
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
 
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
-      return;
-    }
-
-    // Launch the image picker
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+  if (token) {
+    const url = environment.apiUrl + "/master/users";
+    const header = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    const body = JSON.stringify({
+      from: 0,
     });
 
-    if (!result.canceled) {
-      setLogoUri(result.uri); // Set the logo URI
-      setValue('logo', result); // Set the logo in form state
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: header,
+        body: body,
+      });
+
+      const resJson = await res.json();
+      console.log("Response JSON:", resJson);
+
+      if (res.status === 200) {
+        // Extract 'id' and 'name' from the 'body' array
+        const formattedStates = resJson.body.map((user) => ({
+          id: user.id,
+          // Employee_FName :   
+          // Employee_LName :
+          // email :
+          Employee_phoneNumber : user.mobile,
+          Employee_Address : user.password
+          // gender :
+          // birth_date
+        }));
+        setUser(formattedStates);
+      } else {
+        Alert.alert("Error", resJson.message || "Failed to fetch states.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Server Error");
+      console.error("Fetch error:", error);
     }
-  };
+  }
+};
+
+// Call function on page load to display
+  useEffect(() => {
+    getAllUser();
+  }, []);
+
 
   const renderBranchItem = ({ item }) => (
-    // <View style={styles.branchItem}>
-    <View className="bg-white p-4 mb-3 rounded-lg shadow-md border border-gray-200">
-      <Text className="text-black font-semibold text-lg">
-        Order #: <Text className="text-blue-600">{item.Company_Name}</Text>
-      </Text>
-      <Text className="text-gray-500">{item.Company_Name}</Text>
-
-      <View className="flex-row justify-between items-center mt-2">
-        <View className="bg-gray-200 px-3 py-1 rounded-full">
-          <Text className="text-gray-700">{item.Company_Name}</Text>
-        </View>
-        <Text className="text-lg font-bold">{item.Company_Name}</Text>
-        {/* <TouchableOpacity
-                    className={`px-4 py-1 rounded-full ${order.status === "Shipped" ? "bg-purple-100 border border-purple-600" : "bg-orange-100 border border-orange-500"
-                        }`}
-                >
-                    <Text className={order.status === "Shipped" ? "text-purple-600" : "text-orange-600"}>{order.status}</Text>
-                </TouchableOpacity> */}
-      </View>
+    <View style={styles.branchItem}>
+      <Text style={styles.branchTitle}>Employee Name: <Text style={styles.branchText}>{item.Employee_FName} {item.Employee_LName}</Text></Text>
+      <Text style={styles.branchText}>Email: {item.email}</Text>
+      <Text style={styles.branchText}>Phone: {item.Employee_phoneNumber}</Text>
+      <Text style={styles.branchText}>Address: {item.Employee_Address}</Text>
+      <Text style={styles.branchText}>Gender: {item.gender}</Text>
+      <Text style={styles.branchText}>Birth Date: {item.birth_date}</Text>
     </View>
-    // {/* </View> */}
   );
 
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={branches}
+        data={User}
         renderItem={renderBranchItem}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.listContainer}
@@ -177,87 +188,149 @@ const EmployeeMaster = () => {
       <Modal transparent visible={modalVisible} animationType="none">
         <View style={styles.modalContainer}>
           <Animated.View
-            {...panResponder.panHandlers} // Attach gesture detection
+            {...panResponder.panHandlers}
             style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}
           >
             <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80, minHeight: screenHeight * 0.6 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-              <Text style={styles.dateText}>Date: {new Date().toLocaleDateString()}</Text>
-
-              <View className="gap-2">
+              <View>
                 <Controller
                   control={control}
-                  name="First_Name"
+                  name="Employee_FName"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="First Name"
+                        label="Employee First Name"
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
-                      {errors.First_Name && <Text style={styles.errorText}>{errors.First_Name.message}</Text>}
+                      {errors.Employee_FName && <Text style={styles.errorText}>{errors.Employee_FName.message}</Text>}
                     </View>
                   )}
                 />
 
                 <Controller
                   control={control}
-                  name="List_Name"
+                  name="Employee_LName"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="List Name"
+                        label="Employee Last Name"
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
-                      {errors.List_Name && <Text style={styles.errorText}>{errors.List_Name.message}</Text>}
+                      {errors.Employee_LName && <Text style={styles.errorText}>{errors.Employee_LName.message}</Text>}
                     </View>
                   )}
                 />
 
-                {/* Company Phone Number */}
                 <Controller
                   control={control}
-                  name="User_phoneNumber"
+                  name="Employee_Address"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="User Phone Number"
+                        label="Employee Address"
+                        mode="outlined"
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.Employee_Address && <Text style={styles.errorText}>{errors.Employee_Address.message}</Text>}
+                    </View>
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="Employee_phoneNumber"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Employee Phone Number"
                         mode='outlined'
                         keyboardType="numeric"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
-                      {errors.Employee_phoneNumber && <Text style={styles.errorText}>{errors. Employee_phoneNumber.message}</Text>}
+                      {errors.Employee_phoneNumber && <Text style={styles.errorText}>{errors.Employee_phoneNumber.message}</Text>}
                     </View>
                   )}
                 />
-
 
                 <Controller
                   control={control}
-                  name="Employee_AadharNo"
+                  name="email"
                   render={({ field: { onChange, value } }) => (
                     <View>
                       <TextInput
-                        label="Employ Aadhar No"
-                        mode='outlined'
+                        label="Email"
+                        mode="outlined"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
-                      {errors.Employee_AadharNo && <Text style={styles.errorText}>{errors.Employee_AadharNo.message}</Text>}
+                      {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
                     </View>
                   )}
                 />
 
-                
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Password"
+                        mode="outlined"
+                        secureTextEntry
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+                    </View>
+                  )}
+                />
 
-                {/* Submit Button */}
+                <Controller
+                  control={control}
+                  name="gender"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        label="Gender"
+                        mode="outlined"
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                      />
+                      {errors.gender && <Text style={styles.errorText}>{errors.gender.message}</Text>}
+                    </View>
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="birth_date"
+                  render={({ field: { onChange, value } }) => (
+                    <View>
+                      <TextInput
+                        mode='outlined'
+                        value={value}
+                        onChangeText={onChange}
+                        style={styles.input}
+                        label="Birth Date (YYYY-MM-DD)"
+                      />
+                      {errors.birth_date && <Text style={styles.errorText}>{errors.birth_date.message}</Text>}
+                    </View>
+                  )}
+                />
+
                 <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
                   <Text style={styles.buttonText}>SUBMIT</Text>
                 </TouchableOpacity>
@@ -273,13 +346,11 @@ const EmployeeMaster = () => {
 // Styles
 const styles = StyleSheet.create({
   input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    backgroundColor: 'white',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    margin: 0,
+    fontSize: 10,
+    height: 40,
   },
   button: {
     backgroundColor: '#009688',
@@ -296,11 +367,6 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 12,
     marginTop: 5,
-  },
-  logoText: {
-    marginTop: 5,
-    fontSize: 12,
-    color: 'green',
   },
   fab: {
     position: 'absolute',
@@ -334,7 +400,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3, // Android shadow
+    elevation: 3,
     borderWidth: 1,
     borderColor: '#ddd',
   },
@@ -349,67 +415,6 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 2,
   },
-
-
-  // dateText: {
-  //     fontSize: 14,
-  //     marginBottom: 10,
-  // },
-});
-
-
-const stylesin = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  inputContainer: {
-    flex: 1,
-    minWidth: "45%", // Ensures proper spacing
-    maxWidth: "50%",
-  },
-  input: {
-    borderRadius: 8,
-    height: 40,
-    fontSize: 12,
-  },
-  errorInput: {
-    borderColor: "red", // Changes only the border color
-    borderBlockColor: 1,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 10,
-    textAlign: "left",
-  },
-});
-
-
-const stylesx = StyleSheet.create({
-  input: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    margin: 0,
-    fontSize: 10,
-    height: 40,
-  },
-  inputContent: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-  },
 });
 
 export default EmployeeMaster;
-
-
-
-
-
-
-
-
-
-
-
