@@ -122,6 +122,10 @@ const styles = StyleSheet.create({
     height: 50, 
     color: '#333', 
   }, 
+  iconContainer: {
+    flexDirection: 'row',
+    gap: 10,
+  },
 });
 
 
