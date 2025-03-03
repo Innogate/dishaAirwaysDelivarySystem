@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import * as FileSystem from 'expo-file-system';
 import { environment } from '@/app/environment/environment';
-
+import styles from '@/app/components/GlobalStyle';
 // Define the validation schema
 const schema = yup.object().shape({
   Company_Name: yup.string().required('Company Name is required'),
@@ -16,10 +16,10 @@ const schema = yup.object().shape({
   Company_City: yup.string().required('Company City is required'),
   Company_States: yup.string().required('Company State is required'),
   Company_Pincode: yup.string()
-    .required('Company Pincode is required')
+    .required('Pincode is required')
     .matches(/^[0-9]{6}$/, 'Invalid Pincode'),
   phoneNumber: yup.string()
-    .required('Company Phone Number is required')
+    .required('Phone Number is required')
     .matches(/^[0-9]{10}$/, 'Invalid phone number'),
   Company_Email: yup.string()
     .email('Invalid email format')
@@ -42,7 +42,7 @@ const BranchMaster = () => {
   // Get all states
   const [statesList, setStatesList] = useState([]);
   const getAllStates = useCallback(async () => {
-       const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
     if (token) {
       const url = `${environment.apiUrl}/master/states`;
       const header = {
@@ -79,7 +79,7 @@ const BranchMaster = () => {
   const [cityList, setCityList] = useState([]);
   const handleStateChange = async (selectedValue) => {
     if (selectedValue) {
-         const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
       if (token) {
         const url = `${environment.apiUrl}/master/cities/byStateId`;
         const header = {
@@ -110,7 +110,7 @@ const BranchMaster = () => {
   // Get all companies
   const [companyList, setCompanyList] = useState([]);
   const getAllCompanies = async () => {
-       const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
     if (token) {
       const url = `${environment.apiUrl}/master/companies`;
       const header = {
@@ -150,7 +150,7 @@ const BranchMaster = () => {
     const newCompany = { ...data, logo: selectedImage };
 
     if (newCompany) {
-         const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
 
       if (token) {
         const url = `${environment.apiUrl}/master/companies/new`;
@@ -251,27 +251,25 @@ const BranchMaster = () => {
     });
 
     if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      setSelectedImage(base64);
-      onChange(base64); // Update form field with base64 string
+      const uri = result.assets[0].uri; // Get image URI directly
+      setSelectedImage(uri);
+      onChange(uri); // Update form field with image URI
     }
   };
+
 
   const renderBranchItem = ({ item }) => (
     console.log(item),
     <View style={styles.branchItem}>
       <Text style={styles.branchTitle}>{item.name}</Text>
-      <Text style={styles.branchText}>{item.address}</Text>       
+      <Text style={styles.branchText}>{item.address}</Text>
       {item.logo && (
-        <Image source={{ uri: item.logo }} style={{ width: 100, height: 100 }} />      )}
+        <Image source={{ uri: item.logo }} style={{ width: 100, height: 100 }} />)}
     </View>
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 }} className="bg-slate-100">
       <FlatList
         data={companyList}  // Use `companyList` instead of `branches`
         renderItem={renderBranchItem}
@@ -290,7 +288,7 @@ const BranchMaster = () => {
             style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}
           >
             <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80, minHeight: screenHeight * 0.6 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-              <View style={{ gap: 2 }}>
+              <View style={{ gap: 3 }}>
                 <Controller
                   control={control}
                   name="Company_Name"
@@ -323,82 +321,87 @@ const BranchMaster = () => {
                     </View>
                   )}
                 />
+                <View style={styles.rowContainer}>
+                  {/* State Picker */}
+                  <Controller
+                    control={control}
+                    name="Company_States"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={[styles.pickerWrapper, styles.pickerWrapperLeft]}>
+                        <Picker
+                          selectedValue={value}
+                          onValueChange={(selectedValue) => {
+                            handleStateChange(selectedValue);
+                            onChange(selectedValue);
+                          }}
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="Select a State" value="" />
+                          {statesList.map((state) => (
+                            <Picker.Item key={state.id} label={state.States_Name} value={state.id} />
+                          ))}
+                        </Picker>
+                        {errors.Company_States && <Text style={styles.errorText}>{errors.Company_States.message}</Text>}
+                      </View>
+                    )}
+                  />
 
-                <Controller
-                  control={control}
-                  name="Company_States"
-                  render={({ field: { onChange, value } }) => (
-                    <View className="border">
-                      <Picker
-                        selectedValue={value}
-                        onValueChange={(selectedValue) => {
-                          handleStateChange(selectedValue);
-                          onChange(selectedValue); // Update form state
-                        }}
-                      >
-                        <Picker.Item label="Select a State" value="" />
-                        {statesList.map((state) => (
-                          <Picker.Item key={state.id} label={state.States_Name} value={state.id} />
-                        ))}
-                      </Picker>
-                      {errors.Company_States && <Text style={styles.errorText}>{errors.Company_States.message}</Text>}
-                    </View>
-                  )}
-                />
-
-                <Controller
-                  control={control}
-                  name="Company_City"
-                  render={({ field: { onChange, value } }) => (
-                    <View style={{ borderWidth: 1, padding: 0, margin: 0 }}>
-                      <Picker
-                        selectedValue={value}
-                        onValueChange={(selectedValue) => onChange(selectedValue)}
-                        style={{ margin: 0, padding: 0 }}
-                      >
-                        <Picker.Item label="Select a City" value="" />
-                        {cityList.map((city) => (
-                          <Picker.Item key={city.id} label={city.city_name} value={city.id} />
-                        ))}
-                      </Picker>
-                      {errors.Company_City && <Text style={styles.errorText}>{errors.Company_City.message}</Text>}
-                    </View>
-                  )}
-                />
-
-                <Controller
-                  control={control}
-                  name="Company_Pincode"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Company Pincode"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={styles.input}
-                      />
-                      {errors.Company_Pincode && <Text style={styles.errorText}>{errors.Company_Pincode.message}</Text>}
-                    </View>
-                  )}
-                />
-                <Controller
-                  control={control}
-                  name="phoneNumber"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Company Phone Number"
-                        mode='outlined'
-                        keyboardType="numeric"
-                        value={value}
-                        onChangeText={onChange}
-                        style={styles.input}
-                      />
-                      {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>}
-                    </View>
-                  )}
-                />
+                  {/* City Picker */}
+                  <Controller
+                    control={control}
+                    name="Company_City"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={styles.pickerWrapper}>
+                        <Picker
+                          selectedValue={value}
+                          onValueChange={(selectedValue) => onChange(selectedValue)}
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="Select a City" value="" />
+                          {cityList.map((city) => (
+                            <Picker.Item key={city.id} label={city.city_name} value={city.id} />
+                          ))}
+                        </Picker>
+                        {errors.Company_City && <Text style={styles.errorText}>{errors.Company_City.message}</Text>}
+                      </View>
+                    )}
+                  />
+                </View>
+                <View style={styles.container} className="gap-2">
+                  <Controller
+                    control={control}
+                    name="Company_Pincode"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={styles.twoinputContainer}>
+                        <TextInput
+                          label="Company Pincode"
+                          mode='outlined'
+                          value={value}
+                          onChangeText={onChange}
+                          style={styles.input}
+                        />
+                        {errors.Company_Pincode && <Text style={styles.errorText}>{errors.Company_Pincode.message}</Text>}
+                      </View>
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name="phoneNumber"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={styles.twoinputContainer}>
+                        <TextInput
+                          label="Company Phone Number"
+                          mode='outlined'
+                          keyboardType="numeric"
+                          value={value}
+                          onChangeText={onChange}
+                          style={styles.input}
+                        />
+                        {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>}
+                      </View>
+                    )}
+                  />
+                </View>
                 <Controller
                   control={control}
                   name="Company_Email"
@@ -416,38 +419,42 @@ const BranchMaster = () => {
                   )}
                 />
 
-                <Controller
-                  control={control}
-                  name="Company_GST"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Company GST No"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={styles.input}
-                      />
-                      {errors.Company_GST && <Text style={styles.errorText}>{errors.Company_GST.message}</Text>}
-                    </View>
-                  )}
-                />
-                <Controller
-                  control={control}
-                  name="Company_CIN"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Company CIN No"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={styles.input}
-                      />
-                      {errors.Company_CIN && <Text style={styles.errorText}>{errors.Company_CIN.message}</Text>}
-                    </View>
-                  )}
-                />
+                <View style={styles.container} className='gap-2'>
+                  <Controller
+                    control={control}
+                    name="Company_GST"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={styles.twoinputContainer}>
+                        <TextInput
+                          label="Company GST No"
+                          mode='outlined'
+                          value={value}
+                          onChangeText={onChange}
+                          style={styles.input}
+                        />
+                        {errors.Company_GST && <Text style={styles.errorText}>{errors.Company_GST.message}</Text>}
+                      </View>
+                    )}
+                  />
+
+                  <Controller
+                    control={control}
+                    name="Company_CIN"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={styles.twoinputContainer}>
+                        <TextInput
+                          label="Company CIN No"
+                          mode='outlined'
+                          value={value}
+                          onChangeText={onChange}
+                          style={styles.input}
+                        />
+                        {errors.Company_CIN && <Text style={styles.errorText}>{errors.Company_CIN.message}</Text>}
+                      </View>
+                    )}
+                  />
+                </View>
+
                 <Controller
                   control={control}
                   name="Company_Udyam"
@@ -469,21 +476,24 @@ const BranchMaster = () => {
                   name="Company_Logo"
                   render={({ field: { onChange, value } }) => (
                     <View style={{ alignItems: 'center', marginVertical: 10 }}>
-                      {selectedImage || value ? (
-                        <Image source={{ uri: selectedImage || value }} style={{ width: 100, height: 100, borderRadius: 10 }} />
+                      {/* Show the selected image or placeholder text */}
+                      {value ? (
+                        <Image source={{ uri: value }} style={{ width: 100, height: 100, borderRadius: 10 }} />
                       ) : (
                         <Text>No Image Selected</Text>
                       )}
-                      <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => handleImageUpload(onChange)}
-                      >
+
+                      {/* Upload Image Button */}
+                      <TouchableOpacity style={styles.button} onPress={() => handleImageUpload(onChange)}>
                         <Text style={styles.buttonText}>Upload Image</Text>
                       </TouchableOpacity>
+
+                      {/* Error Message */}
                       {errors.Company_Logo && <Text style={styles.errorText}>{errors.Company_Logo.message}</Text>}
                     </View>
                   )}
                 />
+
                 <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)} disabled={loading}>
                   <Text style={styles.buttonText}>{loading ? 'Submitting...' : 'SUBMIT'}</Text>
                 </TouchableOpacity>
@@ -495,82 +505,4 @@ const BranchMaster = () => {
     </View>
   );
 };
-
-// Styles
-const styles = StyleSheet.create({
-  input: {
-    borderRadius: 8,
-    height: 40,
-    fontSize: 12,
-  },
-  button: {
-    backgroundColor: '#009688',
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  logoText: {
-    marginTop: 5,
-    fontSize: 12,
-    color: 'green',
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 4,
-    bottom: 48,
-  },
-  modalContent: {
-    height: screenHeight * 0.6,
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    width: "100%",
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  listContainer: {
-    padding: 16,
-  },
-  branchItem: {
-    backgroundColor: '#ffffff',
-    padding: 15,
-    marginVertical: 10,
-    marginHorizontal: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3, // Android shadow
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  branchTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
-  },
-  branchText: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 2,
-  },
-});
-
 export default BranchMaster;

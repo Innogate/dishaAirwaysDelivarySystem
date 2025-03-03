@@ -11,7 +11,7 @@ export default function TopBar() {
 
 const styles = StyleSheet.create({
   topBar: {
-    height: 50,
+    height: 40,
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',

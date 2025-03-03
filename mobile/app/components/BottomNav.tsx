@@ -13,7 +13,7 @@ const BottomNav = () => {
   }
 
   return (
-    <View className="flex-row justify-around bg-white py-3 border-t border-gray-200">
+    <View className="flex-row justify-around bg-white py-1 border-t border-gray-200">
       {/* Home */}
       <Pressable 
         className="items-center" 
@@ -27,7 +27,7 @@ const BottomNav = () => {
       {/* Booking */}
       <Pressable 
         className="items-center" 
-        onPress={() => setActive(1, "/booking")} 
+        onPress={() => setActive(1, "/pages/booking")} 
         android_ripple={{ borderless: true, radius: 0 }}
       >
         <Ionicons name={activeIndex === 1 ? "book" : "book-outline"} size={24} color={activeIndex === 1 ? "#0d9488" : "#6b7280"} />
