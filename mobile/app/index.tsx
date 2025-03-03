@@ -1,24 +1,43 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { useRouter, useRootNavigationState } from "expo-router";
 import globalStorage from "./components/GlobalStorage";
-import '../global.css'
+import "../global.css";
 import React from "react";
-export default async function LandingScreen() {
+
+export default function LandingScreen() {
   const router = useRouter();
   const navigationState = useRootNavigationState();
-  globalStorage.setTemp("pageTitle","Login");
-  const token = await globalStorage.getValue("token")
+  const [token, setToken] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!token) {
-      router.push("/login");
-      return;
+    globalStorage.setTemp("pageTitle", "Login");
+
+    const checkToken = async () => {
+      const storedToken = await globalStorage.getValue("token");
+      setToken(storedToken);
+    };
+
+    checkToken();
+  }, []);
+
+  useEffect(() => {
+    if (navigationState?.key && token !== null) {
+      if (!token) {
+        router.replace("/login");
+      } else {
+        router.replace("/home");
+      }
     }
-    router.push("/home");
-  }, [navigationState?.key]);
+  }, [navigationState?.key, token]);
+
   return (
     <View className="flex-1 justify-center items-center bg-blue-500">
-      <Text className="text-white text-2xl font-bold">This app in devolvement mode application Malfunction pls contact developer for fix this. or conduct innogate@yhaoo.com</Text>
+      <Text className="text-white text-2xl font-bold">
+        This app is in development mode. If you encounter any issues, please
+        contact the developer at{" "}
+        <Text className="underline">innogate@yahoo.com</Text>.
+      </Text>
     </View>
   );
 }
