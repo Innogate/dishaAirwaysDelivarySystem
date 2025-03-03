@@ -7,7 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
 import { environment } from '@/app/environment/environment';
 import { Picker } from '@react-native-picker/picker';
-
+import styles from '@/app/components/GlobalStyle';
 // Define the validation schema
 const schema = yup.object().shape({
   Company_name: yup.string().required('Company Name is required'),
@@ -155,30 +155,6 @@ const BranchMaster = () => {
       Branch_CIN: "CIN123456",
       Branch_Udyam: "Udyam123456",
       logo: "https://example.com/logo1.png"
-    },
-    {
-      Branch_Name: "XYZ Ltd",
-      Branch_Address: "456 Elm St",
-      Branch_City: "Los Angeles",
-      Branch_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Branch_Email: "info@xyzltd.com",
-      Branch_GST: "GST654321",
-      Branch_CIN: "CIN654321",
-      Branch_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
-    },
-    {
-      Branch_Name: "XYZ Ltd",
-      Branch_Address: "456 Elm St",
-      Branch_City: "Los Angeles",
-      Branch_Pincode: "90001",
-      phoneNumber: "0987654321",
-      Branch_Email: "info@xyzltd.com",
-      Branch_GST: "GST654321",
-      Branch_CIN: "CIN654321",
-      Branch_Udyam: "Udyam654321",
-      logo: "https://example.com/logo2.png"
     }
   ]);
 
@@ -217,7 +193,7 @@ const BranchMaster = () => {
     },
   });
 
-  const { control, handleSubmit, setValue,reset, formState: { errors } } = useForm({
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
@@ -336,7 +312,7 @@ const BranchMaster = () => {
               <Text style={styles.dateText}>Date: {new Date().toLocaleDateString()}</Text>
               <View className="gap-2">
 
-                <Controller
+                {/* <Controller
                   control={control}
                   name="Company_name"
                   render={({ field: { onChange, value } }) => (
@@ -347,11 +323,33 @@ const BranchMaster = () => {
                           onChange(selectedValue); // Update form state
                         }}
                       >
-                        <Picker.Item label="Select a State" value="" />
+                        <Picker.Item label="Select Company" value="" />
                         {companyList.map((Company) => (
                           <Picker.Item key={Company.id} label={Company.Company_Name} value={Company.id} />
                         ))}
                       </Picker>
+                      {errors.Company_name && <Text style={styles.errorText}>{errors.Company_name.message}</Text>}
+                    </View>
+                  )}
+                /> */}
+                <Controller
+                  control={control}
+                  name="Company_name"
+                  render={({ field: { onChange, value } }) => (
+                    <View style={styles.pickerWrapper}>
+                      <Picker
+                        selectedValue={value}
+                        onValueChange={(selectedValue) => {
+                          onChange(selectedValue);
+                        }}
+                        style={styles.picker}
+                      >
+                        <Picker.Item label="Select Company" value="" />
+                        {companyList.map((Company) => (
+                          <Picker.Item key={Company.id} label={Company.Company_Name} value={Company.id} />
+                        ))}
+                      </Picker>
+
                       {errors.Company_name && <Text style={styles.errorText}>{errors.Company_name.message}</Text>}
                     </View>
                   )}
@@ -367,7 +365,7 @@ const BranchMaster = () => {
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Branch_Name && <Text style={styles.errorText}>{errors.Branch_Name.message}</Text>}
                     </View>
@@ -385,109 +383,99 @@ const BranchMaster = () => {
                         mode="outlined"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Branch_Address && <Text style={styles.errorText}>{errors.Branch_Address.message}</Text>}
                     </View>
                   )}
                 />
 
-                <Controller
-                  control={control}
-                  name="Branch_States"
-                  render={({ field: { onChange, value } }) => (
-                    <View className="border">
-                      <Picker
-                        selectedValue={value}
-                        onValueChange={(selectedValue) => {
-                          handleStateChange(selectedValue);
-                          onChange(selectedValue); // Update form state
-                        }}
-                      >
-                        <Picker.Item label="Select a State" value="" />
-                        {statesList.map((state) => (
-                          <Picker.Item key={state.id} label={state.States_Name} value={state.id} />
-                        ))}
-                      </Picker>
-                      {errors.Branch_States && <Text style={styles.errorText}>{errors.Branch_States.message}</Text>}
-                    </View>
-                  )}
-                />
+                <View style={styles.rowContainer}>
+                  {/* State Picker */}
+                  <Controller
+                    control={control}
+                    name="Branch_States"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={styles.pickerWrapper}>
+                        <Picker
+                          selectedValue={value}
+                          onValueChange={(selectedValue) => {
+                            handleStateChange(selectedValue);
+                            onChange(selectedValue); // Update form state
+                          }}
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="Select a State" value="" />
+                          {statesList.map((state) => (
+                            <Picker.Item key={state.id} label={state.States_Name} value={state.id} />
+                          ))}
+                        </Picker>
+                        {errors.Branch_States && <Text style={styles.errorText}>{errors.Branch_States.message}</Text>}
+                      </View>
+                    )}
+                  />
 
-                <Controller
-                  control={control}
-                  name="Branch_City"
-                  render={({ field: { onChange, value } }) => (
-                    <View style={{ borderWidth: 1, padding: 0, margin: 0 }}>
-                      <Picker
-                        selectedValue={value}
-                        onValueChange={(selectedValue) => onChange(selectedValue)}
-                        style={{ margin: 0, padding: 0 }}
-                      >
-                        <Picker.Item label="Select a City" value="" />
-                        {cityList.map((city) => (
-                          <Picker.Item key={city.id} label={city.city_name} value={city.id} />
-                        ))}
-                      </Picker>
-                      {errors.Branch_City && <Text style={styles.errorText}>{errors.Branch_City.message}</Text>}
-                    </View>
-                  )}
-                />
-
-                <View style={stylesin.container} className="gap-2">
-                  {/* <Controller
+                  {/* City Picker */}
+                  <Controller
                     control={control}
                     name="Branch_City"
                     render={({ field: { onChange, value } }) => (
-                      <View style={stylesin.inputContainer}>
-                        <TextInput
-                          label="Branch City"
-                          mode='outlined'
-                          value={value}
-                          onChangeText={onChange}
-                          style={stylesin.input}
-                        />
+                      <View style={styles.pickerWrapper}>
+                        <Picker
+                          selectedValue={value}
+                          onValueChange={(selectedValue) => onChange(selectedValue)}
+                          style={styles.picker}
+                        >
+                          <Picker.Item label="Select a City" value="" />
+                          {cityList.map((city) => (
+                            <Picker.Item key={city.id} label={city.city_name} value={city.id} />
+                          ))}
+                        </Picker>
                         {errors.Branch_City && <Text style={styles.errorText}>{errors.Branch_City.message}</Text>}
                       </View>
                     )}
-                  /> */}
+                  />
+                </View>
 
+                <View style={styles.container} className="gap-2">
                   {/* Branch Pincode */}
                   <Controller
                     control={control}
                     name="Branch_Pincode"
                     render={({ field: { onChange, value } }) => (
-                      <View style={stylesin.inputContainer}>
+                      <View style={styles.twoinputContainer}>
                         <TextInput
                           label="Branch Pincode"
                           mode='outlined'
                           value={value}
                           onChangeText={onChange}
-                          style={stylesin.input}
+                          style={styles.input}
                         />
                         {errors.Branch_Pincode && <Text style={styles.errorText}>{errors.Branch_Pincode.message}</Text>}
+                      </View>
+                    )}
+                  />
+
+                  <Controller
+                    control={control}
+                    name="Branch_ShortName"
+                    render={({ field: { onChange, value } }) => (
+                      <View style={styles.twoinputContainer}>
+                        <TextInput
+                          label="Branch Short Name"
+                          mode='outlined'
+                          value={value}
+                          onChangeText={onChange}
+                          style={styles.input}
+                        />
+                        {errors.Branch_ShortName && <Text style={styles.errorText}>{errors.Branch_ShortName.message}</Text>}
                       </View>
                     )}
                   />
                 </View>
 
                 {/* Branch Short Name */}
-                <Controller
-                  control={control}
-                  name="Branch_ShortName"
-                  render={({ field: { onChange, value } }) => (
-                    <View>
-                      <TextInput
-                        label="Branch Short Name"
-                        mode='outlined'
-                        value={value}
-                        onChangeText={onChange}
-                        style={stylesx.input}
-                      />
-                      {errors.Branch_ShortName && <Text style={styles.errorText}>{errors.Branch_ShortName.message}</Text>}
-                    </View>
-                  )}
-                />
+
 
                 {/* Branch Contact No */}
                 <Controller
@@ -501,7 +489,7 @@ const BranchMaster = () => {
                         keyboardType="numeric"
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Branch_Contact_No && <Text style={styles.errorText}>{errors.Branch_Contact_No.message}</Text>}
                     </View>
@@ -519,7 +507,7 @@ const BranchMaster = () => {
                         mode='outlined'
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Branch_Email && <Text style={styles.errorText}>{errors.Branch_Email.message}</Text>}
                     </View>
@@ -537,7 +525,7 @@ const BranchMaster = () => {
                         mode='outlined'
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Branch_GST && <Text style={styles.errorText}>{errors.Branch_GST.message}</Text>}
                     </View>
@@ -555,7 +543,7 @@ const BranchMaster = () => {
                         mode='outlined'
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Branch_CIN && <Text style={styles.errorText}>{errors.Branch_CIN.message}</Text>}
                     </View>
@@ -573,7 +561,7 @@ const BranchMaster = () => {
                         mode='outlined'
                         value={value}
                         onChangeText={onChange}
-                        style={stylesx.input}
+                        style={styles.input}
                       />
                       {errors.Branch_Udyam && <Text style={styles.errorText}>{errors.Branch_Udyam.message}</Text>}
                     </View>
@@ -601,136 +589,4 @@ const BranchMaster = () => {
     </View>
   );
 };
-
-// Styles
-const styles = StyleSheet.create({
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    backgroundColor: 'white',
-  },
-  button: {
-    backgroundColor: '#009688',
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  logoText: {
-    marginTop: 5,
-    fontSize: 12,
-    color: 'green',
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 4,
-    bottom: 48,
-  },
-  modalContent: {
-    height: screenHeight * 0.6,
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    width: "100%",
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  listContainer: {
-    padding: 16,
-  },
-  branchItem: {
-    backgroundColor: '#ffffff',
-    padding: 15,
-    marginVertical: 10,
-    marginHorizontal: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3, // Android shadow
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  branchTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
-  },
-  branchText: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 2,
-  },
-
-
-  // dateText: {
-  //     fontSize: 14,
-  //     marginBottom: 10,
-  // },
-});
-
-
-const stylesin = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  inputContainer: {
-    flex: 1,
-    minWidth: "45%", // Ensures proper spacing
-    maxWidth: "50%",
-  },
-  input: {
-    borderRadius: 8,
-    height: 40,
-    fontSize: 12,
-  },
-  errorInput: {
-    borderColor: "red", // Changes only the border color
-    borderBlockColor: 1,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 10,
-    textAlign: "left",
-  },
-});
-
-
-const stylesx = StyleSheet.create({
-  input: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    margin: 0,
-    fontSize: 10,
-    height: 40,
-  },
-  inputContent: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-  },
-});
-
 export default BranchMaster;

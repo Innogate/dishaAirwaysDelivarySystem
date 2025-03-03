@@ -5,12 +5,12 @@ import { useRouter } from "expo-router";
 const { width } = Dimensions.get("window");
 
 const menuItems = [
-  { id: 1, title: "Company Master", icon: "users", screen: "/pages/master/company_master" },
-  { id: 2, title: "Branch Master", icon: "building", screen: "/pages/master/branch_master" },
-  { id: 3, title: "Employee Master", icon: "book-open", screen: "/pages/master/employee_master" },
-  { id: 4, title: "User Master", icon: "book-open", screen: "/pages/master/user_master" },
-  { id: 5, title: "States Master", icon: "book-open", screen: "/pages/master/states_master" },
-  { id: 6, title: "City Master", icon: "book-open", screen: "/pages/master/city_master" },
+  { id: 1, title: "Company Master", icon: "building", screen: "/pages/master/company_master" },
+{ id: 2, title: "Branch Master", icon: "map-pin", screen: "/pages/master/branch_master" },
+{ id: 3, title: "Employee Master", icon: "users", screen: "/pages/master/employee_master" },
+{ id: 4, title: "User Master", icon: "user", screen: "/pages/master/user_master" },
+{ id: 5, title: "States Master", icon: "flag", screen: "/pages/master/states_master" },
+{ id: 6, title: "City Master", icon: "map", screen: "/pages/master/city_master" },
 ];
 
 const MenuGrid = () => {
@@ -18,7 +18,7 @@ const MenuGrid = () => {
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#f3f4f6", padding: 16 }}>
+    <View style={{ flex: 1, padding: 16 }} className="bg-slate-100">
       <Text style={{ fontSize: 18, fontWeight: "bold", color: "#4b5563", marginBottom: 10 }}>
         Choose your area
       </Text>

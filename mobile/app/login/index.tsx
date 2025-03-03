@@ -1,51 +1,58 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { useRouter } from 'expo-router';
-import { environment } from '../environment/environment';
-import globalStorage from '../components/GlobalStorage';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useRouter } from "expo-router";
+import { environment } from "../environment/environment";
+import globalStorage from "../components/GlobalStorage";
+
+// Validation Schema
 const loginSchema = yup.object().shape({
   email: yup.string().required("User ID is required"),
   password: yup.string().min(4, "At least 4 characters required").required("Password is required"),
 });
 
-
 const LoginScreen = () => {
   const router = useRouter();
-  const [emailError, setEmailError] = useState(""); // Email-specific error
-  const [passwordError, setPasswordError] = useState(""); // Password-specific error
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
   const handleLogin = async (data: any) => {
-    // Reset errors before request
     setEmailError("");
     setPasswordError("");
 
-    const url = environment.apiUrl + '/login';
-    const header = {
-      'Content-Type': 'application/json',
-    };
+    const url = environment.apiUrl + "/login";
+    const header = { "Content-Type": "application/json" };
 
     const body = JSON.stringify({
-      "id": data.email,
-      "passwd": data.password
+      id: data.email,
+      passwd: data.password,
     });
 
     try {
       const res = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: header,
-        body: body
+        body: body,
       });
+
       if (res.status === 200) {
         const response = await res.json();
         if (response.body.token) {
-          globalStorage.setPermanent('token', response.body.token);
-          router.replace('home');
+          globalStorage.setPermanent("token", response.body.token);
+          router.replace("home");
         }
       } else {
         const errorResponse = await res.json();
@@ -63,21 +70,28 @@ const LoginScreen = () => {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <View className="h-3/5 bg-purple-600 items-center">
-        <View className="bg-white rounded-xl p-2 mt-[6rem]"></View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={require("../../assets/images/logo.jpeg")}
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </View>
       </View>
-      <View className="absolute top-1/3 left-0 right-0 bg-white rounded-tl-[15%] px-6 py-10">
-        <Text className="text-black text-2xl font-semibold text-center mb-6">Login</Text>
+
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Login</Text>
 
         {/* Email Input */}
-        <Text className="text-gray-500 mb-1">Email</Text>
+        <Text style={styles.label}>Email</Text>
         <Controller
           control={control}
           name="email"
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              className="w-full border border-gray-300 bg-gray-100 rounded-xl px-4 py-3 text-lg"
+              style={styles.input}
               placeholder="Enter email"
               onBlur={onBlur}
               onChangeText={onChange}
@@ -87,17 +101,17 @@ const LoginScreen = () => {
             />
           )}
         />
-        {errors.email && <Text className="text-red-500 text-sm mb-1">{errors.email.message}</Text>}
-        {emailError && <Text className="text-red-500 text-sm mb-3">{emailError}</Text>}
+        {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+        {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
         {/* Password Input */}
-        <Text className="text-gray-500 mb-1 mt-3">Password</Text>
+        <Text style={styles.label}>Password</Text>
         <Controller
           control={control}
           name="password"
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              className="w-full border border-gray-300 bg-gray-100 rounded-xl px-4 py-3 text-lg"
+              style={styles.input}
               placeholder="Enter password"
               secureTextEntry
               onBlur={onBlur}
@@ -106,19 +120,94 @@ const LoginScreen = () => {
             />
           )}
         />
-        {errors.password && <Text className="text-red-500 text-sm mb-1">{errors.password.message}</Text>}
-        {passwordError && <Text className="text-red-500 text-sm mb-3">{passwordError}</Text>}
+        {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+        {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
         {/* Login Button */}
-        <TouchableOpacity
-          className="w-full mt-20 py-4 bg-amber-500 rounded-xl items-center"
-          onPress={handleSubmit(handleLogin)}
-        >
-          <Text className="text-white text-lg font-semibold">Login</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit(handleLogin)}>
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
+// Styles
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  header: {
+    height: "60%",
+    backgroundColor: "#6B21A8",
+    // justifyContent: "center",
+    alignItems: "center",
+  },
+  imageContainer: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 100, // Ensure container is also round
+    marginTop: 60,
+  },
+  image: {
+    width: 70,
+    height: 70,
+    alignSelf: "center",
+    borderRadius: 75, // Make it fully round
+  },
+
+  formContainer: {
+    position: "absolute",
+    top: "40%",
+    left: 0,
+    right: 0,
+    backgroundColor: "white",
+    borderTopLeftRadius: 40,
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 16,
+    color: "black",
+  },
+  label: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginBottom: 4,
+  },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  button: {
+    width: "100%",
+    marginTop: 40,
+    paddingVertical: 14,
+    backgroundColor: "#F59E0B",
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+});
 
 export default LoginScreen;
