@@ -18,7 +18,7 @@
         $handler->validateInput($data, ["from"]); // Ensure 'from' is provided
     
         $db = new Database();
-        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no 
+        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, logo
                             FROM companies LIMIT 10 OFFSET ?", [$data["from"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -37,7 +37,7 @@
         $handler->validateInput($data, ["company_id"]);
     
         $db = new Database();
-        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no FROM companies WHERE id = ?", [$data["company_id"]]);
+        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, logo FROM companies WHERE id = ?", [$data["company_id"]]);
         $list = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if (!$list) {
@@ -59,7 +59,7 @@
         $handler->validateInput($data, ["state_id"]);
     
         $db = new Database();
-        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no FROM companies WHERE state_id = ?", [$data["state_id"]]);
+        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no,logo FROM companies WHERE state_id = ?", [$data["state_id"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
         (new ApiResponse(200, "Success", $list ?: []))->toJson();
@@ -77,7 +77,7 @@
         $handler->validateInput($data, ["city_id"]);
     
         $db = new Database();
-        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no FROM companies WHERE city_id = ?", [$data["city_id"]]);
+        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no,logo FROM companies WHERE city_id = ?", [$data["city_id"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
         (new ApiResponse(200, "Success", $list ?: []))->toJson();
@@ -95,7 +95,7 @@
         $handler->validateInput($data, ["state_id", "city_id"]);
     
         $db = new Database();
-        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no FROM companies WHERE state_id = ? AND city_id = ?", [$data["state_id"], $data["city_id"]]);
+        $stmt = $db->query("SELECT id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, logo FROM companies WHERE state_id = ? AND city_id = ?", [$data["state_id"], $data["city_id"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
         (new ApiResponse(200, "Success", $list ?: []))->toJson();

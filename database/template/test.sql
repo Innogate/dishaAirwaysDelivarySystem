@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
--- Dumped by pg_dump version 17.3 (Debian 17.3-3)
+-- Dumped by pg_dump version 17.4 (Debian 17.4-1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -86,7 +86,7 @@ CREATE TABLE public.branches (
     gst_no character varying NOT NULL,
     cin_no character varying NOT NULL,
     udyam_no character varying NOT NULL,
-    logo bytea NOT NULL,
+    logo character varying NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     created_by integer NOT NULL,
     updated_at timestamp without time zone DEFAULT now(),
@@ -171,7 +171,7 @@ CREATE TABLE public.companies (
     gst_no character varying NOT NULL,
     cin_no character varying NOT NULL,
     udyam_no character varying NOT NULL,
-    logo bytea NOT NULL,
+    logo character varying NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     created_by integer NOT NULL,
     updated_at timestamp without time zone DEFAULT now(),
@@ -290,7 +290,7 @@ ALTER SEQUENCE public.employees_id_seq OWNED BY public.employees.id;
 
 CREATE TABLE public.packages (
     id integer NOT NULL,
-    container_id integer NOT NULL,
+    container_id integer,
     count integer NOT NULL,
     value integer NOT NULL,
     contents character varying NOT NULL,
@@ -911,14 +911,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: bookings bookings_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.bookings
-    ADD CONSTRAINT bookings_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id);
-
-
---
 -- Name: bookings bookings_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -927,27 +919,11 @@ ALTER TABLE ONLY public.bookings
 
 
 --
--- Name: bookings bookings_destination_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.bookings
-    ADD CONSTRAINT bookings_destination_branch_id_fkey FOREIGN KEY (destination_branch_id) REFERENCES public.branches(id);
-
-
---
 -- Name: bookings bookings_destination_city_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
 ALTER TABLE ONLY public.bookings
     ADD CONSTRAINT bookings_destination_city_id_fkey FOREIGN KEY (destination_city_id) REFERENCES public.cities(id);
-
-
---
--- Name: bookings bookings_package_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.bookings
-    ADD CONSTRAINT bookings_package_id_fkey FOREIGN KEY (package_id) REFERENCES public.packages(id);
 
 
 --
@@ -1020,14 +996,6 @@ ALTER TABLE ONLY public.companies
 
 ALTER TABLE ONLY public.containers
     ADD CONSTRAINT containers_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id);
-
-
---
--- Name: employees employees_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.employees
-    ADD CONSTRAINT employees_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id);
 
 
 --
