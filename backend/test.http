@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "1234567890",
-    "passwd": "1234"
+    "id": "9876543212",
+    "passwd": "securePass123"
 }
 
 ### VERIFY
@@ -250,8 +250,9 @@ Authorization: Bearer {{token}}
     "gst_no": 9090,
     "cin_no": 9090,
     "udyam_no": 9090,
-    "logo": "u"
+    "logo": 0
 }
+
 
 ### Delete a Branch
 POST {{apiUrl}}/master/branches/delete
@@ -278,11 +279,11 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "user_id": "3",
+  "user_id": "2",
   "address": "123 Main St",
   "adhara_no": "123456789012",
   "joining_date": "2025-02-28",
-  "branch_id": "5",
+  "branch_id": "1",
   "type": "2"
 }
 
@@ -312,12 +313,14 @@ Authorization: Bearer {{token}}
 
 {
   "slip_no": "123456",
-  "consignee_name": "John Doe",
+  "consignee_name": "JohnDoe",
+  "consignor_name": "John2Doe",
   "consignee_mobile": "9876543210",
+  "consignor_mobile": "9876543212",
   "transport_mode": "Air",
   "paid_type": "Prepaid",
-  "destination_city_id": 5,
-  "destination_branch_id": 2,
+  "destination_city_id": 1,
+  "destination_branch_id": 1,
   "count": 3,
   "value": 1000,
   "contents": "Electronics",
