@@ -33,7 +33,7 @@ $router->add('POST', '/master/employees/new', function () {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $requiredFields = ["user_id", "address", "adhara_no", "joining_date", "branch_id", "first_name"];
+    $requiredFields = ["user_id", "address", "adhara_no", "joining_date", "branch_id", "type"];
     foreach ($requiredFields as $field) {
         if (!isset($data[$field]) || empty(trim($data[$field]))) {
             (new ApiResponse(400, "All fields are required."))->toJson();
@@ -48,23 +48,23 @@ $router->add('POST', '/master/employees/new', function () {
 
         // Check if the provided branch_id exists
         $stmt = $db->query("SELECT id FROM branches WHERE id = ?", [$data["branch_id"]]);
-        $user_id =$stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
-            (new ApiResponse(404, "Branch not found."))->toJson();
+        $brach_id =$stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$brach_id) {
+            (new ApiResponse(404, "Branch not found.", ""))->toJson();
             return;
         }
 
         // Check if employee already exists with the same email or mobile
-        $stmt = $db->query("SELECT id FROM employees WHERE user_id = ?", [$user_id->id]);
+        $stmt = $db->query("SELECT id FROM employees WHERE user_id = ?", [$brach_id["id"]]);
         if ($stmt->fetch(PDO::FETCH_ASSOC)) {
             (new ApiResponse(409, "Employee with this email or mobile number already exists."))->toJson();
             return;
         }
 
         $stmt = $db->query(
-            "INSERT INTO employees (user_id, address, adhara_no, joining_date, branch_id, first_name) 
-            VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
-            [$user_id->id, $data["address"], $data["adhara_no"], $data["joining_date"], $data["branch_id"], $data["first_name"]]
+            "INSERT INTO employees (user_id, address, aadhar_no, joining_date, branch_id, type, created_by) 
+            VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id",
+            [$data["user_id"], $data["address"], $data["adhara_no"], $data["joining_date"], $brach_id["id"], $data["type"], $_info->user_id]
         );
         $employee_id = $stmt->fetch(PDO::FETCH_ASSOC)["id"];
         $db->commit();

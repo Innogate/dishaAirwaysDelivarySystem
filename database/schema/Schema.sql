@@ -140,7 +140,7 @@ CREATE TABLE containers (
 
 CREATE TABLE packages (
     id SERIAL PRIMARY KEY NOT NULL,
-    container_id INT NOT NULL,
+    container_id INT NULL,
     count INTEGER NOT NULL,
     value INTEGER NOT NULL,
     contents VARCHAR NOT NULL,
