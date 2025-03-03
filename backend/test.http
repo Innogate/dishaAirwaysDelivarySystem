@@ -1,6 +1,5 @@
 @apiUrl = http://localhost:8000
-@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI
-
+@token = {{login.response.body.body.token}}
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version
 Content-Type: application/json
@@ -284,7 +283,7 @@ Authorization: Bearer {{token}}
   "adhara_no": "123456789012",
   "joining_date": "2025-02-28",
   "branch_id": "5",
-  "first_name": "John"
+  "type": "2"
 }
 
 ### Delete Employee
@@ -294,4 +293,37 @@ Authorization: Bearer {{token}}
 
 {
   "employee_id": 1
+}
+
+### Get Booking List
+POST {{apiUrl}}/booking
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "from": 0
+}
+
+
+#### Add New Booking
+POST {{apiUrl}}/booking/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "slip_no": "123456",
+  "consignee_name": "John Doe",
+  "consignee_mobile": "9876543210",
+  "transport_mode": "Air",
+  "paid_type": "Prepaid",
+  "destination_city_id": 5,
+  "destination_branch_id": 2,
+  "count": 3,
+  "value": 1000,
+  "contents": "Electronics",
+  "charges": 150,
+  "shipper": "XYZ Logistics",
+  "cgst": 18,
+  "sgst": 18,
+  "igst": 0
 }
