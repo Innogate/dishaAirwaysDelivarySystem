@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
@@ -36,10 +36,7 @@ const schema = yup.object().shape({
   cgst: yup.number().positive().notRequired(),
 });
 
-
-console.log(2);
 const BookingForm = () => {
-  console.log(1);
   const [token, setToken] = useState(null);
   const [BranchList, setBranchList] = useState([]);
   const [statesList, setStatesList] = useState([]);
@@ -143,7 +140,7 @@ const BookingForm = () => {
   }
 
   // GET ALL STATES
-  const getAllStates = useCallback(async () => {
+  const getAllStates = async () => {
 
     if (!token) {
       Alert.alert("Error", "Authentication token missing.");
@@ -175,12 +172,12 @@ const BookingForm = () => {
         Alert.alert("Error", "Server Error");
         console.error("Fetch error:", error);
     }
-  }, []);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchToken(); // Ensure token is fetched first
-      await getAllStates(); // Only call this after the token is available
+      await fetchToken();
+      await getAllStates();
     };
   
     if (!token) {
