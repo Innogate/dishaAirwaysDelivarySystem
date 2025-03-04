@@ -37,7 +37,7 @@ const BottomNav = () => {
       {/* Profile */}
       <Pressable 
         className="items-center" 
-        onPress={() => setActive(2, "/login")} 
+        onPress={() => setActive(2, "/login/logout")} 
         android_ripple={{ borderless: true, radius: 0 }}
       >
         <Ionicons name={activeIndex === 2 ? "person" : "person-outline"} size={24} color={activeIndex === 2 ? "#0d9488" : "#6b7280"} />

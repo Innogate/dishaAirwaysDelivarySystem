@@ -7,6 +7,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import styles from '../components/GlobalStyle';
 import { environment } from '../environment/environment';
+import globalStorage from '../components/GlobalStorage';
 // Define the validation schema
 const schema = yup.object().shape({
   bookingNo: yup.string().required('Booking No is required'),
@@ -34,8 +35,10 @@ const schema = yup.object().shape({
   cgst: yup.number().positive().notRequired(),
 });
 
+
+
 const BookingForm = () => {
-  const { control, handleSubmit, setValue,reset, formState: { errors } } = useForm({
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
@@ -63,7 +66,7 @@ const BookingForm = () => {
 
   const onSubmit = async (data) => {
     if (data) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+      const token = globalStorage.getValue("token");
       if (token) {
         const url = `${environment.apiUrl}/booking/new`;
         const header = {
@@ -82,6 +85,7 @@ const BookingForm = () => {
           destination_city_id: data.destination_city,
           destination_branch_id: 1,
           count: data.packages,
+          weight: data.weight,
           value: data.declaredValue,
           contents: data.contain,
           charges: data.charges,
@@ -95,7 +99,6 @@ const BookingForm = () => {
           const resJson = await res.json();
           if (res.status === 200) {
             Alert.alert("Success", resJson.message);
-            FormData.reset(); // Reset the form state
           } else {
             Alert.alert("Error", resJson.message || "Failed to fetch states.");
           }
@@ -108,13 +111,45 @@ const BookingForm = () => {
     }
   };
 
+  const [BranchList, setBranchList] = useState([]);
+  const handleCitySelection = async (cityId) => {
+    if (cityId) {
+      console.log(cityId);
+       const token = globalStorage.getValue("token");
+      if (token) {
+        const url = `${environment.apiUrl}/master/branches`;
+        const header = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const body = JSON.stringify({ from: 0, city_id: cityId });
+        try {
+          const res = await fetch(url, { method: "POST", headers: header, body });
+          const resJson = await res.json();
+          if (res.status === 200) {
+            const formattedBranch = resJson.body.map((Branch: { id: any; name: any; }) => ({
+              id: Branch.id,
+              Branch_name: Branch.name,
+            }));
+            console.log(formattedBranch);
+            setBranchList(formattedBranch);
+          } else {
+            Alert.alert("Error", resJson.message || "Failed to fetch Branch.");
+          }
+        } catch (error) {
+          Alert.alert("Error", "Server Error");
+          console.error("Fetch error:", error);
+        }
+      }
+    };
+  }
   const currentDate = new Date();
   const formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
 
   //gate all state
   const [statesList, setStatesList] = useState([]);
   const getAllStates = useCallback(async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+     const token = globalStorage.getValue("token");
     if (token) {
       const url = `${environment.apiUrl}/master/states`;
       const header = {
@@ -147,7 +182,7 @@ const BookingForm = () => {
   const handleStateChange = async (selectedValue: any) => {
     console.log("Selected State ID:", selectedValue);
     if (selectedValue) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+       const token = globalStorage.getValue("token");
       if (token) {
         const url = `${environment.apiUrl}/master/cities/byStateId`;
         const header = {
@@ -175,7 +210,6 @@ const BookingForm = () => {
       }
     };
   }
-
   useEffect(() => {
     getAllStates();
   }, [getAllStates]);
@@ -299,7 +333,6 @@ const BookingForm = () => {
             )}
           />
 
-          {/* City Picker */}
           <Controller
             control={control}
             name="destination_city"
@@ -307,7 +340,39 @@ const BookingForm = () => {
               <View style={styles.pickerWrapper}>
                 <Picker
                   selectedValue={value}
-                  onValueChange={(selectedValue) => onChange(selectedValue)}
+                  onValueChange={(selectedValue) => {
+                    onChange(selectedValue); // Update the form state
+                    handleCitySelection(selectedValue); // Call the method with the selected city ID
+                  }}
+                >
+                  <Picker.Item label="Destination City" value="" />
+                  {cityList.map((city) => {
+                    // Ensure city.id is unique
+                    if (!city.id) {
+                      console.warn("City ID is missing for city:", city);
+                    }
+                    return (
+                      <Picker.Item key={city.id} label={city.city_name} value={city.id} />
+                    );
+                  })}
+                </Picker>
+                {errors.destination_city && <Text style={styles.errorText}>{errors.destination_city.message}</Text>}
+              </View>
+            )}
+          />
+
+          {/* City Picker */}
+          {/* <Controller
+            control={control}
+            name="destination_city"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={value}
+                  onValueChange={(selectedValue) => {
+                    onChange(selectedValue); // Update the form state
+                    handleCitySelection(selectedValue); // Call the method with the selected city ID
+                  }}
                   style={styles.picker}
                 >
                   <Picker.Item label="Destination City" value="" />
@@ -318,24 +383,29 @@ const BookingForm = () => {
                 {errors.destination_city && <Text style={styles.errorText}>{errors.destination_city.message}</Text>}
               </View>
             )}
-          />
+          /> */}
         </View>
+
         <Controller
           control={control}
           name="branch"
           render={({ field: { onChange, value } }) => (
-            <View style={styles.twoinputContainer}>
-              <TextInput
-                label="Destination Branch Name"
-                mode='outlined'
-                value={value}
-                onChangeText={onChange}
-                style={styles.input}
-              />
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={value}
+                onValueChange={(selectedValue) => onChange(selectedValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Destination Branch" value="" />
+                {BranchList.map((branch) => (
+                  <Picker.Item key={branch.id} label={branch.Branch_name} value={branch.id} />
+                ))}
+              </Picker>
               {errors.branch && <Text style={styles.errorText}>{errors.branch.message}</Text>}
             </View>
           )}
         />
+
         <Controller
           control={control}
           name="transportType"
@@ -416,6 +486,7 @@ const BookingForm = () => {
               </View>
             )}
           />
+
           <Controller
             control={control}
             name="charges"

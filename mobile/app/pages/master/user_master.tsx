@@ -7,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { environment } from '@/app/environment/environment';
 import styles from '@/app/components/GlobalStyle';
 import { Picker } from '@react-native-picker/picker';
+import globalStorage from '@/app/components/GlobalStorage';
 // Define the validation schema
 const schema = yup.object().shape({
   Employee_FName: yup.string().required('Employee First Name is required'),
@@ -71,7 +72,7 @@ const EmployeeMaster = () => {
   const onSubmit = async (data) => {
     console.log('Form submitted with data:', data); // Log the submitted data
     if (data) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+       const token = globalStorage.getValue("token");
       if (token) {
         const url = `${environment.apiUrl}/master/users/new`;
         const header = {

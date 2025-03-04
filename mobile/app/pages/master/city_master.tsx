@@ -25,7 +25,7 @@ const CityMaster = () => {
   const [selectedCity, setSelectedCity] = useState(null); // Track selected city for editing
 
   const getAllStates = useCallback(async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your actual token
+     const token = globalStorage.getValue("token");// Replace with your actual token
     if (token) {
       const url = `${environment.apiUrl}/master/states`;
       const header = {
@@ -107,7 +107,7 @@ const CityMaster = () => {
 
   const onSubmit = async (data) => {
     const url = environment.apiUrl + '/master/cities/new';
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your actual token
+     const token = globalStorage.getValue("token");// Replace with your actual token
     const header = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
@@ -172,7 +172,7 @@ const CityMaster = () => {
 
   const handleStateChange = async (stateId) => {
     if (stateId) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your actual token
+       const token = globalStorage.getValue("token");// Replace with your actual token
       if (token) {
         const url = `${environment.apiUrl}/master/cities/byStateId`;
         const header = {

@@ -42,7 +42,7 @@ const BranchMaster = () => {
   // Get all states
   const [statesList, setStatesList] = useState([]);
   const getAllStates = useCallback(async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+     const token = globalStorage.getValue("token");// Replace with your token
     if (token) {
       const url = `${environment.apiUrl}/master/states`;
       const header = {
@@ -79,7 +79,7 @@ const BranchMaster = () => {
   const [cityList, setCityList] = useState([]);
   const handleStateChange = async (selectedValue) => {
     if (selectedValue) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+       const token = globalStorage.getValue("token");// Replace with your token
       if (token) {
         const url = `${environment.apiUrl}/master/cities/byStateId`;
         const header = {
@@ -110,7 +110,7 @@ const BranchMaster = () => {
   // Get all companies
   const [companyList, setCompanyList] = useState([]);
   const getAllCompanies = async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+     const token = globalStorage.getValue("token");// Replace with your token
     if (token) {
       const url = `${environment.apiUrl}/master/companies`;
       const header = {
@@ -150,7 +150,7 @@ const BranchMaster = () => {
     const newCompany = { ...data, logo: selectedImage };
 
     if (newCompany) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";// Replace with your token
+       const token = globalStorage.getValue("token");// Replace with your token
 
       if (token) {
         const url = `${environment.apiUrl}/master/companies/new`;

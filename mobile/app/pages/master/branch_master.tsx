@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
 import { environment } from '@/app/environment/environment';
 import { Picker } from '@react-native-picker/picker';
 import styles from '@/app/components/GlobalStyle';
+import globalStorage from '@/app/components/GlobalStorage';
 // Define the validation schema
 const schema = yup.object().shape({
   Company_name: yup.string().required('Company Name is required'),
@@ -43,7 +44,7 @@ const BranchMaster = () => {
   //gate all state
   const [statesList, setStatesList] = useState([]);
   const getAllStates = useCallback(async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+     const token = globalStorage.getValue("token");
     if (token) {
       const url = `${environment.apiUrl}/master/states`;
       const header = {
@@ -76,7 +77,7 @@ const BranchMaster = () => {
   const handleStateChange = async (selectedValue: any) => {
     console.log("Selected State ID:", selectedValue);
     if (selectedValue) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+       const token = globalStorage.getValue("token");
       if (token) {
         const url = `${environment.apiUrl}/master/cities/byStateId`;
         const header = {
@@ -108,7 +109,7 @@ const BranchMaster = () => {
   // gate all company
   const [companyList, setcompanyList] = useState([]);
   const getAllCompany = useCallback(async () => {
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+     const token = globalStorage.getValue("token");
     if (token) {
       const url = `${environment.apiUrl}/master/companies`;
       const header = {
@@ -243,7 +244,7 @@ const BranchMaster = () => {
 
   const onSubmit = async (data) => {
     if (data) {
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+       const token = globalStorage.getValue("token");
       if (token) {
         const url = `${environment.apiUrl}/master/branches/new`;
         const header = {
