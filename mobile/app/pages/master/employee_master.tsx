@@ -72,10 +72,8 @@ const EmployeeMaster = () => {
   });
 
   const onSubmit = async (data) => {
-    // const newBranch = { ...data, Join_Date: joinDate, Date_of_Birth: dob, Gender: gender };
-    // setBranches([...branches, newBranch]);
-    // Alert.alert('Form Submitted', JSON.stringify(newBranch, null, 2));
-    // closeModal();
+   
+    closeModal();
   };
 
   const handleLogoUpload = async () => {

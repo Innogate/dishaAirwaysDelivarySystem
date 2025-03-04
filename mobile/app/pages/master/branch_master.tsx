@@ -29,7 +29,6 @@ const schema = yup.object().shape({
   logo: yup.mixed().required('Branch Logo is required'),
   Branch_ShortName: yup.string().required('Branch Short Name is required'),
   Branch_States: yup.string().required('Branch States'),
-  // Logo field
 
 
 });
@@ -140,23 +139,66 @@ const BranchMaster = () => {
   useEffect(() => {
     getAllStates();
     getAllCompany();
+    getAllBranch();
   }, [getAllStates]);
 
   // Initialize with static values
-  const [branches, setBranches] = useState([
-    {
-      Branch_Name: "ABC Corp",
-      Branch_Address: "123 Main St",
-      Branch_City: "New York",
-      Branch_Pincode: "10001",
-      phoneNumber: "1234567890",
-      Branch_Email: "contact@abccorp.com",
-      Branch_GST: "GST123456",
-      Branch_CIN: "CIN123456",
-      Branch_Udyam: "Udyam123456",
-      logo: "https://example.com/logo1.png"
+  const [branches, setBranches] = useState([]);
+
+  const getAllBranch = async () => {
+    const token =
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+  
+    if (token) {
+      const url = environment.apiUrl + "/master/branches";
+      const header = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const body = JSON.stringify({
+        from: 0,
+      });
+  
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: header,
+          body: body,
+        });
+  
+        const resJson = await res.json();
+        console.log("Response JSON:", resJson);
+  
+        if (res.status === 200) {
+          // Extract 'id' and 'name' from the 'body' array
+          const formattedBranch = resJson.body.map((Branch) => ({
+            id: Branch.id,
+            Company_name: Branch.company_id,
+            Branch_Name: Branch.name,
+            Branch_Address: Branch.address,
+            Branch_City: Branch.city_id,
+            Branch_Pincode: Branch.pin_code,
+            Branch_Contact_No: Branch.contact_no,
+            Branch_Email: Branch.email,
+            Branch_GST: Branch.gst_no,
+            Branch_CIN: Branch.cin_no,
+            Branch_Udyam: Branch.udyam_no, // Optional field
+            logo: Branch.logo,
+            // Branch_ShortName: yup.string().required('Branch Short Name is required'),
+            Branch_States: Branch.state_id,
+          }));
+          setBranches(formattedBranch);
+        } else {
+          Alert.alert("Error", resJson.message || "Failed to fetch states.");
+        }
+      } catch (error) {
+        Alert.alert("Error", "Server Error");
+        console.error("Fetch error:", error);
+      }
     }
-  ]);
+  };
+
+
 
   const openModal = () => {
     slideAnim.setValue(screenHeight);
@@ -269,15 +311,15 @@ const BranchMaster = () => {
     // <View style={styles.branchItem}>
     <View className="bg-white p-4 mb-3 rounded-lg shadow-md border border-gray-200">
       <Text className="text-black font-semibold text-lg">
-        Order #: <Text className="text-blue-600">{item.Branch_Name}</Text>
+        Branch Name : - <Text className="text-blue-600">{item.Branch_Name}</Text>
       </Text>
-      <Text className="text-gray-500">{item.Branch_Name}</Text>
+      <Text className="text-gray-500">{item.Branch_Address}</Text>
 
       <View className="flex-row justify-between items-center mt-2">
         <View className="bg-gray-200 px-3 py-1 rounded-full">
-          <Text className="text-gray-700">{item.Branch_Name}</Text>
+          <Text className="text-gray-700">{item.Branch_GST}</Text>
         </View>
-        <Text className="text-lg font-bold">{item.Branch_Name}</Text>
+        <Text className="text-lg font-bold">{item.Branch_Contact_No}</Text>
         {/* <TouchableOpacity
                     className={`px-4 py-1 rounded-full ${order.status === "Shipped" ? "bg-purple-100 border border-purple-600" : "bg-orange-100 border border-orange-500"
                         }`}
