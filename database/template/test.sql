@@ -292,14 +292,14 @@ CREATE TABLE public.packages (
     id integer NOT NULL,
     container_id integer,
     count integer NOT NULL,
-    weight integer NOT NULL,
-    value integer NOT NULL,
+    weight double precision NOT NULL,
+    value double precision NOT NULL,
     contents character varying NOT NULL,
     charges integer NOT NULL,
     shipper character varying NOT NULL,
-    cgst integer NOT NULL,
-    sgst integer NOT NULL,
-    igst integer NOT NULL,
+    cgst double precision NOT NULL,
+    sgst double precision NOT NULL,
+    igst double precision NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     created_by integer NOT NULL,
     status boolean DEFAULT true
@@ -955,14 +955,6 @@ ALTER TABLE ONLY public.bookings
 
 ALTER TABLE ONLY public.bookings
     ADD CONSTRAINT bookings_destination_city_id_fkey FOREIGN KEY (destination_city_id) REFERENCES public.cities(id);
-
-
---
--- Name: bookings bookings_package_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.bookings
-    ADD CONSTRAINT bookings_package_id_fkey FOREIGN KEY (package_id) REFERENCES public.packages(id);
 
 
 --
