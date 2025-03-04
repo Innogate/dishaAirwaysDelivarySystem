@@ -45,6 +45,26 @@
         (new ApiResponse(200, "Success", $list))->toJson();
     });
 
+    // GET BRACH BY CITY ID
+    $router->add('POST', '/master/branches/byCityId', function () {
+        global $pageID;
+        $jwt = new JwtHandler();
+        $handler = new Handler();
+        $_info = $jwt->validate();
+        $handler->validatePermission($pageID, $_info->user_id, "r");
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        $handler->validateInput($data, ["city_id"]);
+        $db = new Database();
+        $stmt = $db->query("SELECT id, name, alias_name, address, city_id, state_id, pin_code, contact_no, email, company_id, gst_no, cin_no, udyam_no, logo FROM branches WHERE city_id = ?", [$data["city_id"]]);
+        $list = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$list) {
+            (new ApiResponse(400, "Invalid BRANCH ID", "", 400))->toJson();
+        }
+
+        (new ApiResponse(200, "Success", $list))->toJson();
+    });
+
     // ADD NEW BRANCH
     $router->add('POST', '/master/branches/new', function () {
         global $pageID;

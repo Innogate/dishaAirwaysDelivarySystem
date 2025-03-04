@@ -292,6 +292,7 @@ CREATE TABLE public.packages (
     id integer NOT NULL,
     container_id integer,
     count integer NOT NULL,
+    weight integer NOT NULL,
     value integer NOT NULL,
     contents character varying NOT NULL,
     charges integer NOT NULL,
@@ -621,6 +622,7 @@ COPY public.bookings (id, branch_id, slip_no, consignee_name, consignee_mobile, 
 --
 
 COPY public.branches (id, name, alias_name, address, city_id, state_id, company_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, logo, created_at, created_by, updated_at, status) FROM stdin;
+1	New Branch	Nbranch	123 Street, City	1	1	1	123456	9876543210	branch@example.com	9090	9090	9090	0	2025-03-04 07:39:22.695942	1	2025-03-04 07:39:22.695942	t
 \.
 
 
@@ -629,7 +631,7 @@ COPY public.branches (id, name, alias_name, address, city_id, state_id, company_
 --
 
 COPY public.cities (id, name, state_id, created_at, created_by) FROM stdin;
-1	Kolkata	1	2025-02-28 16:40:44.347808	1
+1	Kharagpur	1	2025-03-04 07:39:05.880664	1
 \.
 
 
@@ -638,6 +640,7 @@ COPY public.cities (id, name, state_id, created_at, created_by) FROM stdin;
 --
 
 COPY public.companies (id, name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, logo, created_at, created_by, updated_at, status) FROM stdin;
+1	Tech Corp	456 Business Park	1	1	700001	9876543211	info@techcorp.com	29ABCDE1234F1Z5	U12345WB2023PTC123456	UDYAM-WB-2023-123456	base64_encoded_string	2025-03-04 07:39:16.85548	1	2025-03-04 07:39:16.85548	t
 \.
 
 
@@ -654,6 +657,7 @@ COPY public.containers (id, bag_no, name, agent_id, created_at, created_by) FROM
 --
 
 COPY public.employees (id, user_id, address, aadhar_no, joining_date, created_at, branch_id, type, created_by, updated_at, status) FROM stdin;
+1	2	123 Main St	123456789012	2025-02-28 00:00:00	2025-03-04 07:39:33.688537	1	2	1	2025-03-04 07:39:33.688537	t
 \.
 
 
@@ -661,7 +665,7 @@ COPY public.employees (id, user_id, address, aadhar_no, joining_date, created_at
 -- Data for Name: packages; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.packages (id, container_id, count, value, contents, charges, shipper, cgst, sgst, igst, created_at, created_by, status) FROM stdin;
+COPY public.packages (id, container_id, count, weight, value, contents, charges, shipper, cgst, sgst, igst, created_at, created_by, status) FROM stdin;
 \.
 
 
@@ -670,13 +674,13 @@ COPY public.packages (id, container_id, count, value, contents, charges, shipper
 --
 
 COPY public.pages (id, name, created_at, created_by, updated_at, status) FROM stdin;
-1	booking	2025-02-28 15:40:18.355518	1	2025-02-28 15:40:18.355518	t
-2	states	2025-02-28 15:40:30.739977	1	2025-02-28 15:40:30.739977	t
-3	cities	2025-02-28 16:33:08.449284	1	2025-02-28 16:33:08.449284	t
-4	users	2025-02-28 16:51:44.044371	1	2025-02-28 16:51:44.044371	t
-5	companies	2025-02-28 17:32:57.121273	1	2025-02-28 17:32:57.121273	t
-6	branches	2025-02-28 18:18:47.176335	1	2025-02-28 18:18:47.176335	t
-7	employes	2025-02-28 18:23:20.206348	1	2025-02-28 18:23:20.206348	t
+1	Booking	2025-03-04 07:34:25.020398	1	2025-03-04 07:34:25.020398	t
+2	States	2025-03-04 07:34:35.588684	1	2025-03-04 07:34:35.588684	t
+3	Cities	2025-03-04 07:34:44.995932	1	2025-03-04 07:34:44.995932	t
+4	Users	2025-03-04 07:34:53.826795	1	2025-03-04 07:34:53.826795	t
+5	Companies	2025-03-04 07:35:03.593488	1	2025-03-04 07:35:03.593488	t
+6	Branch	2025-03-04 07:35:12.000062	1	2025-03-04 07:35:12.000062	t
+7	Employees	2025-03-04 07:35:19.592822	1	2025-03-04 07:35:19.592822	t
 \.
 
 
@@ -685,13 +689,14 @@ COPY public.pages (id, name, created_at, created_by, updated_at, status) FROM st
 --
 
 COPY public.permissions (id, page_id, permission_code, user_id, created_at, created_by, updated_at, status) FROM stdin;
-1	1	11111	1	2025-02-28 15:41:45.639858	1	2025-02-28 15:41:45.639858	t
-2	2	11111	1	2025-02-28 15:42:02.220213	1	2025-02-28 15:42:02.220213	t
-3	3	11111	1	2025-02-28 16:34:06.950874	1	2025-02-28 16:34:06.950874	t
-4	4	11111	1	2025-02-28 16:52:33.101131	1	2025-02-28 16:52:33.101131	t
-5	5	11111	1	2025-02-28 17:33:37.666721	1	2025-02-28 17:33:37.666721	t
-6	6	11111	1	2025-02-28 18:21:21.140641	1	2025-02-28 18:21:21.140641	t
-7	7	11111	1	2025-02-28 18:23:54.113077	1	2025-02-28 18:23:54.113077	t
+1	1	11111	1	2025-03-04 07:35:44.705745	1	2025-03-04 07:35:44.705745	t
+2	2	11111	1	2025-03-04 07:35:54.134079	1	2025-03-04 07:35:54.134079	t
+3	3	11111	1	2025-03-04 07:36:02.98293	1	2025-03-04 07:36:02.98293	t
+4	4	11111	1	2025-03-04 07:36:11.756743	1	2025-03-04 07:36:11.756743	t
+5	5	11111	1	2025-03-04 07:36:24.476812	1	2025-03-04 07:36:24.476812	t
+6	6	11111	1	2025-03-04 07:36:44.909573	1	2025-03-04 07:36:44.909573	t
+7	7	11111	1	2025-03-04 07:36:55.254696	1	2025-03-04 07:36:55.254696	t
+8	1	11111	2	2025-03-04 07:41:19.859768	1	2025-03-04 07:41:19.859768	t
 \.
 
 
@@ -700,7 +705,7 @@ COPY public.permissions (id, page_id, permission_code, user_id, created_at, crea
 --
 
 COPY public.states (id, name, created_at, created_by) FROM stdin;
-1	West Bengal	2025-02-28 16:12:28.094114	1
+1	West Bengal	2025-03-04 07:38:53.588425	1
 \.
 
 
@@ -709,7 +714,8 @@ COPY public.states (id, name, created_at, created_by) FROM stdin;
 --
 
 COPY public.user_info (id, first_name, last_name, gender, birth_date, address, email, created_at, created_by, updated_at) FROM stdin;
-1	Admin	First	M	2025-10-10 00:00:00	abc	admin@email.com	2025-02-28 15:39:32.022797	1	2025-02-28 15:39:32.022797
+1	Admin	Super	M	2010-10-10 00:00:00	Computer	innogate@yahoo.com	2025-03-04 07:32:18.123676	1	2025-03-04 07:32:18.123676
+2	John	Doe	Male	1990-01-01 00:00:00	123 Main St	john.doe@example.com	2025-03-04 07:38:42.978747	1	2025-03-04 07:38:42.978747
 \.
 
 
@@ -718,7 +724,8 @@ COPY public.user_info (id, first_name, last_name, gender, birth_date, address, e
 --
 
 COPY public.users (id, mobile, password, created_at, created_by, updated_at, status) FROM stdin;
-1	1234567890	1234	2025-02-28 15:38:38.725809	0	2025-02-28 15:38:38.725809	t
+1	1234567890	1234	2025-03-04 07:26:35.016065	1	2025-03-04 07:26:35.016065	t
+2	9876543212	securePass123	2025-03-04 07:38:42.978747	1	2025-03-04 07:38:42.978747	t
 \.
 
 
@@ -733,7 +740,7 @@ SELECT pg_catalog.setval('public.bookings_id_seq', 1, false);
 -- Name: branches_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.branches_id_seq', 1, false);
+SELECT pg_catalog.setval('public.branches_id_seq', 1, true);
 
 
 --
@@ -747,7 +754,7 @@ SELECT pg_catalog.setval('public.cities_id_seq', 1, true);
 -- Name: companies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.companies_id_seq', 1, false);
+SELECT pg_catalog.setval('public.companies_id_seq', 1, true);
 
 
 --
@@ -761,7 +768,7 @@ SELECT pg_catalog.setval('public.containers_id_seq', 1, false);
 -- Name: employees_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.employees_id_seq', 1, false);
+SELECT pg_catalog.setval('public.employees_id_seq', 1, true);
 
 
 --
@@ -775,7 +782,7 @@ SELECT pg_catalog.setval('public.packages_id_seq', 1, false);
 -- Name: pages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.pages_id_seq', 8, true);
+SELECT pg_catalog.setval('public.pages_id_seq', 7, true);
 
 
 --
@@ -796,14 +803,14 @@ SELECT pg_catalog.setval('public.states_id_seq', 1, true);
 -- Name: user_info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.user_info_id_seq', 1, false);
+SELECT pg_catalog.setval('public.user_info_id_seq', 1, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 2, true);
 
 
 --
@@ -812,6 +819,14 @@ SELECT pg_catalog.setval('public.users_id_seq', 1, true);
 
 ALTER TABLE ONLY public.bookings
     ADD CONSTRAINT bookings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bookings bookings_slip_no_key; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_slip_no_key UNIQUE (slip_no);
 
 
 --
@@ -911,6 +926,14 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: bookings bookings_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id);
+
+
+--
 -- Name: bookings bookings_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -919,11 +942,27 @@ ALTER TABLE ONLY public.bookings
 
 
 --
+-- Name: bookings bookings_destination_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_destination_branch_id_fkey FOREIGN KEY (destination_branch_id) REFERENCES public.branches(id);
+
+
+--
 -- Name: bookings bookings_destination_city_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
 ALTER TABLE ONLY public.bookings
     ADD CONSTRAINT bookings_destination_city_id_fkey FOREIGN KEY (destination_city_id) REFERENCES public.cities(id);
+
+
+--
+-- Name: bookings bookings_package_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_package_id_fkey FOREIGN KEY (package_id) REFERENCES public.packages(id);
 
 
 --
@@ -996,6 +1035,14 @@ ALTER TABLE ONLY public.companies
 
 ALTER TABLE ONLY public.containers
     ADD CONSTRAINT containers_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id);
+
+
+--
+-- Name: employees employees_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.employees
+    ADD CONSTRAINT employees_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id);
 
 
 --

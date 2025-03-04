@@ -39,7 +39,7 @@ $router->add("POST", "/booking/new", function () {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $require_data = ["slip_no", "consignee_name", "consignee_mobile", "consignor_name", "consignor_mobile", "transport_mode", "paid_type", "destination_city_id", "destination_branch_id", "count", "value", "contents", "charges", "shipper", "cgst", "sgst", "igst"];
+    $require_data = ["slip_no", "consignee_name", "consignee_mobile", "consignor_name", "consignor_mobile", "transport_mode", "paid_type", "destination_city_id", "destination_branch_id", "count", "value", "contents", "charges", "shipper", "cgst", "sgst", "igst", "weight"];
     $handler->validateInput($data, $require_data);
 
     $db = new Database();
@@ -53,8 +53,9 @@ $router->add("POST", "/booking/new", function () {
             throw new Exception("Branch not found");
         }
 
-        $smtp = $db->query("INSERT INTO packages (count, value, contents, charges, shipper, cgst, sgst, igst, created_by) VALUES (?,?,?,?,?,?,?,?,?) RETURNING id", [
+        $smtp = $db->query("INSERT INTO packages (count, weight, value, contents, charges, shipper, cgst, sgst, igst, created_by) VALUES (?,?,?,?,?,?,?,?,?,?) RETURNING id", [
             $data["count"],
+            $data["weight"],
             $data["value"],
             $data["contents"],
             $data["charges"],

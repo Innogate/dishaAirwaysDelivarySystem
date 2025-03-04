@@ -142,6 +142,7 @@ CREATE TABLE packages (
     id SERIAL PRIMARY KEY NOT NULL,
     container_id INT NULL,
     count INTEGER NOT NULL,
+    weight INTEGER NOT NULL,
     value INTEGER NOT NULL,
     contents VARCHAR NOT NULL,
     charges INTEGER NOT NULL,
@@ -159,7 +160,7 @@ CREATE TABLE packages (
 CREATE TABLE bookings (
     id SERIAL PRIMARY KEY NOT NULL,
     branch_id INT NOT NULL,
-    slip_no VARCHAR NOT NULL,
+    slip_no VARCHAR UNIQUE NOT NULL,
     consignee_name VARCHAR NOT NULL,
     consignee_mobile VARCHAR NOT NULL,
     consignor_name VARCHAR NOT NULL,

@@ -2,6 +2,7 @@
 ## 101 : Invalid Tokon
 # login : 200
 # Permition: 300
+# Booking: 400
 
 
 # PAGE IDS
@@ -11,4 +12,4 @@
 4. Users
 5. Companies
 6. Branch
-7. Employees
+7. Employees    
