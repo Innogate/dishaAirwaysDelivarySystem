@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -65,6 +66,7 @@ const LoginScreen = () => {
         }
       }
     } catch (error) {
+      Alert.alert("Error", error);
       setEmailError("Something went wrong. Please try again.");
     }
   };

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "packageDelivary",
-    "slug": "packageDelivary",
+    "name": "Disha Airways",
+    "slug": "dishaAirways",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,6 +13,7 @@
     },
     "android": {
       "usesCleartextTraffic": true,
+      "package": "io.github.tuhin_su.disaAirways",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -46,6 +47,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c3e2759c-e694-4089-95ea-c24c2e722c4a"
+      }
     }
   }
 }
