@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, ScrollView, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import { Picker } from '@react-native-picker/picker';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-
+import styles from '../components/GlobalStyle';
+import { environment } from '../environment/environment';
+import globalStorage from '../components/GlobalStorage';
 // Define the validation schema
 const schema = yup.object().shape({
   bookingNo: yup.string().required('Booking No is required'),
@@ -17,7 +19,8 @@ const schema = yup.object().shape({
   consigneePhoneNumber: yup.string()
     .required('Consignee Phone number is required')
     .matches(/^[0-9]{10}$/, 'Invalid phone number'),
-  destination: yup.string().required('Destination is required'),
+  destination_city: yup.string().required('Destination City is required'),
+  destination_States: yup.string().required('Destination States is required'),
   branch: yup.string().required('Branch is required'),
   transportType: yup.string().required('Select a transport type'),
   packages: yup.number().required('No. of Packages is required').positive().integer(),
@@ -32,52 +35,196 @@ const schema = yup.object().shape({
   cgst: yup.number().positive().notRequired(),
 });
 
+
+
 const BookingForm = () => {
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
-  interface FormData {
-    bookingNo: string;
-    consignor: string;
-    phoneNumber: string;
-    consignee: string;
-    consigneePhoneNumber: string;
-    destination: string;
-    branch: string;
-    transportType: string;
-    packages: number;
-    weight: number;
-    declaredValue: number;
-    totalValue: number;
-    contain?: number;
-    charges?: number;
-    shipper?: number;
-    igst?: number;
-    sgst?: number;
-    cgst?: number;
-  }
+  // interface FormData {
+  //   bookingNo: string;
+  //   consignor: string;
+  //   phoneNumber: string;
+  //   consignee: string;
+  //   consigneePhoneNumber: string;
+  //   destination: string;
+  //   destination_city: string;
+  //   branch: string;
+  //   transportType: string;
+  //   packages: number;
+  //   weight: number;
+  //   declaredValue: number;
+  //   totalValue: number;
+  //   contain?: number;
+  //   charges?: number;
+  //   shipper?: number;
+  //   igst?: number;
+  //   sgst?: number;
+  //   cgst?: number;
+  // }
 
-  const onSubmit = async (data: FormData) => {
-    // If no errors, proceed with form submission
-    console.log('Form Data:', data);
-    Alert.alert('Form Submitted', JSON.stringify(data, null, 2));
+  const onSubmit = async (data) => {
+    if (data) {
+      const token = globalStorage.getValue("token");
+      if (token) {
+        const url = `${environment.apiUrl}/booking/new`;
+        const header = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const body = JSON.stringify({
+
+          slip_no: data.bookingNo,
+          consignee_name: data.consignee,
+          consignor_name: data.consignor,
+          consignee_mobile: data.consigneePhoneNumber,
+          consignor_mobile: data.phoneNumber,
+          transport_mode: data.transportType,
+          paid_type: "Prepaid",
+          destination_city_id: data.destination_city,
+          destination_branch_id: 1,
+          count: data.packages,
+          weight: data.weight,
+          value: data.declaredValue,
+          contents: data.contain,
+          charges: data.charges,
+          shipper: data.shipper,
+          cgst: data.cgst,
+          sgst: data.sgst,
+          igst: data.igst
+        });
+        try {
+          const res = await fetch(url, { method: "POST", headers: header, body });
+          const resJson = await res.json();
+          if (res.status === 200) {
+            Alert.alert("Success", resJson.message);
+          } else {
+            Alert.alert("Error", resJson.message || "Failed to fetch states.");
+          }
+        } catch (error) {
+          Alert.alert("Error", "Server Error");
+          console.error("Fetch error:", error);
+        }
+
+      }
+    }
   };
 
+  const [BranchList, setBranchList] = useState([]);
+  const handleCitySelection = async (cityId) => {
+    if (cityId) {
+      console.log(cityId);
+       const token = globalStorage.getValue("token");
+      if (token) {
+        const url = `${environment.apiUrl}/master/branches`;
+        const header = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const body = JSON.stringify({ from: 0, city_id: cityId });
+        try {
+          const res = await fetch(url, { method: "POST", headers: header, body });
+          const resJson = await res.json();
+          if (res.status === 200) {
+            const formattedBranch = resJson.body.map((Branch: { id: any; name: any; }) => ({
+              id: Branch.id,
+              Branch_name: Branch.name,
+            }));
+            console.log(formattedBranch);
+            setBranchList(formattedBranch);
+          } else {
+            Alert.alert("Error", resJson.message || "Failed to fetch Branch.");
+          }
+        } catch (error) {
+          Alert.alert("Error", "Server Error");
+          console.error("Fetch error:", error);
+        }
+      }
+    };
+  }
   const currentDate = new Date();
   const formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
+
+  //gate all state
+  const [statesList, setStatesList] = useState([]);
+  const getAllStates = useCallback(async () => {
+     const token = globalStorage.getValue("token");
+    if (token) {
+      const url = `${environment.apiUrl}/master/states`;
+      const header = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const body = JSON.stringify({ from: 0 });
+
+      try {
+        const res = await fetch(url, { method: "POST", headers: header, body });
+        const resJson = await res.json();
+        if (res.status === 200) {
+          const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
+            id: state.id,
+            States_Name: state.name,
+          }));
+          setStatesList(formattedStates);
+        } else {
+          Alert.alert("Error", resJson.message || "Failed to fetch states.");
+        }
+      } catch (error) {
+        Alert.alert("Error", "Server Error");
+        console.error("Fetch error:", error);
+      }
+    }
+  }, []);
+
+  // get all city by states id
+  const [cityList, setcityList] = useState([]);
+  const handleStateChange = async (selectedValue: any) => {
+    console.log("Selected State ID:", selectedValue);
+    if (selectedValue) {
+       const token = globalStorage.getValue("token");
+      if (token) {
+        const url = `${environment.apiUrl}/master/cities/byStateId`;
+        const header = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const body = JSON.stringify({ from: 0, state_id: selectedValue });
+        try {
+          const res = await fetch(url, { method: "POST", headers: header, body });
+          const resJson = await res.json();
+          if (res.status === 200) {
+            const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
+              id: state.id,
+              city_name: state.name,
+            }));
+            setcityList(formattedStates);
+          } else {
+            Alert.alert("Error", resJson.message || "Failed to fetch states.");
+          }
+        } catch (error) {
+          Alert.alert("Error", "Server Error");
+          console.error("Fetch error:", error);
+        }
+
+      }
+    };
+  }
+  useEffect(() => {
+    getAllStates();
+  }, [getAllStates]);
 
   return (
     <ScrollView className="flex-1 bg-slate-100 px-4" contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <Text className="mt-2">Date: {formattedDate}</Text>
       {/* Booking No & Consignor */}
       <View className="gap-2">
-        <View style={stylesin.container} className="gap-2">
+        <View style={styles.container} className="gap-2">
           <Controller
             control={control}
             name="bookingNo"
             render={({ field: { onChange, onBlur, value } }) => (
-              <View style={stylesin.inputContainer}>
+              <View style={styles.twoinputContainer}>
                 <TextInput
                   label="Booking No"
                   value={value}
@@ -85,7 +232,7 @@ const BookingForm = () => {
                   keyboardType="numeric"
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  style={[stylesin.input]}
+                  style={[styles.input]}
                 />
                 {errors.bookingNo && <Text style={styles.errorText}>{errors.bookingNo.message}</Text>}
               </View>
@@ -95,13 +242,13 @@ const BookingForm = () => {
             control={control}
             name="consignor"
             render={({ field: { onChange, value } }) => (
-              <View style={stylesin.inputContainer}>
+              <View style={styles.twoinputContainer}>
                 <TextInput
                   label="Consignor"
                   mode="outlined"
                   value={value}
                   onChangeText={onChange}
-                  style={[stylesin.input]}
+                  style={[styles.input]}
                 />
                 {errors.consignor && <Text style={styles.errorText}>{errors.consignor.message}</Text>}
               </View>
@@ -121,7 +268,7 @@ const BookingForm = () => {
                 keyboardType="numeric"
                 value={value}
                 onChangeText={onChange}
-                style={stylesx.input}
+                style={styles.input}
               />
               {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>}
             </View>
@@ -138,7 +285,7 @@ const BookingForm = () => {
                 mode='outlined'
                 value={value}
                 onChangeText={onChange}
-                style={stylesx.input}
+                style={styles.input}
               />
               {errors.consignee && <Text style={styles.errorText}>{errors.consignee.message}</Text>}
             </View>
@@ -155,52 +302,115 @@ const BookingForm = () => {
                 keyboardType="numeric"
                 value={value}
                 onChangeText={onChange}
-                style={stylesx.input}
+                style={styles.input}
               />
               {errors.consigneePhoneNumber && <Text style={styles.errorText}>{errors.consigneePhoneNumber.message}</Text>}
             </View>
           )}
         />
-        {/* Destination & Branch */}
-        <View style={stylesin.container} className="gap-2">
+        <View style={styles.rowContainer}>
+          {/* State Picker */}
           <Controller
             control={control}
-            name="destination"
+            name="destination_States"
             render={({ field: { onChange, value } }) => (
-              <View style={stylesin.inputContainer}>
-                <TextInput
-                  label="Destination"
-                  mode='outlined'
-                  value={value}
-                  onChangeText={onChange}
-                  style={stylesin.input}
-                />
-                {errors.destination && <Text style={styles.errorText}>{errors.destination.message}</Text>}
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={value}
+                  onValueChange={(selectedValue) => {
+                    handleStateChange(selectedValue);
+                    onChange(selectedValue); // Update form state
+                  }}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="Select a State" value="" />
+                  {statesList.map((state) => (
+                    <Picker.Item key={state.id} label={state.States_Name} value={state.id} />
+                  ))}
+                </Picker>
+                {errors.destination_States && <Text style={styles.errorText}>{errors.destination_States.message}</Text>}
               </View>
             )}
           />
+
           <Controller
             control={control}
-            name="branch"
+            name="destination_city"
             render={({ field: { onChange, value } }) => (
-              <View style={stylesin.inputContainer}>
-                <TextInput
-                  label="Destination Branch Name"
-                  mode='outlined'
-                  value={value}
-                  onChangeText={onChange}
-                  style={stylesin.input}
-                />
-                {errors.branch && <Text style={styles.errorText}>{errors.branch.message}</Text>}
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={value}
+                  onValueChange={(selectedValue) => {
+                    onChange(selectedValue); // Update the form state
+                    handleCitySelection(selectedValue); // Call the method with the selected city ID
+                  }}
+                >
+                  <Picker.Item label="Destination City" value="" />
+                  {cityList.map((city) => {
+                    // Ensure city.id is unique
+                    if (!city.id) {
+                      console.warn("City ID is missing for city:", city);
+                    }
+                    return (
+                      <Picker.Item key={city.id} label={city.city_name} value={city.id} />
+                    );
+                  })}
+                </Picker>
+                {errors.destination_city && <Text style={styles.errorText}>{errors.destination_city.message}</Text>}
               </View>
             )}
           />
+
+          {/* City Picker */}
+          {/* <Controller
+            control={control}
+            name="destination_city"
+            render={({ field: { onChange, value } }) => (
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  selectedValue={value}
+                  onValueChange={(selectedValue) => {
+                    onChange(selectedValue); // Update the form state
+                    handleCitySelection(selectedValue); // Call the method with the selected city ID
+                  }}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="Destination City" value="" />
+                  {cityList.map((city) => (
+                    <Picker.Item key={city.id} label={city.city_name} value={city.id} />
+                  ))}
+                </Picker>
+                {errors.destination_city && <Text style={styles.errorText}>{errors.destination_city.message}</Text>}
+              </View>
+            )}
+          /> */}
         </View>
+
+        <Controller
+          control={control}
+          name="branch"
+          render={({ field: { onChange, value } }) => (
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={value}
+                onValueChange={(selectedValue) => onChange(selectedValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Destination Branch" value="" />
+                {BranchList.map((branch) => (
+                  <Picker.Item key={branch.id} label={branch.Branch_name} value={branch.id} />
+                ))}
+              </Picker>
+              {errors.branch && <Text style={styles.errorText}>{errors.branch.message}</Text>}
+            </View>
+          )}
+        />
+
         <Controller
           control={control}
           name="transportType"
           render={({ field: { onChange, value } }) => (
-            <View>
+            <View style={styles.pickerWrapper}>
               <Picker selectedValue={value} onValueChange={(itemValue) => setValue('transportType', itemValue)} style={styles.picker}>
                 <Picker.Item label="Select Transport Type" value="" />
                 <Picker.Item label="Air" value="air" />
@@ -212,18 +422,18 @@ const BookingForm = () => {
             </View>
           )}
         />
-        <View style={stylesthreefield.container} className="gap-2">
+        <View style={styles.threeFieldContainer}>
           <Controller
             control={control}
             name="packages"
             render={({ field: { onChange, value } }) => (
-              <View>
+              <View style={styles.inputWrapper}>
                 <TextInput
                   label="No of Packages"
                   mode='outlined'
                   value={value}
                   onChangeText={onChange}
-                  style={stylesthreefield.input}
+                  style={styles.input}
                 />
                 {errors.packages && <Text style={styles.errorText}>{errors.packages.message}</Text>}
               </View>
@@ -233,14 +443,14 @@ const BookingForm = () => {
             control={control}
             name="weight"
             render={({ field: { onChange, value } }) => (
-              <View>
+              <View style={styles.inputWrapper}>
                 <TextInput
                   label="Weight"
                   mode='outlined'
                   keyboardType="numeric"
                   value={value}
                   onChangeText={onChange}
-                  style={stylesthreefield.input}
+                  style={styles.input}
                 />
                 {errors.weight && <Text style={styles.errorText}>{errors.weight.message}</Text>}
               </View>
@@ -250,14 +460,14 @@ const BookingForm = () => {
             control={control}
             name="declaredValue"
             render={({ field: { onChange, value } }) => (
-              <View>
+              <View style={styles.inputWrapper}>
                 <TextInput
                   label="Declared Value"
                   mode='outlined'
                   keyboardType="numeric"
                   value={value}
                   onChangeText={onChange}
-                  style={stylesthreefield.input}
+                  style={styles.input}
                 />
                 {errors.declaredValue && <Text style={styles.errorText}>{errors.declaredValue.message}</Text>}
               </View>
@@ -265,23 +475,24 @@ const BookingForm = () => {
           />
         </View>
 
-        <View style={stylesthreefield.container} className="gap-2">
+        <View style={styles.threeFieldContainer}>
           <Controller
             control={control}
             name="contain"
             render={({ field: { onChange, value } }) => (
-              <View>
-                <TextInput label="Contain" mode='outlined' value={value} onChangeText={onChange} style={stylesthreefield.input} />
+              <View style={styles.inputWrapper}>
+                <TextInput label="Contain" mode='outlined' value={value} onChangeText={onChange} style={styles.input} />
                 {errors.contain && <Text style={styles.errorText}>{errors.contain.message}</Text>}
               </View>
             )}
           />
+
           <Controller
             control={control}
             name="charges"
             render={({ field: { onChange, value } }) => (
-              <View>
-                <TextInput label="Charges" mode='outlined' value={value} onChangeText={onChange} style={stylesthreefield.input} keyboardType="numeric" />
+              <View style={styles.inputWrapper}>
+                <TextInput label="Charges" mode='outlined' value={value} onChangeText={onChange} style={styles.input} keyboardType="numeric" />
                 {errors.charges && <Text style={styles.errorText}>{errors.charges.message}</Text>}
               </View>
             )}
@@ -290,8 +501,8 @@ const BookingForm = () => {
             control={control}
             name="shipper"
             render={({ field: { onChange, value } }) => (
-              <View>
-                <TextInput label="Shipper's" mode='outlined' value={value} onChangeText={onChange} style={stylesthreefield.input} keyboardType="numeric" />
+              <View style={styles.inputWrapper}>
+                <TextInput label="Shipper's" mode='outlined' value={value} onChangeText={onChange} style={styles.input} keyboardType="numeric" />
                 {errors.shipper && <Text style={styles.errorText}>{errors.shipper.message}</Text>}
               </View>
             )}
@@ -299,13 +510,20 @@ const BookingForm = () => {
         </View>
 
         {/* Taxes */}
-        <View style={stylesthreefield.container} className="gap-2">
+        <View style={styles.threeFieldContainer}>
           <Controller
             control={control}
             name="cgst"
             render={({ field: { onChange, value } }) => (
-              <View>
-                <TextInput label="CGST" mode='outlined' value={value} onChangeText={onChange} style={stylesthreefield.input} keyboardType="numeric" />
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="CGST"
+                  mode='outlined'
+                  value={value}
+                  onChangeText={onChange}
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
                 {errors.cgst && <Text style={styles.errorText}>{errors.cgst.message}</Text>}
               </View>
             )}
@@ -314,8 +532,15 @@ const BookingForm = () => {
             control={control}
             name="sgst"
             render={({ field: { onChange, value } }) => (
-              <View>
-                <TextInput label="SGST" mode='outlined' value={value} onChangeText={onChange} style={stylesthreefield.input} keyboardType="numeric" />
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="SGST"
+                  mode='outlined'
+                  value={value}
+                  onChangeText={onChange}
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
                 {errors.sgst && <Text style={styles.errorText}>{errors.sgst.message}</Text>}
               </View>
             )}
@@ -324,8 +549,15 @@ const BookingForm = () => {
             control={control}
             name="igst"
             render={({ field: { onChange, value } }) => (
-              <View>
-                <TextInput label="IGST" mode='outlined' value={value} onChangeText={onChange} style={stylesthreefield.input} keyboardType="numeric" />
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  label="IGST"
+                  mode='outlined'
+                  value={value}
+                  onChangeText={onChange}
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
                 {errors.igst && <Text style={styles.errorText}>{errors.igst.message}</Text>}
               </View>
             )}
@@ -344,7 +576,7 @@ const BookingForm = () => {
                 keyboardType="numeric"
                 value={value}
                 onChangeText={onChange}
-                style={stylesx.input}
+                style={styles.input}
               />
               {errors.totalValue && <Text style={styles.errorText}>{errors.totalValue.message}</Text>}
             </View>
@@ -355,107 +587,7 @@ const BookingForm = () => {
           <Text style={styles.buttonText}>SUBMIT</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </ScrollView >
   );
 };
-
-// Styles remain unchanged
-const styles = {
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
-    backgroundColor: 'white',
-  },
-  picker: {
-    borderWidth: 1,
-    borderColor: 'black',
-    padding: 1,
-    margin: 2,
-    borderRadius: 10,
-    backgroundColor: 'white',
-  },
-  button: {
-    backgroundColor: '#009688',
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 5,
-  },
-};
-
-// Other styles remain unchanged
-const stylesx = StyleSheet.create({
-  input: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    margin: 0,
-    fontSize: 10,
-    height: 40,
-  },
-  inputContent: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-  },
-});
-
-const stylesin = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  inputContainer: {
-    flex: 1,
-    minWidth: "45%", // Ensures proper spacing
-    maxWidth: "50%",
-  },
-  input: {
-    borderRadius: 8,
-    height: 40,
-    fontSize: 12,
-  },
-  errorInput: {
-    borderColor: "red", // Changes only the border color
-    borderBlockColor: 1,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 10,
-    textAlign: "left",
-  },
-});
-
-const stylesthreefield = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  input: {
-    flex: 1,
-    borderRadius: 8,
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    margin: 0,
-    height: 40,
-    fontSize: 10,
-    minWidth: 100,
-    maxWidth: "33%",
-  },
-});
-
 export default BookingForm;

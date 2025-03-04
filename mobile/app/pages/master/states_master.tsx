@@ -134,7 +134,7 @@ const StatesMaster = () => {
 
       const url = environment.apiUrl + '/master/states/new';
       // const token = globalStorage.getValue('token');
-      const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+       const token = globalStorage.getValue("token");
       const header = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}` 
@@ -175,7 +175,7 @@ const StatesMaster = () => {
         {
           text: "OK",
           onPress: async () => {
-            const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
+             const token = globalStorage.getValue("token");
             if (token) {
               const url = environment.apiUrl + '/master/states/delete';
               const headers = {

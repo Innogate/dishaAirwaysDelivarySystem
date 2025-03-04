@@ -126,6 +126,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
+
+
+
+/// three feild conten 
+threeFieldContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: 10,
+},
+inputWrapper: {
+  flex: 1,
+  marginRight: 10, // Add some space between inputs
+},
 });
 
 
