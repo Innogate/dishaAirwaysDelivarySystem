@@ -23,20 +23,19 @@ export default function LandingScreen() {
 
   useEffect(() => {
     if (navigationState?.key && token !== null) {
-      if (!token) {
-        router.replace("/login");
-      } else {
+      if (token) {
         router.replace("/home");
+      } else {
+        router.replace("/login");
       }
     }
   }, [navigationState?.key, token]);
 
   return (
-    <View className="flex-1 justify-center items-center bg-blue-500">
-      <Text className="text-white text-2xl font-bold">
-        This app is in development mode. If you encounter any issues, please
-        contact the developer at{" "}
-        <Text className="underline">innogate@yahoo.com</Text>.
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#3B82F6" }}>
+      <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", textAlign: "center" }}>
+        This app is in development mode. If you encounter any issues, please contact the developer at{" "}
+        <Text style={{ textDecorationLine: "underline" }}>innogate@yahoo.com</Text>.
       </Text>
     </View>
   );
