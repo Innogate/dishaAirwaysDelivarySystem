@@ -50,7 +50,7 @@ $router->add("POST", "/booking/new", function () {
         $branch = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$branch) {
-            throw new Exception("Branch not found");
+            throw new Exception("It is not a employee account.");
         }
 
         $smtp = $db->query("INSERT INTO packages (count, weight, value, contents, charges, shipper, cgst, sgst, igst, created_by) VALUES (?,?,?,?,?,?,?,?,?,?) RETURNING id", [
