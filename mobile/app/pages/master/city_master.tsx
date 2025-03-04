@@ -6,7 +6,8 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Picker } from "@react-native-picker/picker";
 import { MaterialIcons } from '@expo/vector-icons';
-import { environment } from '@/app/environment/environment';
+import { API_BASE_URL } from '@/constants/api.url';
+import globalStorage from '@/app/components/GlobalStorage';
 
 // Define the validation schema
 const schema = yup.object().shape({
@@ -27,7 +28,7 @@ const CityMaster = () => {
   const getAllStates = useCallback(async () => {
      const token = globalStorage.getValue("token");// Replace with your actual token
     if (token) {
-      const url = `${environment.apiUrl}/master/states`;
+      const url = `${API_BASE_URL}/master/states`;
       const header = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -106,7 +107,7 @@ const CityMaster = () => {
   });
 
   const onSubmit = async (data) => {
-    const url = environment.apiUrl + '/master/cities/new';
+    const url = API_BASE_URL + '/master/cities/new';
      const token = globalStorage.getValue("token");// Replace with your actual token
     const header = {
       'Content-Type': 'application/json',
@@ -174,7 +175,7 @@ const CityMaster = () => {
     if (stateId) {
        const token = globalStorage.getValue("token");// Replace with your actual token
       if (token) {
-        const url = `${environment.apiUrl}/master/cities/byStateId`;
+        const url = `${API_BASE_URL}/master/cities/byStateId`;
         const header = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

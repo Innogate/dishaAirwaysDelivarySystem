@@ -4,7 +4,7 @@ import { TextInput, FAB } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { environment } from '@/app/environment/environment';
+import { API_BASE_URL } from '@/constants/api.url';
 import styles from '@/app/components/GlobalStyle';
 import { Picker } from '@react-native-picker/picker';
 import globalStorage from '@/app/components/GlobalStorage';
@@ -74,10 +74,10 @@ const EmployeeMaster = () => {
     if (data) {
        const token = globalStorage.getValue("token");
       if (token) {
-        const url = `${environment.apiUrl}/master/users/new`;
+        const url = `${API_BASE_URL}/master/users/new`;
         const header = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         };
         const body = JSON.stringify({
           mobile: data.Employee_phoneNumber,
@@ -115,10 +115,10 @@ const EmployeeMaster = () => {
       "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
 
     if (token) {
-      const url = environment.apiUrl + "/master/users";
+      const url = API_BASE_URL + "/master/users";
       const header = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`
       };
       const body = JSON.stringify({
         from: 0,

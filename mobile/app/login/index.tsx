@@ -11,7 +11,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "expo-router";
-import { environment } from "../environment/environment";
+import { API_BASE_URL } from "@/constants/api.url";
 import globalStorage from "../components/GlobalStorage";
 
 // Validation Schema
@@ -33,7 +33,7 @@ const LoginScreen = () => {
     setEmailError("");
     setPasswordError("");
 
-    const url = environment.apiUrl + "/login";
+    const url = API_BASE_URL + "/login";
     const header = { "Content-Type": "application/json" };
 
     const body = JSON.stringify({

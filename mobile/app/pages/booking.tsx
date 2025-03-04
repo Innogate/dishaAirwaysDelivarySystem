@@ -6,8 +6,9 @@ import { Picker } from '@react-native-picker/picker';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import styles from '../components/GlobalStyle';
-import { environment } from '../environment/environment';
+import { API_BASE_URL } from '@/constants/api.url';
 import globalStorage from '../components/GlobalStorage';
+
 // Define the validation schema
 const schema = yup.object().shape({
   bookingNo: yup.string().required('Booking No is required'),
@@ -36,44 +37,39 @@ const schema = yup.object().shape({
 });
 
 
-
+console.log(2);
 const BookingForm = () => {
-  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
-    resolver: yupResolver(schema),
-  });
+  console.log(1);
+  const [token, setToken] = useState(null);
+  const [BranchList, setBranchList] = useState([]);
+  const [statesList, setStatesList] = useState([]);
+  const [cityList, setcityList] = useState([]);
 
-  // interface FormData {
-  //   bookingNo: string;
-  //   consignor: string;
-  //   phoneNumber: string;
-  //   consignee: string;
-  //   consigneePhoneNumber: string;
-  //   destination: string;
-  //   destination_city: string;
-  //   branch: string;
-  //   transportType: string;
-  //   packages: number;
-  //   weight: number;
-  //   declaredValue: number;
-  //   totalValue: number;
-  //   contain?: number;
-  //   charges?: number;
-  //   shipper?: number;
-  //   igst?: number;
-  //   sgst?: number;
-  //   cgst?: number;
-  // }
+  const fetchToken = async () => {
+    const storedToken = await globalStorage.getValue("token");
+    console.log("Fetched Token:", storedToken); // Debugging
+    if (storedToken) {
+      setToken(storedToken);
+    } else {
+      Alert.alert("Error", "Authentication token missing.");
+    }
+  };
 
   const onSubmit = async (data) => {
+    if (!token) {
+      Alert.alert("Error", "Authentication token missing.");
+      return;
+    }
+
     if (data) {
-      const token = globalStorage.getValue("token");
-      if (token) {
-        const url = `${environment.apiUrl}/booking/new`;
-        const header = {
+      const url = `${API_BASE_URL}/booking/new`;
+
+      const header = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        };
-        const body = JSON.stringify({
+          Authorization: `Bearer ${token}`
+      };
+
+      const body = JSON.stringify({
 
           slip_no: data.bookingNo,
           consignee_name: data.consignee,
@@ -94,6 +90,7 @@ const BookingForm = () => {
           sgst: data.sgst,
           igst: data.igst
         });
+        
         try {
           const res = await fetch(url, { method: "POST", headers: header, body });
           const resJson = await res.json();
@@ -106,24 +103,26 @@ const BookingForm = () => {
           Alert.alert("Error", "Server Error");
           console.error("Fetch error:", error);
         }
-
-      }
     }
   };
 
-  const [BranchList, setBranchList] = useState([]);
+  // SELECT Branch by city_id
   const handleCitySelection = async (cityId) => {
+    if (!token) {
+      Alert.alert("Error", "Authentication token missing.");
+      return;
+    }
+    
     if (cityId) {
       console.log(cityId);
-       const token = globalStorage.getValue("token");
-      if (token) {
-        const url = `${environment.apiUrl}/master/branches`;
-        const header = {
+      const url = `${API_BASE_URL}/master/branches`;
+      const header = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        };
-        const body = JSON.stringify({ from: 0, city_id: cityId });
-        try {
+          Authorization: `Bearer ${token}`
+      };
+      const body = JSON.stringify({ from: 0, city_id: cityId });
+
+      try {
           const res = await fetch(url, { method: "POST", headers: header, body });
           const resJson = await res.json();
           if (res.status === 200) {
@@ -136,29 +135,31 @@ const BookingForm = () => {
           } else {
             Alert.alert("Error", resJson.message || "Failed to fetch Branch.");
           }
-        } catch (error) {
+      } catch (error) {
           Alert.alert("Error", "Server Error");
           console.error("Fetch error:", error);
-        }
       }
     };
   }
-  const currentDate = new Date();
-  const formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
 
-  //gate all state
-  const [statesList, setStatesList] = useState([]);
+  // GET ALL STATES
   const getAllStates = useCallback(async () => {
-     const token = globalStorage.getValue("token");
-    if (token) {
-      const url = `${environment.apiUrl}/master/states`;
-      const header = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-      const body = JSON.stringify({ from: 0 });
 
-      try {
+    if (!token) {
+      Alert.alert("Error", "Authentication token missing.");
+      return;
+    }
+
+    const url = `${API_BASE_URL}/master/states`;
+
+    const header = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+    };
+
+    const body = JSON.stringify({ from: 0 });
+
+    try {
         const res = await fetch(url, { method: "POST", headers: header, body });
         const resJson = await res.json();
         if (res.status === 200) {
@@ -170,24 +171,40 @@ const BookingForm = () => {
         } else {
           Alert.alert("Error", resJson.message || "Failed to fetch states.");
         }
-      } catch (error) {
+    } catch (error) {
         Alert.alert("Error", "Server Error");
         console.error("Fetch error:", error);
-      }
     }
   }, []);
 
-  // get all city by states id
-  const [cityList, setcityList] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchToken(); // Ensure token is fetched first
+      await getAllStates(); // Only call this after the token is available
+    };
+  
+    if (!token) {
+      fetchData();
+    } else {
+      getAllStates();
+    }
+  }, [token]);
+
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const currentDate = new Date();
+  const formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
+  
   const handleStateChange = async (selectedValue: any) => {
     console.log("Selected State ID:", selectedValue);
     if (selectedValue) {
-       const token = globalStorage.getValue("token");
       if (token) {
-        const url = `${environment.apiUrl}/master/cities/byStateId`;
+        const url = `${API_BASE_URL}/master/cities/byStateId`;
         const header = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         };
         const body = JSON.stringify({ from: 0, state_id: selectedValue });
         try {
@@ -210,9 +227,6 @@ const BookingForm = () => {
       }
     };
   }
-  useEffect(() => {
-    getAllStates();
-  }, [getAllStates]);
 
   return (
     <ScrollView className="flex-1 bg-slate-100 px-4" contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
@@ -590,4 +604,5 @@ const BookingForm = () => {
     </ScrollView >
   );
 };
+
 export default BookingForm;

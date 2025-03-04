@@ -17,7 +17,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { MaterialIcons } from "@expo/vector-icons";
-import { environment } from "@/app/environment/environment";
+import { API_BASE_URL } from "@/constants/api.url";
 import { tokens } from "react-native-paper/lib/typescript/styles/themes/v3/tokens";
 import globalStorage from "@/app/components/GlobalStorage";
 
@@ -82,7 +82,7 @@ const StatesMaster = () => {
       "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
   
     if (token) {
-      const url = environment.apiUrl + "/master/states";
+      const url = API_BASE_URL + "/master/states";
       const header = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -132,7 +132,7 @@ const StatesMaster = () => {
       Alert.alert("Updated!", "State updated successfully.");
     } else {
 
-      const url = environment.apiUrl + '/master/states/new';
+      const url = API_BASE_URL + '/master/states/new';
       // const token = globalStorage.getValue('token');
        const token = globalStorage.getValue("token");
       const header = {
@@ -177,7 +177,7 @@ const StatesMaster = () => {
           onPress: async () => {
              const token = globalStorage.getValue("token");
             if (token) {
-              const url = environment.apiUrl + '/master/states/delete';
+              const url = API_BASE_URL + '/master/states/delete';
               const headers = {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,

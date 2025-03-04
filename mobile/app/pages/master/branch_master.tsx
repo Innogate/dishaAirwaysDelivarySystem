@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
-import { environment } from '@/app/environment/environment';
+import { API_BASE_URL } from '@/constants/api.url';
 import { Picker } from '@react-native-picker/picker';
 import styles from '@/app/components/GlobalStyle';
 import globalStorage from '@/app/components/GlobalStorage';
@@ -46,10 +46,10 @@ const BranchMaster = () => {
   const getAllStates = useCallback(async () => {
      const token = globalStorage.getValue("token");
     if (token) {
-      const url = `${environment.apiUrl}/master/states`;
+      const url = `${API_BASE_URL}/master/states`;
       const header = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`
       };
       const body = JSON.stringify({ from: 0 });
 
@@ -79,10 +79,10 @@ const BranchMaster = () => {
     if (selectedValue) {
        const token = globalStorage.getValue("token");
       if (token) {
-        const url = `${environment.apiUrl}/master/cities/byStateId`;
+        const url = `${API_BASE_URL}/master/cities/byStateId`;
         const header = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         };
         const body = JSON.stringify({ from: 0, state_id: selectedValue });
         try {
@@ -111,10 +111,10 @@ const BranchMaster = () => {
   const getAllCompany = useCallback(async () => {
      const token = globalStorage.getValue("token");
     if (token) {
-      const url = `${environment.apiUrl}/master/companies`;
+      const url = `${API_BASE_URL}/master/companies`;
       const header = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`
       };
       const body = JSON.stringify({ from: 0 });
 
@@ -151,10 +151,10 @@ const BranchMaster = () => {
       "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
   
     if (token) {
-      const url = environment.apiUrl + "/master/branches";
+      const url = API_BASE_URL + "/master/branches";
       const header = {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`
       };
       const body = JSON.stringify({
         from: 0,
@@ -246,10 +246,10 @@ const BranchMaster = () => {
     if (data) {
        const token = globalStorage.getValue("token");
       if (token) {
-        const url = `${environment.apiUrl}/master/branches/new`;
+        const url = `${API_BASE_URL}/master/branches/new`;
         const header = {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         };
         const body = JSON.stringify({
           company_id: data.Company_name,

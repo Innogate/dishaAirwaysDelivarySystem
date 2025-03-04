@@ -9,7 +9,7 @@
     $token = str_replace('Bearer ', '', $authHeader);
     
     if (!$token || !$jwt->verifyToken($token)) {
-        $response = new ApiResponse(401, "Unauthorized access");
+        $response = new ApiResponse(401, "Unauthorized access", $token);
         $response->toJson();
         exit;
     }

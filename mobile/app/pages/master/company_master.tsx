@@ -7,8 +7,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import * as FileSystem from 'expo-file-system';
-import { environment } from '@/app/environment/environment';
+import { API_BASE_URL } from '@/constants/api.url';
 import styles from '@/app/components/GlobalStyle';
+import globalStorage from '@/app/components/GlobalStorage';
 // Define the validation schema
 const schema = yup.object().shape({
   Company_Name: yup.string().required('Company Name is required'),
@@ -44,7 +45,7 @@ const BranchMaster = () => {
   const getAllStates = useCallback(async () => {
      const token = globalStorage.getValue("token");// Replace with your token
     if (token) {
-      const url = `${environment.apiUrl}/master/states`;
+      const url = `${API_BASE_URL}/master/states`;
       const header = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -81,7 +82,7 @@ const BranchMaster = () => {
     if (selectedValue) {
        const token = globalStorage.getValue("token");// Replace with your token
       if (token) {
-        const url = `${environment.apiUrl}/master/cities/byStateId`;
+        const url = `${API_BASE_URL}/master/cities/byStateId`;
         const header = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -112,7 +113,7 @@ const BranchMaster = () => {
   const getAllCompanies = async () => {
      const token = globalStorage.getValue("token");// Replace with your token
     if (token) {
-      const url = `${environment.apiUrl}/master/companies`;
+      const url = `${API_BASE_URL}/master/companies`;
       const header = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -153,7 +154,7 @@ const BranchMaster = () => {
        const token = globalStorage.getValue("token");// Replace with your token
 
       if (token) {
-        const url = `${environment.apiUrl}/master/companies/new`;
+        const url = `${API_BASE_URL}/master/companies/new`;
         const headers = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
