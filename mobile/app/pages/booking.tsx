@@ -52,7 +52,7 @@ const BookingForm = () => {
     }
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: any) => {
     if (!token) {
       Alert.alert("Error", "Authentication token missing.");
       return;
@@ -104,7 +104,7 @@ const BookingForm = () => {
   };
 
   // SELECT Branch by city_id
-  const handleCitySelection = async (cityId) => {
+  const handleCitySelection = async (cityId: string) => {
     if (!token) {
       Alert.alert("Error", "Authentication token missing.");
       return;
