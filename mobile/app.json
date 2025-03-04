@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "packageDelivary",
-    "slug": "packageDelivary",
+    "name": "Disha Airways",
+    "slug": "dishaAirways",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,6 +13,7 @@
     },
     "android": {
       "usesCleartextTraffic": true,
+      "package": "io.github.tuhin_su.disaAirways",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
