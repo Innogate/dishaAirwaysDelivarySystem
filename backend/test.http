@@ -1,4 +1,4 @@
-@apiUrl = http://localhost:8000
+@apiUrl = http://ec2-3-138-35-53.us-east-2.compute.amazonaws.com
 @token = {{login.response.body.body.token}}
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version
@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "9876543212",
-    "passwd": "securePass123"
+    "id": "1234567890",
+    "passwd": "1234"
 }
 
 ### VERIFY

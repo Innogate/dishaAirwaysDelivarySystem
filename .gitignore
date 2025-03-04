@@ -5,3 +5,4 @@ database/data/.*
 .env
 composer.lock
 .android
+mobile/android
