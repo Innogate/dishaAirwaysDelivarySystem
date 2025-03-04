@@ -8,11 +8,11 @@ global $pageID;
 $pageID = 1;
 
 $router->add('POST', '/booking', function () {
-    global $pageID;
+    $pageID=1;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "r"); // Check user permission for this page
+    $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
 
     $data = json_decode(file_get_contents("php://input"), true);
     $handler->validateInput($data, ["from"]);
