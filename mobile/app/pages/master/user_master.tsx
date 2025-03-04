@@ -8,7 +8,6 @@ import { API_BASE_URL } from '@/constants/api.url';
 import styles from '@/app/components/GlobalStyle';
 import { Picker } from '@react-native-picker/picker';
 import globalStorage from '@/app/components/GlobalStorage';
-// Define the validation schema
 const schema = yup.object().shape({
   Employee_FName: yup.string().required('Employee First Name is required'),
   Employee_LName: yup.string().required('Employee Last Name is required'),
@@ -30,8 +29,28 @@ const EmployeeMaster = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(500)).current;
   const startY = useRef(0);
-
   const [User, setUser] = useState([]);
+
+  const [token, setToken] = useState(null);
+
+
+
+  const fetchToken = async () => {
+    try {
+      const storedToken = await globalStorage.getValue("token");
+      console.log("Fetched Token:", storedToken); // Debugging
+
+      if (storedToken) {
+        setToken(storedToken); // State update is asynchronous
+      } else {
+        Alert.alert("Error", "Authentication token is missing.");
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      Alert.alert("Error", "An error occurred while fetching the token.");
+    }
+  };
+
   const openModal = () => {
     slideAnim.setValue(screenHeight);
     setModalVisible(true);
@@ -69,10 +88,8 @@ const EmployeeMaster = () => {
     resolver: yupResolver(schema),
   });
   // Create User
-  const onSubmit = async (data) => {
-    console.log('Form submitted with data:', data); // Log the submitted data
+  const onSubmit = async (data:any) => {
     if (data) {
-       const token = globalStorage.getValue("token");
       if (token) {
         const url = `${API_BASE_URL}/master/users/new`;
         const header = {
@@ -97,6 +114,7 @@ const EmployeeMaster = () => {
             Alert.alert("Success", resJson.message);
             closeModal(); // Close the modal after successful creation
             reset(); // Reset the form state
+            getAllUser();
           } else {
             Alert.alert("Error", resJson.message || "Failed to fetch states.");
           }
@@ -111,9 +129,6 @@ const EmployeeMaster = () => {
 
   // Gate all Users
   const getAllUser = async () => {
-    const token =
-      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
-
     if (token) {
       const url = API_BASE_URL + "/master/users";
       const header = {
@@ -159,8 +174,11 @@ const EmployeeMaster = () => {
 
   // Call function on page load to display
   useEffect(() => {
-    getAllUser();
-  }, []);
+    fetchToken();
+    if (token){
+      getAllUser();
+    }
+  }, [token]);
 
 
   const renderBranchItem = ({ item }) => (

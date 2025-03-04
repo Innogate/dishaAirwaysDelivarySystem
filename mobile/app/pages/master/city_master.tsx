@@ -24,9 +24,26 @@ const CityMaster = () => {
   const [cities, setCities] = useState([]);
   const [statesList, setStatesList] = useState([]);
   const [selectedCity, setSelectedCity] = useState(null); // Track selected city for editing
+  const [token, setToken] = useState(null);
 
-  const getAllStates = useCallback(async () => {
-     const token = globalStorage.getValue("token");// Replace with your actual token
+
+
+  const fetchToken = async () => {
+    try {
+      const storedToken = await globalStorage.getValue("token");
+      if (storedToken) {
+        setToken(storedToken);
+      } else {
+        Alert.alert("Error", "Authentication token is missing.");
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      Alert.alert("Error", "An error occurred while fetching the token.");
+    }
+  };
+
+
+  const getAllStates = async () => {
     if (token) {
       const url = `${API_BASE_URL}/master/states`;
       const header = {
@@ -51,12 +68,18 @@ const CityMaster = () => {
         Alert.alert("Error", "Server Error");
         console.error("Fetch error:", error);
       }
+    } else {
+      Alert.alert("Error", "aaa Authentication token missing.");
     }
-  }, []);
+  };
 
   useEffect(() => {
-    getAllStates();
-  }, [getAllStates]);
+    fetchToken();
+    if (token) {
+      getAllStates();
+    }
+  }, [token]); // Runs when `token` changes
+
 
   const openModal = (city = null) => {
     slideAnim.setValue(screenHeight);
@@ -108,7 +131,6 @@ const CityMaster = () => {
 
   const onSubmit = async (data) => {
     const url = API_BASE_URL + '/master/cities/new';
-     const token = globalStorage.getValue("token");// Replace with your actual token
     const header = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
@@ -173,7 +195,6 @@ const CityMaster = () => {
 
   const handleStateChange = async (stateId) => {
     if (stateId) {
-       const token = globalStorage.getValue("token");// Replace with your actual token
       if (token) {
         const url = `${API_BASE_URL}/master/cities/byStateId`;
         const header = {

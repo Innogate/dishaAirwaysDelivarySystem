@@ -62,44 +62,44 @@ const BookingForm = () => {
       const url = `${API_BASE_URL}/booking/new`;
 
       const header = {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
       };
 
       const body = JSON.stringify({
 
-          slip_no: data.bookingNo,
-          consignee_name: data.consignee,
-          consignor_name: data.consignor,
-          consignee_mobile: data.consigneePhoneNumber,
-          consignor_mobile: data.phoneNumber,
-          transport_mode: data.transportType,
-          paid_type: "Prepaid",
-          destination_city_id: data.destination_city,
-          destination_branch_id: 1,
-          count: data.packages,
-          weight: data.weight,
-          value: data.declaredValue,
-          contents: data.contain,
-          charges: data.charges,
-          shipper: data.shipper,
-          cgst: data.cgst,
-          sgst: data.sgst,
-          igst: data.igst
-        });
-        
-        try {
-          const res = await fetch(url, { method: "POST", headers: header, body });
-          const resJson = await res.json();
-          if (res.status === 200) {
-            Alert.alert("Success", resJson.message);
-          } else {
-            Alert.alert("Error", resJson.message || "Failed to fetch states.");
-          }
-        } catch (error) {
-          Alert.alert("Error", "Server Error");
-          console.error("Fetch error:", error);
+        slip_no: data.bookingNo,
+        consignee_name: data.consignee,
+        consignor_name: data.consignor,
+        consignee_mobile: data.consigneePhoneNumber,
+        consignor_mobile: data.phoneNumber,
+        transport_mode: data.transportType,
+        paid_type: "Prepaid",
+        destination_city_id: data.destination_city,
+        destination_branch_id: 1,
+        count: data.packages,
+        weight: data.weight,
+        value: data.declaredValue,
+        contents: data.contain,
+        charges: data.charges,
+        shipper: data.shipper,
+        cgst: data.cgst,
+        sgst: data.sgst,
+        igst: data.igst
+      });
+
+      try {
+        const res = await fetch(url, { method: "POST", headers: header, body });
+        const resJson = await res.json();
+        if (res.status === 200) {
+          Alert.alert("Success", resJson.message);
+        } else {
+          Alert.alert("Error", resJson.message || "Failed to fetch states.");
         }
+      } catch (error) {
+        Alert.alert("Error", "Server Error");
+        console.error("Fetch error:", error);
+      }
     }
   };
 
@@ -109,32 +109,32 @@ const BookingForm = () => {
       Alert.alert("Error", "Authentication token missing.");
       return;
     }
-    
+
     if (cityId) {
       console.log(cityId);
       const url = `${API_BASE_URL}/master/branches`;
       const header = {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
       };
       const body = JSON.stringify({ from: 0, city_id: cityId });
 
       try {
-          const res = await fetch(url, { method: "POST", headers: header, body });
-          const resJson = await res.json();
-          if (res.status === 200) {
-            const formattedBranch = resJson.body.map((Branch: { id: any; name: any; }) => ({
-              id: Branch.id,
-              Branch_name: Branch.name,
-            }));
-            console.log(formattedBranch);
-            setBranchList(formattedBranch);
-          } else {
-            Alert.alert("Error", resJson.message || "Failed to fetch Branch.");
-          }
+        const res = await fetch(url, { method: "POST", headers: header, body });
+        const resJson = await res.json();
+        if (res.status === 200) {
+          const formattedBranch = resJson.body.map((Branch: { id: any; name: any; }) => ({
+            id: Branch.id,
+            Branch_name: Branch.name,
+          }));
+          console.log(formattedBranch);
+          setBranchList(formattedBranch);
+        } else {
+          Alert.alert("Error", resJson.message || "Failed to fetch Branch.");
+        }
       } catch (error) {
-          Alert.alert("Error", "Server Error");
-          console.error("Fetch error:", error);
+        Alert.alert("Error", "Server Error");
+        console.error("Fetch error:", error);
       }
     };
   }
@@ -150,39 +150,33 @@ const BookingForm = () => {
     const url = `${API_BASE_URL}/master/states`;
 
     const header = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
     };
 
     const body = JSON.stringify({ from: 0 });
 
     try {
-        const res = await fetch(url, { method: "POST", headers: header, body });
-        const resJson = await res.json();
-        if (res.status === 200) {
-          const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
-            id: state.id,
-            States_Name: state.name,
-          }));
-          setStatesList(formattedStates);
-        } else {
-          Alert.alert("Error", resJson.message || "Failed to fetch states.");
-        }
+      const res = await fetch(url, { method: "POST", headers: header, body });
+      const resJson = await res.json();
+      if (res.status === 200) {
+        const formattedStates = resJson.body.map((state: { id: any; name: any; }) => ({
+          id: state.id,
+          States_Name: state.name,
+        }));
+        setStatesList(formattedStates);
+      } else {
+        Alert.alert("Error", resJson.message || "Failed to fetch states.");
+      }
     } catch (error) {
-        Alert.alert("Error", "Server Error");
-        console.error("Fetch error:", error);
+      Alert.alert("Error", "Server Error");
+      console.error("Fetch error:", error);
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchToken();
-      await getAllStates();
-    };
-  
-    if (!token) {
-      fetchData();
-    } else {
+    fetchToken();
+    if (token) {
       getAllStates();
     }
   }, [token]);
@@ -193,9 +187,8 @@ const BookingForm = () => {
 
   const currentDate = new Date();
   const formattedDate = `${String(currentDate.getDate()).padStart(2, "0")}/${String(currentDate.getMonth() + 1).padStart(2, "0")}/${currentDate.getFullYear()}`;
-  
+
   const handleStateChange = async (selectedValue: any) => {
-    console.log("Selected State ID:", selectedValue);
     if (selectedValue) {
       if (token) {
         const url = `${API_BASE_URL}/master/cities/byStateId`;

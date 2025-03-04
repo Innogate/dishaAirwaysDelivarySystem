@@ -38,13 +38,33 @@ const StatesMaster = () => {
     resolver: yupResolver(schema),
   });
 
+  const [token, setToken] = useState(null);
+
+
+
+  const fetchToken = async () => {
+    try {
+      const storedToken = await globalStorage.getValue("token");
+      console.log("Fetched Token:", storedToken); // Debugging
+
+      if (storedToken) {
+        setToken(storedToken); // State update is asynchronous
+      } else {
+        Alert.alert("Error", "Authentication token is missing.");
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      Alert.alert("Error", "An error occurred while fetching the token.");
+    }
+  };
+
   // Open Modal for Add / Edit
   const openModal = (States = null) => {
     setselectedStates(States);
     slideAnim.setValue(screenHeight);
     setModalVisible(true);
     if (States) setValue("States_Name", States.States_Name);
-    
+
     Animated.timing(slideAnim, {
       toValue: 0,
       duration: 300,
@@ -78,9 +98,6 @@ const StatesMaster = () => {
 
   // Get all states
   const getAllStates = async () => {
-    const token =
-      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
-  
     if (token) {
       const url = API_BASE_URL + "/master/states";
       const header = {
@@ -90,17 +107,17 @@ const StatesMaster = () => {
       const body = JSON.stringify({
         from: 0,
       });
-  
+
       try {
         const res = await fetch(url, {
           method: "POST",
           headers: header,
           body: body,
         });
-  
+
         const resJson = await res.json();
         console.log("Response JSON:", resJson);
-  
+
         if (res.status === 200) {
           // Extract 'id' and 'name' from the 'body' array
           const formattedStates = resJson.body.map((state) => ({
@@ -117,55 +134,57 @@ const StatesMaster = () => {
       }
     }
   };
-  
-  
+
+
 
   useEffect(() => {
-    getAllStates(); // Fetch data on page load
-  }, []);
+    fetchToken();
+    if (token) {
+      getAllStates(); // Fetch data on page load
+    }
+  }, [token]);
 
 
   // Submit Form (Add / Edit)
-  const onSubmit = async (data:any) => {
+  const onSubmit = async (data: any) => {
     if (selectedStates) {
       console.log(selectedStates);
       Alert.alert("Updated!", "State updated successfully.");
     } else {
-
-      const url = API_BASE_URL + '/master/states/new';
-      // const token = globalStorage.getValue('token');
-       const token = globalStorage.getValue("token");
-      const header = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}` 
+      if (token) {
+        const url = API_BASE_URL + '/master/states/new';
+        const header = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         };
-      const body = JSON.stringify({
-        "state_name": data.States_Name
-      });
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: header,
-          body: body,
+        const body = JSON.stringify({
+          "state_name": data.States_Name
         });
-        const resJson = await res.json();
-        if (res.status === 200) {
-          Alert.alert("Success", resJson.message);
-          getAllStates();
-        } else if (res.status === 409){
-          Alert.alert("Error", resJson.message);
-        }else{
-          Alert.alert("Error", "Failed to Add state.");
-        }
-      }catch{
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: header,
+            body: body,
+          });
+          const resJson = await res.json();
+          if (res.status === 200) {
+            Alert.alert("Success", resJson.message);
+            getAllStates();
+          } else if (res.status === 409) {
+            Alert.alert("Error", resJson.message);
+          } else {
+            Alert.alert("Error", "Failed to Add state.");
+          }
+        } catch {
           Alert.alert("Error", "Server Error");
+        }
       }
     }
     closeModal();
   };
 
   // Delete State
-  const deleteStates = async (id:number) => {
+  const deleteStates = async (id: number) => {
     console.log(id);
     Alert.alert(
       "Confirm Delete",
@@ -175,7 +194,6 @@ const StatesMaster = () => {
         {
           text: "OK",
           onPress: async () => {
-             const token = globalStorage.getValue("token");
             if (token) {
               const url = API_BASE_URL + '/master/states/delete';
               const headers = {
@@ -186,17 +204,17 @@ const StatesMaster = () => {
                 "state_id": id
               });
 
-  
+
               try {
                 const response = await fetch(url, {
                   method: "POST",
                   headers: headers,
                   body: body,
                 });
-  
+
                 const resJson = await response.json();
                 console.log("Delete Response:", resJson);
-  
+
                 if (response.status === 200 && resJson.error_code === 0) {
                   // Remove deleted state from UI
                   setStates((prevStates) =>
@@ -216,7 +234,7 @@ const StatesMaster = () => {
       ]
     );
   };
-  
+
 
   const renderStatesItem = ({ item }) => (
     <TouchableOpacity onPress={() => setselectedStates(item)}>

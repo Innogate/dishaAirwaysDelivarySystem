@@ -30,8 +30,6 @@ const schema = yup.object().shape({
   logo: yup.mixed().required('Branch Logo is required'),
   Branch_ShortName: yup.string().required('Branch Short Name is required'),
   Branch_States: yup.string().required('Branch States'),
-
-
 });
 
 const screenHeight = Dimensions.get("window").height;
@@ -43,8 +41,35 @@ const BranchMaster = () => {
 
   //gate all state
   const [statesList, setStatesList] = useState([]);
+
+  const [token, setToken] = useState(null);
+
+
+
+  const fetchToken = async () => {
+    try {
+      const storedToken = await globalStorage.getValue("token");
+      console.log("Fetched Token:", storedToken); // Debugging
+
+      if (storedToken) {
+        setToken(storedToken); // State update is asynchronous
+      } else {
+        Alert.alert("Error", "Authentication token is missing.");
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      Alert.alert("Error", "An error occurred while fetching the token.");
+    }
+  };
+
+
+
+
+
+
+
+
   const getAllStates = useCallback(async () => {
-     const token = globalStorage.getValue("token");
     if (token) {
       const url = `${API_BASE_URL}/master/states`;
       const header = {
@@ -75,9 +100,7 @@ const BranchMaster = () => {
   // get all city by states id
   const [cityList, setcityList] = useState([]);
   const handleStateChange = async (selectedValue: any) => {
-    console.log("Selected State ID:", selectedValue);
     if (selectedValue) {
-       const token = globalStorage.getValue("token");
       if (token) {
         const url = `${API_BASE_URL}/master/cities/byStateId`;
         const header = {
@@ -108,8 +131,7 @@ const BranchMaster = () => {
 
   // gate all company
   const [companyList, setcompanyList] = useState([]);
-  const getAllCompany = useCallback(async () => {
-     const token = globalStorage.getValue("token");
+  const getAllCompany = async () => {
     if (token) {
       const url = `${API_BASE_URL}/master/companies`;
       const header = {
@@ -135,21 +157,21 @@ const BranchMaster = () => {
         console.error("Fetch error:", error);
       }
     }
-  }, []);
+  };
 
   useEffect(() => {
-    getAllStates();
-    getAllCompany();
-    getAllBranch();
-  }, [getAllStates]);
+    fetchToken();
+    if(token){
+      getAllStates();
+      getAllCompany();
+      getAllBranch();
+    }
+  }, [getAllStates,token]);
 
   // Initialize with static values
   const [branches, setBranches] = useState([]);
 
   const getAllBranch = async () => {
-    const token =
-      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.hbVVVjR08wPKctvNOgbGBm8xE_VRDureVLHgOaHj8iI";
-  
     if (token) {
       const url = API_BASE_URL + "/master/branches";
       const header = {
@@ -242,9 +264,8 @@ const BranchMaster = () => {
 
   const [logoUri, setLogoUri] = useState(null); // State to hold the logo URI
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data:any) => {
     if (data) {
-       const token = globalStorage.getValue("token");
       if (token) {
         const url = `${API_BASE_URL}/master/branches/new`;
         const header = {
@@ -273,6 +294,7 @@ const BranchMaster = () => {
             Alert.alert("Success", "Branch created successfully.");
             closeModal(); // Close the modal after successful creation
             reset(); // Reset the form state
+            getAllBranch();
           } else {
             Alert.alert("Error", resJson.message || "Failed to fetch states.");
           }

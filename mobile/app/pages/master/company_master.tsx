@@ -10,7 +10,7 @@ import * as FileSystem from 'expo-file-system';
 import { API_BASE_URL } from '@/constants/api.url';
 import styles from '@/app/components/GlobalStyle';
 import globalStorage from '@/app/components/GlobalStorage';
-// Define the validation schema
+
 const schema = yup.object().shape({
   Company_Name: yup.string().required('Company Name is required'),
   Company_Address: yup.string().required('Company Address is required'),
@@ -39,11 +39,29 @@ const BranchMaster = () => {
   const startY = useRef(0);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(null);
+
+
+
+  const fetchToken = async () => {
+    try {
+      const storedToken = await globalStorage.getValue("token");
+      console.log("Fetched Token:", storedToken); // Debugging
+
+      if (storedToken) {
+        setToken(storedToken); // State update is asynchronous
+      } else {
+        Alert.alert("Error", "Authentication token is missing.");
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      Alert.alert("Error", "An error occurred while fetching the token.");
+    }
+  };
 
   // Get all states
   const [statesList, setStatesList] = useState([]);
   const getAllStates = useCallback(async () => {
-     const token = globalStorage.getValue("token");// Replace with your token
     if (token) {
       const url = `${API_BASE_URL}/master/states`;
       const header = {
@@ -72,15 +90,17 @@ const BranchMaster = () => {
   }, []);
 
   useEffect(() => {
-    getAllStates();
-    getAllCompanies();
-  }, [getAllStates]);
+    fetchToken();
+    if(token){
+      getAllStates();
+      getAllCompanies();
+    }
+  }, [getAllStates,token,]);
 
   // Get all cities by state id
   const [cityList, setCityList] = useState([]);
   const handleStateChange = async (selectedValue) => {
     if (selectedValue) {
-       const token = globalStorage.getValue("token");// Replace with your token
       if (token) {
         const url = `${API_BASE_URL}/master/cities/byStateId`;
         const header = {
@@ -111,7 +131,6 @@ const BranchMaster = () => {
   // Get all companies
   const [companyList, setCompanyList] = useState([]);
   const getAllCompanies = async () => {
-     const token = globalStorage.getValue("token");// Replace with your token
     if (token) {
       const url = `${API_BASE_URL}/master/companies`;
       const header = {
@@ -151,8 +170,6 @@ const BranchMaster = () => {
     const newCompany = { ...data, logo: selectedImage };
 
     if (newCompany) {
-       const token = globalStorage.getValue("token");// Replace with your token
-
       if (token) {
         const url = `${API_BASE_URL}/master/companies/new`;
         const headers = {
