@@ -105,7 +105,6 @@ const EmployeeMaster = () => {
           birth_date: data.birth_date,
           address: data.Employee_Address,
           email: data.email
-
         });
         try {
           const res = await fetch(url, { method: "POST", headers: header, body });

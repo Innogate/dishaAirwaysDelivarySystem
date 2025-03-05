@@ -25,7 +25,8 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ]
+      ],
+      "package": "com.maityamit2024.packageDelivary"
     },
     "web": {
       "bundler": "metro",
@@ -46,6 +47,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5ea5d9c3-f491-4a7b-b530-aae3f7f5202f"
+      }
     }
   }
 }
