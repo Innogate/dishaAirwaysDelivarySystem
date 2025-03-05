@@ -12,9 +12,10 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "expo-router";
-import { API_BASE_URL } from "@/constants/api.url";
+import Constants from "expo-constants";
 import globalStorage from "../components/GlobalStorage";
 
+const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
 // Validation Schema
 const loginSchema = yup.object().shape({
   email: yup.string().required("User ID is required"),
@@ -34,7 +35,7 @@ const LoginScreen = () => {
     setEmailError("");
     setPasswordError("");
 
-    const url = API_BASE_URL + "/login";
+    const url = `${API_BASE_URL}/login`;
     const header = { "Content-Type": "application/json" };
 
     const body = JSON.stringify({
@@ -48,23 +49,23 @@ const LoginScreen = () => {
         headers: header,
         body: body,
       });
-
-      if (res.status === 200) {
-        const response = await res.json();
-        if (response.body.token) {
-          globalStorage.setPermanent("token", response.body.token);
-          router.replace("home");
-        }
-      } else {
-        const errorResponse = await res.json();
-        if (errorResponse.message.includes("User ID not matched")) {
-          setEmailError("User ID not matched");
-        } else if (errorResponse.message.includes("Password not matched")) {
-          setPasswordError("Password not matched");
-        } else {
-          setEmailError("Invalid credentials");
-        }
-      }
+      Alert.alert("MSG", res.body, "ok")
+      // if (res.status === 200) {
+      //   const response = await res.json();
+      //   if (response.body.token) {
+      //     globalStorage.setPermanent("token", response.body.token);
+      //     router.replace("/home");
+      //   }
+      // } else {
+      //   const errorResponse = await res.json();
+      //   if (errorResponse.message.includes("User ID not matched")) {
+      //     setEmailError("User ID not matched");
+      //   } else if (errorResponse.message.includes("Password not matched")) {
+      //     setPasswordError("Password not matched");
+      //   } else {
+      //     setEmailError("Invalid credentials");
+      //   }
+      // }
     } catch (error) {
       Alert.alert("Error", error);
       setEmailError("Something went wrong. Please try again.");

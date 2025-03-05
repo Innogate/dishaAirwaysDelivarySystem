@@ -6,8 +6,9 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Picker } from "@react-native-picker/picker";
 import { MaterialIcons } from '@expo/vector-icons';
-import { API_BASE_URL } from '@/constants/api.url';
+import Constants from "expo-constants";
 import globalStorage from '@/app/components/GlobalStorage';
+const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
 
 // Define the validation schema
 const schema = yup.object().shape({

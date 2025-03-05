@@ -17,10 +17,10 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { MaterialIcons } from "@expo/vector-icons";
-import { API_BASE_URL } from "@/constants/api.url";
+import Constants from "expo-constants";
 import { tokens } from "react-native-paper/lib/typescript/styles/themes/v3/tokens";
 import globalStorage from "@/app/components/GlobalStorage";
-
+const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
 // Validation Schema
 const schema = yup.object().shape({
   States_Name: yup.string().required("States Name is required"),

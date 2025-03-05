@@ -4,10 +4,11 @@ import { TextInput, FAB } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { API_BASE_URL } from '@/constants/api.url';
+import Constants from "expo-constants";
 import styles from '@/app/components/GlobalStyle';
 import { Picker } from '@react-native-picker/picker';
 import globalStorage from '@/app/components/GlobalStorage';
+const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
 const schema = yup.object().shape({
   Employee_FName: yup.string().required('Employee First Name is required'),
   Employee_LName: yup.string().required('Employee Last Name is required'),

@@ -5,10 +5,13 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as ImagePicker from 'expo-image-picker'; // Import expo-image-picker
-import { API_BASE_URL } from '@/constants/api.url';
+import Constants from "expo-constants";
 import { Picker } from '@react-native-picker/picker';
 import styles from '@/app/components/GlobalStyle';
 import globalStorage from '@/app/components/GlobalStorage';
+
+const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
+
 // Define the validation schema
 const schema = yup.object().shape({
   Company_name: yup.string().required('Company Name is required'),

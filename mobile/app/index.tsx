@@ -4,12 +4,14 @@ import { useRouter, useRootNavigationState } from "expo-router";
 import globalStorage from "./components/GlobalStorage";
 import "../global.css";
 import React from "react";
-import { API_BASE_URL } from "../constants/api.url";
+import Constants from "expo-constants";
+
 
 export default function LandingScreen() {
   const router = useRouter();
   const navigationState = useRootNavigationState();
   const [token, setToken] = useState<string | null>(null);
+  const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
 
   useEffect(() => {
     globalStorage.setTemp("pageTitle", "Login");

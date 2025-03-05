@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true
     },
+    
     "android": {
       "usesCleartextTraffic": true,
       "package": "io.github.tuhin_su.disaAirways",
@@ -50,6 +51,7 @@
       "typedRoutes": true
     },
     "extra": {
+      "API_BASE_URL": "http://ec2-3-138-35-53.us-east-2.compute.amazonaws.com",
       "router": {
         "origin": false
       },

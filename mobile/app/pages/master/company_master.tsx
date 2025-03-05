@@ -7,9 +7,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import * as FileSystem from 'expo-file-system';
-import { API_BASE_URL } from '@/constants/api.url';
+import Constants from "expo-constants";
 import styles from '@/app/components/GlobalStyle';
 import globalStorage from '@/app/components/GlobalStorage';
+
+const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
 
 const schema = yup.object().shape({
   Company_Name: yup.string().required('Company Name is required'),
