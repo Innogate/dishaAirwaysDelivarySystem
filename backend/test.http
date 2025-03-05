@@ -1,4 +1,4 @@
-@apiUrl = http://localhost:8000
+@apiUrl = http://18.217.159.77
 @token = {{login.response.body.body.token}}
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version

@@ -30,7 +30,6 @@ $router->add('POST', '/booking', function () {
 
 //  ADD NEW BOOKING
 $router->add("POST", "/booking/new", function () {
-    global $pageID;
     $pageID = 1;
     $jwt = new JwtHandler();
     $handler = new Handler();
