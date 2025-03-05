@@ -11,10 +11,8 @@
     "ios": {
       "supportsTablet": true
     },
-    
     "android": {
-      "usesCleartextTraffic": true,
-      "package": "io.github.tuhin_su.disaAirways",
+      "package": "io.githu.tuhin_su.packageDelivary",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -27,13 +25,7 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ],
-      "package": "com.maityamit2024.packageDelivary"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -51,12 +43,12 @@
       "typedRoutes": true
     },
     "extra": {
-      "API_BASE_URL": "http://ec2-3-138-35-53.us-east-2.compute.amazonaws.com",
+      "API_BASE_URL": "http://18.217.159.77",
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "5ea5d9c3-f491-4a7b-b530-aae3f7f5202f"
+        "projectId": "c3e2759c-e694-4089-95ea-c24c2e722c4a"
       }
     }
   }
