@@ -8,7 +8,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker'; // Import Picker for gender selection
 import styles from '@/app/components/GlobalStyle';
 import globalStorage from '@/app/components/GlobalStorage';
-import { API_BASE_URL } from '@/constants/api.url';
+import Constants from "expo-constants";
+const API_BASE_URL = Constants.expoConfig?.extra?.API_BASE_URL;
 // Define the validation schema
 const schema = yup.object().shape({
   Employee_Name: yup.string(),
