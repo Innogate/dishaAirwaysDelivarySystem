@@ -6,3 +6,4 @@ database/data/.*
 composer.lock
 .android
 mobile/android
+.git_backup
