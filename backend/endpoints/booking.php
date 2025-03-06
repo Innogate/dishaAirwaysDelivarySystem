@@ -39,10 +39,10 @@ $router->add('POST', '/booking', function () {
     p.cgst,
     p.sgst,
     p.igst,
-    b.created_at,  -- Keep original created_at from bookings
-    b.created_by,  -- Keep original created_by from bookings
-    p.created_at AS package_created_at,  -- package created_at
-    p.created_by AS package_created_by  -- package created_by
+    b.created_at,
+    b.created_by,
+    p.created_at AS package_created_at,
+    p.created_by AS package_created_by
 FROM 
     bookings b
 INNER JOIN 
