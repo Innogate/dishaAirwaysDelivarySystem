@@ -1,0 +1,3 @@
+[submodule "mobile"]
+	path = mobile
+	url = git@github.com:Innogate/delivaryReactNative.git
