@@ -18,7 +18,39 @@ $router->add('POST', '/booking', function () {
     $handler->validateInput($data, ["from"]);
 
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM bookings LIMIT 100 OFFSET ?", [$data["from"]]);
+    $stmt = $db->query("SELECT 
+    b.id AS booking_id,
+    b.slip_no,
+    b.consignee_name,
+    b.consignee_mobile,
+    b.consignor_name,
+    b.consignor_mobile,
+    b.transport_mode,
+    b.paid_type,
+    b.destination_city_id,
+    b.destination_branch_id,
+    p.id AS package_id,
+    p.container_id,
+    p.count,
+    p.weight,
+    p.value,
+    p.contents,
+    p.charges,
+    p.cgst,
+    p.sgst,
+    p.igst,
+    b.created_at,  -- Keep original created_at from bookings
+    b.created_by,  -- Keep original created_by from bookings
+    p.created_at AS package_created_at,  -- package created_at
+    p.created_by AS package_created_by  -- package created_by
+FROM 
+    bookings b
+INNER JOIN 
+    packages p 
+    ON b.package_id = p.id
+WHERE 
+    b.status = TRUE AND p.status = TRUE;
+ LIMIT 100 OFFSET ?", [$data["from"]]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fix fetch issue
 
     if (!$list) {
