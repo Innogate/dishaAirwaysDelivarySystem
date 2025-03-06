@@ -49,7 +49,7 @@ INNER JOIN
     packages p 
     ON b.package_id = p.id
 WHERE 
-    b.status = TRUE AND p.status = TRUE;
+    b.status = TRUE AND p.status = TRUE
  LIMIT 100 OFFSET ?", [$data["from"]]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fix fetch issue
 

@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "987654321w2",
-    "passwd": "securePass123"
+    "id": "1234567890",
+    "passwd": "1234"
 }
 
 ### VERIFY
