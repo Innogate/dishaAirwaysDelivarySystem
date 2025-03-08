@@ -18,7 +18,7 @@ $router->add('POST', '/master/users', function () {
     $data = json_decode(file_get_contents("php://input"), true);
     
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM users LIMIT 10 OFFSET ?", [$data["from"]]);
+    $stmt = $db->query("SELECT * FROM users INNER JOIN user_info ON users.id = user_info.id LIMIT 10 OFFSET ?", [$data["from"]]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     
     (new ApiResponse(200, "Success", $list))->toJson();
