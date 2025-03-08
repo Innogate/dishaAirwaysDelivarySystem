@@ -57,7 +57,7 @@
         $handler->validateInput($data, ["city_id"]);
         $db = new Database();
         $stmt = $db->query("SELECT id, name, alias_name, address, city_id, state_id, pin_code, contact_no, email, company_id, gst_no, cin_no, udyam_no, logo FROM branches WHERE city_id = ?", [$data["city_id"]]);
-        $list = $stmt->fetch(PDO::FETCH_ASSOC);
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (!$list) {
             (new ApiResponse(400, "Invalid BRANCH ID", "", 400))->toJson();
         }

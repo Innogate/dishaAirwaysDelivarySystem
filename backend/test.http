@@ -232,6 +232,17 @@ Authorization: Bearer {{token}}
     "brach_id": 0
 }
 
+### Get Branch BY CITY ID
+POST {{apiUrl}}/master/branches
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_id": 1,
+    "from": 0
+}
+
+
 ### Create a New Branch
 POST {{apiUrl}}/master/branches/new
 Content-Type: application/json
