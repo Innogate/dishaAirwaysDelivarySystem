@@ -284,6 +284,25 @@ Authorization: Bearer {{token}}
   "from": 0
 }
 
+### Fetch Employees ById
+POST {{apiUrl}}/master/employees/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "employees_id": 1,
+}
+
+
+### Fetch Employees by BrachId
+POST {{apiUrl}}/master/employees/byBrachId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "brach_id": 1
+}
+
 ### Create New Employee
 POST {{apiUrl}}/master/employees/new
 Content-Type: application/json

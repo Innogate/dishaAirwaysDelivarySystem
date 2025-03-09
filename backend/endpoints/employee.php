@@ -16,9 +16,46 @@ $router->add('POST', '/master/employees', function () {
     $handler->validatePermission($pageID, $_info->user_id, "r");
 
     $data = json_decode(file_get_contents("php://input"), true);
-
+    $require_fids=["from"];
+    $handler->validateInput($data, $require_fids);
     $db = new Database();
     $stmt = $db->query("SELECT * FROM employees LIMIT 10 OFFSET ?", [$data["from"]]);
+    $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    (new ApiResponse(200, "Success", $list))->toJson();
+});
+
+$router->add('POST', '/master/employees/byId', function () {
+    global $pageID;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "r");
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    $require_fids = ["employees_id"];
+    $handler->validateInput($data, $require_fids);
+
+    $db = new Database();
+    $stmt = $db->query("SELECT * FROM employees WHERE id = ?", [$data["employees_id"]]);
+    $list = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+    (new ApiResponse(200, "Success", $list))->toJson();
+});
+
+$router->add('POST', '/master/employees/byBranchId', function () {
+    global $pageID;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "r");
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    $require_fids = ["branch_id", "from"];
+    $handler->validateInput($data, $require_fids);
+
+    $db = new Database();
+    $stmt = $db->query("SELECT * FROM employees WHERE branch_id = ? LIMIT 10 OFFSET ?", [ $data["branch_id"], $data["from"]]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();
