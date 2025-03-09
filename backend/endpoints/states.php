@@ -12,7 +12,6 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
-        $handler->validatePermission($pageID, $_info->user_id, "r"); // check user permit or not for this page
         $data = json_decode(file_get_contents("php://input"), true);
 
         $db = new Database();
@@ -31,7 +30,6 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
-        $handler->validatePermission($pageID, $_info->user_id, "r"); // check user permit or not for this page
         $data = json_decode(file_get_contents("php://input"), true);
 
         $db = new Database();

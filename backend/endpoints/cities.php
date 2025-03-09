@@ -14,8 +14,6 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
-        $handler->validatePermission($pageID, $_info->user_id, "r");
-
         $data = json_decode(file_get_contents("php://input"), true);
 
         $db = new Database();
@@ -35,7 +33,6 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
-        $handler->validatePermission($pageID, $_info->user_id, "r");
 
         $data = json_decode(file_get_contents("php://input"), true);
 
@@ -60,7 +57,6 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
-        $handler->validatePermission($pageID, $_info->user_id, "r");
 
         $data = json_decode(file_get_contents("php://input"), true);
 
