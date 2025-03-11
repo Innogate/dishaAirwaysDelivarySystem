@@ -33,11 +33,11 @@ $router->add('POST', '/master/employees/byId', function () {
     $handler->validatePermission($pageID, $_info->user_id, "r");
 
     $data = json_decode(file_get_contents("php://input"), true);
-    $require_fids = ["employees_id"];
+    $require_fids = ["employee_id"];
     $handler->validateInput($data, $require_fids);
 
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM employees WHERE id = ?", [$data["employees_id"]]);
+    $stmt = $db->query("SELECT * FROM employees WHERE id = ?", [$data["employee_id"]]);
     $list = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();

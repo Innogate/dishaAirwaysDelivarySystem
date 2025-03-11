@@ -290,7 +290,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "employees_id": 1,
+  "employee_id": 1,
 }
 
 

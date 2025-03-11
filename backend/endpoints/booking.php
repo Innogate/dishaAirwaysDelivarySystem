@@ -28,7 +28,9 @@ $router->add('POST', '/booking', function () {
     b.transport_mode,
     b.paid_type,
     b.destination_city_id,
+    c.name AS destination_city_name,
     b.destination_branch_id,
+    br.name AS destination_branch_name,
     p.id AS package_id,
     p.container_id,
     p.count,
@@ -46,11 +48,15 @@ $router->add('POST', '/booking', function () {
 FROM 
     bookings b
 INNER JOIN 
-    packages p 
-    ON b.package_id = p.id
+    packages p ON b.package_id = p.id
+INNER JOIN 
+    branches br ON b.destination_branch_id = br.id
+INNER JOIN 
+    cities c ON b.destination_city_id = c.id
 WHERE 
-    b.status = TRUE AND p.status = TRUE
- LIMIT 100 OFFSET ?", [$data["from"]]);
+    b.status = TRUE 
+    AND p.status = TRUE
+LIMIT 100 OFFSET ?;", [$data["from"]]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fix fetch issue
 
     if (!$list) {

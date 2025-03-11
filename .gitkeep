@@ -2,3 +2,4 @@ docker/containers/react-native
 backend
 web
 database
+android/app/src/main/assets/*
