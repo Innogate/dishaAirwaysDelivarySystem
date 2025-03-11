@@ -15,7 +15,7 @@
         $data = json_decode(file_get_contents("php://input"), true);
 
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM states LIMIT 10 OFFSET ?", [$data["from"]]);
+        $stmt = $db->query("SELECT * FROM states ORDER BY name ASC LIMIT 10 OFFSET ?", [$data["from"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (!$list) {
             $list = [];

@@ -1,4 +1,4 @@
-@apiUrl = http://18.217.159.77
+@apiUrl = http://localhost:8000
 @token = {{login.response.body.body.token}}
 ### VERSION AND CHECK SERVER CONNECTION
 GET {{apiUrl}}/version
@@ -78,7 +78,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "state_name": "West Bengal"
+    "state_name": "ZSD"
 }
 
 #### DELETE STATE
@@ -126,7 +126,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "city_name": "Kharagpur",
+    "city_name": "ZSD",
     "state_id": 1
 }
 

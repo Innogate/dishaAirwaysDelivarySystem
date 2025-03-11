@@ -17,7 +17,7 @@
         $data = json_decode(file_get_contents("php://input"), true);
 
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM cities LIMIT 10 OFFSET ?", [$data["from"]]);
+        $stmt = $db->query("SELECT * FROM cities ORDER BY name ASC LIMIT 10 OFFSET ?;", [$data["from"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
             $list = [];
@@ -61,7 +61,7 @@
         $data = json_decode(file_get_contents("php://input"), true);
 
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM cities WHERE state_id = ? LIMIT 10 OFFSET ?", [$data["state_id"], $data["from"]]);
+        $stmt = $db->query("SELECT * FROM cities ORDER BY name ASC WHERE state_id = ? LIMIT 10 OFFSET ?", [$data["state_id"], $data["from"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
             $list = [];
