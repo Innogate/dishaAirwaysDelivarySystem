@@ -164,8 +164,5 @@ $router->add('POST', '/master/users/update', function () {
     } catch (Exception $e) {
         (new ApiResponse(500,"Update failed",  $e->getMessage()))->toJson();
     }
-
-
-
 });
 ?>

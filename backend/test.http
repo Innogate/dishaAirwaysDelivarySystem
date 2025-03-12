@@ -331,6 +331,21 @@ Authorization: Bearer {{token}}
 }
 
 
+#### UPDATE USERS
+POST {{apiUrl}}/master/branches/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "branches.name": " NAME"
+    },
+    "conditions":{
+        "branches.id": 1
+    }
+}
+
+
 ### Delete a Branch
 POST {{apiUrl}}/master/branches/delete
 Content-Type: application/json
