@@ -1989,7 +1989,6 @@ COPY public.cities (id, name, state_id, created_at, status) FROM stdin;
 1213	Warud	20	2025-03-12 15:15:56.193147	t
 1214	Asarganj	5	2025-03-12 15:15:56.193147	t
 1215	Sarsod	12	2025-03-12 15:15:56.193147	t
-1216	ZSDC	35	2025-03-12 15:22:31.903787	f
 \.
 
 
@@ -2110,7 +2109,6 @@ COPY public.states (id, name, status, created_at) FROM stdin;
 32	Uttar Pradesh	t	2025-03-12 15:15:54.007749
 33	Uttarakhand	t	2025-03-12 15:15:54.007749
 34	West Bengal	t	2025-03-12 15:15:54.007749
-35	ZSD	f	2025-03-12 15:22:17.324204
 \.
 
 
@@ -2164,7 +2162,7 @@ SELECT pg_catalog.setval('public.branches_id_seq', 1, false);
 -- Name: cities_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.cities_id_seq', 1216, true);
+SELECT pg_catalog.setval('public.cities_id_seq', 1215, true);
 
 
 --
@@ -2227,7 +2225,7 @@ SELECT pg_catalog.setval('public.permissions_id_seq', 8, true);
 -- Name: states_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.states_id_seq', 35, true);
+SELECT pg_catalog.setval('public.states_id_seq', 1, false);
 
 
 --
