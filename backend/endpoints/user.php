@@ -31,7 +31,8 @@ $router->add('POST', '/master/users', function () {
     
     $db = new Database();
     $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation);
-    $stmt = $db->query ($sqlQuery);
+    $sqlQuery = $sqlQuery . " LIMIT ? OFFSET ?";
+    $stmt = $db->query ($sqlQuery, [$payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     
     (new ApiResponse(200, "Success", $list))->toJson();

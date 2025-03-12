@@ -27,7 +27,7 @@ Authorization: Bearer {{token}}
 {
     "fields" : ["users.*"],
     "max" : 10,
-    "current" : 1,
+    "current" : 0,
     "relation" : null
 }
 
