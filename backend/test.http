@@ -11,7 +11,7 @@ Content-Type: application/json
 
 {
     "id": "1234567890",
-    "passwd": "1234"
+    "passwd": "pass@1234"
 }
 
 ### VERIFY
@@ -25,7 +25,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "from": 0
+    "fields" : ["users.*"],
+    "max" : 10,
+    "current" : 1,
+    "relation" : null
 }
 
 #### ADD NEW USER
@@ -117,7 +120,7 @@ Authorization: Bearer {{token}}
 
 {
     "from":0,
-    "state_id": 1
+    "state_id": 2
 }
 
 #### ADD NEW CITY

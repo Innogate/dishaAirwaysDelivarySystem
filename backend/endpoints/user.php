@@ -13,12 +13,25 @@ $router->add('POST', '/master/users', function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
+    $payload = (object) [
+        "fields" => ["users.*", "user_info.*"],
+        "max" => 10,
+        "current" => 1,
+        "relation" => "users.id=user_info.id",
+    ];
     $handler->validatePermission($pageID, $_info->user_id, "r");
     
     $data = json_decode(file_get_contents("php://input"), true);
     
+    if (!empty($data)) {
+        $payload = (object) $data; 
+    }
+    
+
+    
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM users INNER JOIN user_info ON users.id = user_info.id LIMIT 10 OFFSET ?", [$data["from"]]);
+    $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation);
+    $stmt = $db->query ($sqlQuery);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     
     (new ApiResponse(200, "Success", $list))->toJson();

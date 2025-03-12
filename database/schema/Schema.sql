@@ -26,9 +26,7 @@ CREATE TABLE user_info (
 CREATE TABLE states (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NOT NULL,
-    FOREIGN KEY (created_by) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE cities (
@@ -36,8 +34,6 @@ CREATE TABLE cities (
     name VARCHAR NOT NULL,
     state_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NOT NULL,
-    FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (state_id) REFERENCES states(id)
 );
 
@@ -76,6 +72,9 @@ CREATE TABLE branches (
     gst_no VARCHAR NOT NULL,
     cin_no VARCHAR NOT NULL,
     udyam_no VARCHAR NOT NULL,
+    cgst FLOAT DEFAULT 0.0,
+    sgst FLOAT DEFAULT 0.0,
+    igst FLOAT DEFAULT 0.0,
     logo VARCHAR NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     created_by INT NOT NULL,
@@ -147,9 +146,6 @@ CREATE TABLE packages (
     contents VARCHAR NOT NULL,
     charges INTEGER NOT NULL,
     shipper VARCHAR NOT NULL,
-    cgst FLOAT NOT NULL,
-    sgst FLOAT NOT NULL,
-    igst FLOAT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     created_by INT NOT NULL,
     status BOOLEAN DEFAULT TRUE,
@@ -165,9 +161,14 @@ CREATE TABLE bookings (
     consignee_mobile VARCHAR NOT NULL,
     consignor_name VARCHAR NOT NULL,
     consignor_mobile VARCHAR NOT NULL,
+    address VARCHAR NOT NULL,
     transport_mode VARCHAR NOT NULL,
     package_id INT NOT NULL,
     paid_type VARCHAR NOT NULL,
+    cgst FLOAT DEFAULT 0.0,
+    sgst FLOAT DEFAULT 0.0,
+    igst FLOAT DEFAULT 0.0,
+    total_value FLOAT NOT NULL,
     destination_city_id INT NOT NULL,
     destination_branch_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
