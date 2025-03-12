@@ -190,4 +190,50 @@
         $response->toJson();
     });
 
+    // UPDATE DB 
+    $router->add('POST', '/master/cities/update', function () {
+        $pageID = 2;
+        $jwt = new JwtHandler();
+        $handler = new Handler();
+        $_info = $jwt->validate();
+        $handler->validatePermission($pageID, $_info->user_id, "u"); // "d" for delete permission
+    
+        $payload = (object) [
+            "updates" => [
+                'talbe.name' => 'Error'
+            ],
+            "conditions" => [
+                'talbe.id' => 0
+            ]
+        ];
+    
+        $data = json_decode(file_get_contents("php://input"), true);
+    
+    
+        if (!empty($data)) {
+            $payload = (object) $data;
+        }
+    
+        $db = new Database();
+        $sql = $db->generateDynamicUpdate($payload->updates, $payload->conditions);
+    
+        // Debug: Print generated SQL query and parameters
+        error_log("SQL Query: " . $sql["query"]);
+        error_log("Parameters: " . json_encode($sql["params"]));
+    
+        try {
+            $stmt = $db->query($sql["query"], $sql["params"]);
+    
+            if ($stmt->rowCount() > 0) {
+                (new ApiResponse(200,"Update successful", $stmt->rowCount()))->toJson();
+            } else {
+                (new ApiResponse(500,"No rows updated"))->toJson();
+            }
+        } catch (Exception $e) {
+            (new ApiResponse(500,"Update failed",  $e->getMessage()))->toJson();
+        }
+    
+    
+    
+    })
 ?>

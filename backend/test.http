@@ -109,6 +109,21 @@ Authorization: Bearer {{token}}
     "state_id": 35
 }
 
+#### UPDATE CITY
+POST {{apiUrl}}/master/cities/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "cities.name": "WPC"
+    },
+    "conditions":{
+        "cities.id": 1
+    }
+}
+
+
 #### DELETE CITY
 POST {{apiUrl}}/master/cities/delete
 Content-Type: application/json

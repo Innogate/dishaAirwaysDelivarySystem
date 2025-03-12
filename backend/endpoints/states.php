@@ -161,7 +161,7 @@ $router->add('POST', '/master/states/update', function () {
             'sates.name' => 'Error'
         ],
         "conditions" => [
-            'users.id' => 0
+            'sates.id' => 0
         ]
     ];
 
@@ -194,6 +194,4 @@ $router->add('POST', '/master/states/update', function () {
 
 
 })
-
-
-    ?>
+?>
