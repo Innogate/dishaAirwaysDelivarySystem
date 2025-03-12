@@ -176,6 +176,20 @@ Authorization: Bearer {{token}}
     "email": "john.doe@example.com"
 }
 
+#### UPDATE USERS
+POST {{apiUrl}}/master/users/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "users.name": "USER NAME"
+    },
+    "conditions":{
+        "users.id": 1
+    }
+}
+
 #### DELETE USER
 POST {{apiUrl}}/master/users/delete
 Content-Type: application/json
