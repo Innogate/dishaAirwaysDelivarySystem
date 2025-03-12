@@ -4,6 +4,105 @@
 GET {{apiUrl}}/version
 Content-Type: application/json
 
+
+#### GET ALL STATES
+POST {{apiUrl}}/master/states
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "fields" : ["states.id","states.name"],
+    "max" : 102,
+    "current" : 0,
+    "relation" : null
+}
+
+#### GET ALL STATE BY ID
+POST {{apiUrl}}/master/states/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "fields" : ["states.id","states.name"],
+    "state_id": 1,
+    "relation": null
+}
+
+#### ADD NEW STATE
+POST {{apiUrl}}/master/states/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "state_name": "ZSD"
+}
+
+#### DELETE STATE
+POST {{apiUrl}}/master/states/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "state_id": 35
+}
+
+#### GET ALL CITIES
+POST {{apiUrl}}/master/cities
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "fields" : ["cities.id","cities.name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null
+}
+
+#### GET CITY By id
+POST {{apiUrl}}/master/cities/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_id": 1,
+    "fields" : ["cities.id","cities.name"],
+    "relation" : null
+}
+
+
+
+#### GET CITIES BY STATE ID
+POST {{apiUrl}}/master/cities/byStateId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "fields" : ["cities.id","cities.name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null,
+    "state_id": 35
+}
+
+#### ADD NEW CITY
+POST {{apiUrl}}/master/cities/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_name": "ZSDC",
+    "state_id": 35
+}
+
+#### DELETE CITY
+POST {{apiUrl}}/master/cities/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_id": "2"
+}
+
 ### Login with the created user
 # @name login
 POST {{ apiUrl }}/login
@@ -56,105 +155,7 @@ Authorization: Bearer {{token}}
     "user_id": "2"
 }
 
-#### GET ALL STATES
-POST {{apiUrl}}/master/states
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "fields" : ["states.id","states.name"],
-    "max" : 12,
-    "current" : 0,
-    "relation" : null
-}
-
-#### GET ALL STATE BY ID
-POST {{apiUrl}}/master/states/byId
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "fields" : ["states.id","states.name"],
-    "state_id": 1,
-    "relation": null
-}
-
-#### ADD NEW STATE
-POST {{apiUrl}}/master/states/new
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "state_name": "ZSD"
-}
-
-#### DELETE STATE
-POST {{apiUrl}}/master/states/delete
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "state_id": "1"
-}
-
-#### GET ALL CITIES
-POST {{apiUrl}}/master/cities
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-   "fields" : ["cities.id","cities.name"],
-    "max" : 12,
-    "current" : 0,
-    "relation" : null
-}
-
-#### GET CITY By id
-POST {{apiUrl}}/master/cities/byId
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "city_id": 1,
-    "fields" : ["cities.id","cities.name"],
-    "relation" : null
-}
-
-
-
-#### GET CITIES BY STATE ID
-POST {{apiUrl}}/master/cities/byStateId
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "fields" : ["cities.id","cities.name"],
-    "max" : 12,
-    "current" : 0,
-    "relation" : null,
-    "state_id": 2
-}
-
-#### ADD NEW CITY
-POST {{apiUrl}}/master/cities/new
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "city_name": "ZSD",
-    "state_id": 1
-}
-
-#### DELETE CITY
-POST {{apiUrl}}/master/cities/delete
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "city_id": "2"
-}
-
-#### GET ALL COMPANIES
+#### ! GET ALL COMPANIES 
 POST {{apiUrl}}/master/companies
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -347,7 +348,7 @@ Authorization: Bearer {{token}}
   "employee_id": 1
 }
 
-### Get Booking List
+### ! Get Booking List
 POST {{apiUrl}}/booking
 Content-Type: application/json
 Authorization: Bearer {{token}}

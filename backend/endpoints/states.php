@@ -25,7 +25,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." ORDER BY name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE status = TRUE ORDER BY name ASC LIMIT ? OFFSET ?";
 
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -67,6 +67,7 @@
         $response->toJson();
     });
 
+    // CREATE NEW STATE
     $router->add('POST', '/master/states/new', function () {
         global $pageID;
         $jwt = new JwtHandler();
@@ -90,7 +91,7 @@
         // Check if the state already exists
         $stmt = $db->query("SELECT id FROM states WHERE LOWER(TRIM(name)) = ?", [$normalizedStateName]);
         $existingState = $stmt->fetch(PDO::FETCH_ASSOC);
-
+  
         if ($existingState) {
             $response = new ApiResponse(409, "State already exists.");
             $response->toJson();
@@ -98,13 +99,14 @@
         }
 
         // Insert with original user-provided state name
-        $stmt = $db->query("INSERT INTO states (name, created_by) VALUES (?, ?) RETURNING id", [$data["state_name"], $_info->user_id]);
+        $stmt = $db->query("INSERT INTO states (name) VALUES (?) RETURNING id", [$data["state_name"]]);
         $entry_id = $stmt->fetchColumn();
 
         $response = new ApiResponse(200, "Success", $entry_id);
         $response->toJson();
     });
 
+    // DELETE STATE
     $router->add('POST', '/master/states/delete', function () {
         global $pageID;
         $jwt = new JwtHandler();
@@ -134,13 +136,19 @@
             $response->toJson();
             return;
         }
-    
+        
+        // DELETE ALL CITIFIES ASSOCIATED WITH STATE
+        $stmt = $db->query("UPDATE cities SET status=FALSE WHERE state_id = ?", [$state_id]);
+        
         // Delete the state
-        $stmt = $db->query("DELETE FROM states WHERE id = ?", [$state_id]);
-    
+        $stmt = $db->query("UPDATE states SET status=FALSE  WHERE id = ?", [$state_id]);
+        
+        
         $response = new ApiResponse(200, "State deleted successfully.");
         $response->toJson();
     });
+
+    // 
     
 
 ?>

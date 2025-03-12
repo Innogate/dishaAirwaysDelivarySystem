@@ -26,7 +26,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." ORDER BY name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE status = TRUE ORDER BY name ASC LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
@@ -70,6 +70,7 @@
         $response->toJson();
     });
 
+    // Get cities by state id
     $router->add('POST', '/master/cities/byStateId', function () {
         global $pageID;
         $jwt = new JwtHandler();
@@ -89,7 +90,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ? ORDER BY name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ? AND status = TRUE ORDER BY name ASC LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$payload->state_id, $payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
@@ -143,7 +144,7 @@
         }
     
         // Insert with original user-provided city name
-        $stmt = $db->query("INSERT INTO cities (name, state_id, created_by) VALUES (?, ?, ?) RETURNING id", [$data["city_name"], $data["state_id"], $_info->user_id]);
+        $stmt = $db->query("INSERT INTO cities (name, state_id) VALUES (?, ?) RETURNING id", [$data["city_name"], $data["state_id"]]);
         $entry_id = $stmt->fetchColumn();
     
         $response = new ApiResponse(200, "Success", $entry_id);

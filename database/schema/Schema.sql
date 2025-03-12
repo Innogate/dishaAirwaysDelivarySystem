@@ -1,3 +1,19 @@
+CREATE TABLE states (
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR NOT NULL,
+    status BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE cities (
+    id SERIAL PRIMARY KEY NOT NULL,
+    name VARCHAR NOT NULL,
+    state_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    status BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (state_id) REFERENCES states(id)
+);
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     mobile VARCHAR NOT NULL UNIQUE,
@@ -21,20 +37,6 @@ CREATE TABLE user_info (
     updated_at TIMESTAMP DEFAULT NOW(),
     FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (id) REFERENCES users(id)
-);
-
-CREATE TABLE states (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE cities (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NOT NULL,
-    state_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (state_id) REFERENCES states(id)
 );
 
 CREATE TABLE companies (
@@ -89,11 +91,7 @@ CREATE TABLE branches (
 CREATE TABLE pages (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NOT NULL,
-    updated_at TIMESTAMP DEFAULT NOW(),
-    status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (created_by) REFERENCES users(id)
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE permissions (
@@ -153,14 +151,26 @@ CREATE TABLE packages (
     FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
-CREATE TABLE bookings (
+CREATE TABLE consignee (
     id SERIAL PRIMARY KEY NOT NULL,
-    branch_id INT NOT NULL,
-    slip_no VARCHAR UNIQUE NOT NULL,
     consignee_name VARCHAR NOT NULL,
     consignee_mobile VARCHAR NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE consignor (
+    id SERIAL PRIMARY KEY NOT NULL,
     consignor_name VARCHAR NOT NULL,
     consignor_mobile VARCHAR NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE bookings (
+    id SERIAL PRIMARY KEY NOT NULL,
+    consignee_id SERIAL NOT NULL,
+    consignor_id SERIAL NOT NULL,
+    branch_id INT NOT NULL,
+    slip_no VARCHAR UNIQUE NOT NULL,
     address VARCHAR NOT NULL,
     transport_mode VARCHAR NOT NULL,
     package_id INT NOT NULL,
@@ -178,5 +188,7 @@ CREATE TABLE bookings (
     FOREIGN KEY (package_id) REFERENCES packages(id),
     FOREIGN KEY (destination_city_id) REFERENCES cities(id),
     FOREIGN KEY (destination_branch_id) REFERENCES branches(id),
+    FOREIGN KEY (consignee_id) REFERENCES consignee(id),
+    FOREIGN KEY (consignor_id) REFERENCES consignor(id),
     FOREIGN KEY (created_by) REFERENCES users(id)
 );
