@@ -15,11 +15,21 @@
         $handler = new Handler();
         $_info = $jwt->validate();
         $handler->validatePermission($pageID, $_info->user_id, "r");
-
+        $payload = (object) [
+            "fields" => ["branches.*"],
+            "max" => 10,
+            "current" => 0,
+            "relation" => null,
+        ];
         $data = json_decode(file_get_contents("php://input"), true);
-        $handler->validateInput($data, ["from"]);
+        if (!empty($data)) {
+            $payload = (object) $data; 
+        }
+
+        
         $db = new Database();
-        $stmt = $db->query("SELECT id, name, alias_name, address, city_id, state_id, pin_code, contact_no, email, company_id, gst_no, cin_no, udyam_no, logo FROM branches LIMIT 10 OFFSET ?", [$data["from"]]);
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." LIMIT ? OFFSET ?";
+        $stmt = $db->query($sql, [$payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
         (new ApiResponse(200, "Success", $list))->toJson();
@@ -52,11 +62,18 @@
         $handler = new Handler();
         $_info = $jwt->validate();
         $handler->validatePermission($pageID, $_info->user_id, "r");
-
+        $payload = (object) [
+            "fields" => ["branches.*"],
+            "max" => 10,
+            "current" => 0,
+            "relation" => null,
+            "city_id" => 0,
+        ];
         $data = json_decode(file_get_contents("php://input"), true);
-        $handler->validateInput($data, ["city_id"]);
+        
         $db = new Database();
-        $stmt = $db->query("SELECT id, name, alias_name, address, city_id, state_id, pin_code, contact_no, email, company_id, gst_no, cin_no, udyam_no, logo FROM branches WHERE city_id = ?", [$data["city_id"]]);
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE city_id = ? LIMIT ? OFFSET ?";
+        $stmt = $db->query($sql, [$payload->city_id, $payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (!$list) {
             (new ApiResponse(400, "Invalid BRANCH ID", "", 400))->toJson();

@@ -235,7 +235,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "from": 0
+    "fields" : ["branches.id","branches.name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null
 }
 
 ### Get Branch BY ID
@@ -253,8 +256,11 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "city_id": 1,
-    "from": 0
+    "fields" : ["branches.id","branches.name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null,
+    "city_id": 1
 }
 
 
