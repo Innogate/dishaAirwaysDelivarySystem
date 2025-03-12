@@ -37,6 +37,21 @@ Authorization: Bearer {{token}}
     "state_name": "ZSD"
 }
 
+
+#### UPDATE STATES
+POST {{apiUrl}}/master/states/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "states.name": "WP"
+    },
+    "conditions":{
+        "states.id": 1
+    }
+}
+
 #### DELETE STATE
 POST {{apiUrl}}/master/states/delete
 Content-Type: application/json
