@@ -62,17 +62,21 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "from":0
+    "fields" : ["states.id","states.name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null
 }
 
-#### GET ALL STATES
+#### GET ALL STATE BY ID
 POST {{apiUrl}}/master/states/byId
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "from":0,
-    "state_id": 1
+    "fields" : ["states.id","states.name"],
+    "state_id": 1,
+    "relation": null
 }
 
 #### ADD NEW STATE
@@ -99,7 +103,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "from":0
+   "fields" : ["cities.id","cities.name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null
 }
 
 #### GET CITY By id
@@ -108,7 +115,9 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "city_id": 1
+    "city_id": 1,
+    "fields" : ["cities.id","cities.name"],
+    "relation" : null
 }
 
 
@@ -119,7 +128,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "from":0,
+    "fields" : ["cities.id","cities.name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null,
     "state_id": 2
 }
 

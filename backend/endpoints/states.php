@@ -12,10 +12,22 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
+        $payload = (object) [
+            "fields" => ["states.*"],
+            "max" => 10,
+            "current" => 1,
+            "relation" => null,
+        ];
         $data = json_decode(file_get_contents("php://input"), true);
 
+        if (!empty($data)) {
+            $payload = (object) $data; 
+        }
+
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM states ORDER BY name ASC LIMIT 10 OFFSET ?", [$data["from"]]);
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." ORDER BY name ASC LIMIT ? OFFSET ?";
+
+        $stmt = $db->query($sql, [$payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (!$list) {
             $list = [];
@@ -30,10 +42,22 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
+
+        $payload = (object) [
+            "fields" => ["states.*"],
+            "max" => 10,
+            "current" => 1,
+            "state_id" => 0,
+            "relation" => null,
+        ];
         $data = json_decode(file_get_contents("php://input"), true);
+        if (!empty($data)) {
+            $payload = (object) $data; 
+        }
 
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM states WHERE id = ? LIMIT 10 OFFSET ?", [$data["state_id"], $data["from"]]);
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE id = ?";
+        $stmt = $db->query($sql, [$data["state_id"]]);
         $list = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$list) {
             $list = [];

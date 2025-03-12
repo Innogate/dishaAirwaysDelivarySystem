@@ -14,10 +14,20 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
+        $payload = (object) [
+            "fields" => ["cities.*"],
+            "max" => 10,
+            "current" => 1,
+            "relation" => null,
+        ];
         $data = json_decode(file_get_contents("php://input"), true);
+        if (!empty($data)) {
+            $payload = (object) $data; 
+        }
 
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM cities ORDER BY name ASC LIMIT 10 OFFSET ?;", [$data["from"]]);
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." ORDER BY name ASC LIMIT ? OFFSET ?";
+        $stmt = $db->query($sql, [$payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
             $list = [];
@@ -34,14 +44,22 @@
         $handler = new Handler();
         $_info = $jwt->validate();
 
+        $payload = (object) [
+            "fields" => ["cities.*"],
+            "max" => 10,
+            "city_id" => 0,
+            "current" => 1,
+            "relation" => null,
+        ];
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if(!isset($data["city_id"])){
-            (new ApiResponse(400,"city_id require", $data))->toJson();
+        if (!empty($data)) {
+            $payload = (object) $data; 
         }
 
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM cities WHERE id = ?", [$data["city_id"]]);
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE id = ?";
+        $stmt = $db->query($sql, [$payload->city_id]);
         $list = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$list) {
             $response = new ApiResponse(400, "Invalid City ID", "", 400);
@@ -58,10 +76,21 @@
         $handler = new Handler();
         $_info = $jwt->validate();
 
+        $payload = (object) [
+            "fields" => ["cities.*"],
+            "max" => 10,
+            "current" => 1,
+            "relation" => null,
+            "state_id" => 0
+        ];
         $data = json_decode(file_get_contents("php://input"), true);
+        if (!empty($data)) {
+            $payload = (object) $data; 
+        }
 
         $db = new Database();
-        $stmt = $db->query("SELECT * FROM cities WHERE state_id = ? ORDER BY name ASC LIMIT 10 OFFSET ?", [$data["state_id"], $data["from"]]);
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ? ORDER BY name ASC LIMIT ? OFFSET ?";
+        $stmt = $db->query($sql, [$payload->state_id, $payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
             $list = [];
