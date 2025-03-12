@@ -141,7 +141,7 @@ CREATE TABLE packages (
     count INTEGER NOT NULL,
     weight FLOAT NOT NULL,
     value FLOAT NOT NULL,
-    contents VARCHAR NOT NULL,
+    contents VARCHAR,
     charges INTEGER NOT NULL,
     shipper VARCHAR NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),

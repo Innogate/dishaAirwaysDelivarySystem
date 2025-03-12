@@ -108,4 +108,63 @@ class Database {
 
         return $query;
     }
+
+    public function generateDynamicUpdate(array $updates, array $conditions) {
+        if (empty($updates)) {
+            die((new ApiResponse(400, "No update data provided"))->toJson());
+        }
+    
+        $tables = [];
+        $updateClauses = [];
+        $joinClauses = [];
+        $whereClauses = [];
+        $params = [];
+    
+        foreach ($updates as $column => $value) {
+            $parts = explode(".", $column);
+            if (count($parts) !== 2) {
+                die((new ApiResponse(400, "Invalid column format: $column"))->toJson());
+            }
+            list($table, $col) = $parts;
+            $tables[$table] = $table;
+            $updateClauses[$table][] = "$col = ?";
+            $params[] = $value;
+        }
+    
+        $foreignKeys = $this->getForeignKeys();
+    
+        // Process conditions for WHERE clause
+        foreach ($conditions as $column => $value) {
+            $parts = explode(".", $column);
+            if (count($parts) !== 2) {
+                die((new ApiResponse(400, "Invalid condition format: $column"))->toJson());
+            }
+            list($table, $col) = $parts;
+            $whereClauses[$table][] = "$col = ?";
+            $params[] = $value;
+        }
+    
+        // Create join conditions based on foreign keys
+        foreach ($tables as $table) {
+            if (isset($foreignKeys[$table])) {
+                foreach ($foreignKeys[$table] as $relatedTable => $condition) {
+                    if (isset($tables[$relatedTable]) && !in_array("JOIN $relatedTable ON $condition", $joinClauses)) {
+                        $joinClauses[] = "JOIN $relatedTable ON $condition";
+                    }
+                }
+            }
+        }
+    
+        $queries = [];
+        foreach ($updateClauses as $table => $updates) {
+            $updateQuery = "UPDATE $table SET " . implode(", ", $updates);
+            if (!empty($whereClauses[$table])) {
+                $updateQuery .= " WHERE " . implode(" AND ", $whereClauses[$table]);
+            }
+            $queries[] = $updateQuery;
+        }
+    
+        $finalQuery = implode("; ", $queries);
+        return ['query' => $finalQuery, 'params' => $params];
+    }
 }

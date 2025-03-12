@@ -416,7 +416,7 @@ CREATE TABLE public.packages (
     count integer NOT NULL,
     weight double precision NOT NULL,
     value double precision NOT NULL,
-    contents character varying NOT NULL,
+    contents character varying,
     charges integer NOT NULL,
     shipper character varying NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
@@ -1989,7 +1989,6 @@ COPY public.cities (id, name, state_id, created_at, status) FROM stdin;
 1213	Warud	20	2025-03-12 15:15:56.193147	t
 1214	Asarganj	5	2025-03-12 15:15:56.193147	t
 1215	Sarsod	12	2025-03-12 15:15:56.193147	t
-1216	ZSDC	35	2025-03-12 15:22:31.903787	f
 \.
 
 
@@ -2110,7 +2109,6 @@ COPY public.states (id, name, status, created_at) FROM stdin;
 32	Uttar Pradesh	t	2025-03-12 15:15:54.007749
 33	Uttarakhand	t	2025-03-12 15:15:54.007749
 34	West Bengal	t	2025-03-12 15:15:54.007749
-35	ZSD	f	2025-03-12 15:22:17.324204
 \.
 
 
@@ -2418,14 +2416,6 @@ ALTER TABLE ONLY public.bookings
 
 ALTER TABLE ONLY public.bookings
     ADD CONSTRAINT bookings_destination_city_id_fkey FOREIGN KEY (destination_city_id) REFERENCES public.cities(id);
-
-
---
--- Name: bookings bookings_package_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.bookings
-    ADD CONSTRAINT bookings_package_id_fkey FOREIGN KEY (package_id) REFERENCES public.packages(id);
 
 
 --
