@@ -184,7 +184,7 @@
         }
 
         // Delete the city
-        $stmt = $db->query("DELETE FROM cities WHERE id = ?", [$city_id]);
+        $stmt = $db->query("UPDATE cities SET status = FALSE WHERE id = ?", [$city_id]);
 
         $response = new ApiResponse(200, "City deleted successfully.");
         $response->toJson();
