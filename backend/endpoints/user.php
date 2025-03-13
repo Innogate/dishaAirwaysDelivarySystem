@@ -76,12 +76,10 @@ $router->add('POST', '/master/users/new', function () {
              $data["address"], $data["email"], $_info->user_id]
         );
         
-        $db->commit();
-        (new ApiResponse(200, "User created successfully.", $user_id))->toJson();
     } catch (Exception $e) {
-        $db->rollBack();
         (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
     }
+    (new ApiResponse(200, "User created successfully.", $user_id))->toJson();
 });
 
 $router->add('POST', '/master/users/delete', function () {
@@ -147,7 +145,7 @@ $router->add('POST', '/master/users/update', function () {
 
     $db = new Database();
     $sql = $db->generateDynamicUpdate($payload->updates, $payload->conditions);
-
+    
     // Debug: Print generated SQL query and parameters
     error_log("SQL Query: " . $sql["query"]);
     error_log("Parameters: " . json_encode($sql["params"]));

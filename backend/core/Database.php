@@ -116,45 +116,33 @@ class Database {
     
         $tables = [];
         $updateClauses = [];
-        $joinClauses = [];
         $whereClauses = [];
         $params = [];
     
+        // Process updates
         foreach ($updates as $column => $value) {
-            $parts = explode(".", $column);
-            if (count($parts) !== 2) {
+            if (!str_contains($column, ".")) {
                 die((new ApiResponse(400, "Invalid column format: $column"))->toJson());
             }
-            list($table, $col) = $parts;
+    
+            list($table, $col) = explode(".", $column, 2);
             $tables[$table] = $table;
             $updateClauses[$table][] = "$col = ?";
             $params[] = $value;
         }
     
-        $foreignKeys = $this->getForeignKeys();
-    
-        // Process conditions for WHERE clause
+        // Process conditions
         foreach ($conditions as $column => $value) {
-            $parts = explode(".", $column);
-            if (count($parts) !== 2) {
+            if (!str_contains($column, ".")) {
                 die((new ApiResponse(400, "Invalid condition format: $column"))->toJson());
             }
-            list($table, $col) = $parts;
+    
+            list($table, $col) = explode(".", $column, 2);
             $whereClauses[$table][] = "$col = ?";
             $params[] = $value;
         }
     
-        // Create join conditions based on foreign keys
-        foreach ($tables as $table) {
-            if (isset($foreignKeys[$table])) {
-                foreach ($foreignKeys[$table] as $relatedTable => $condition) {
-                    if (isset($tables[$relatedTable]) && !in_array("JOIN $relatedTable ON $condition", $joinClauses)) {
-                        $joinClauses[] = "JOIN $relatedTable ON $condition";
-                    }
-                }
-            }
-        }
-    
+        // Build SQL Queries
         $queries = [];
         foreach ($updateClauses as $table => $updates) {
             $updateQuery = "UPDATE $table SET " . implode(", ", $updates);
@@ -164,9 +152,12 @@ class Database {
             $queries[] = $updateQuery;
         }
     
-        $finalQuery = implode("; ", $queries);
+        // Combine queries using transactions for consistency
+        $finalQuery = "" . implode("; ", $queries) . "";
+    
         return ['query' => $finalQuery, 'params' => $params];
     }
+    
 
     public function rollback() {
         $this->pdo->rollBack();

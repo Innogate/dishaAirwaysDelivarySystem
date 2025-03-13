@@ -14,49 +14,22 @@ $router->add('POST', '/booking', function () {
     $_info = $jwt->validate();
     $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
 
+    $payload = (object) [
+        "fields" => ["bookings.*", "packages.*", "branches.*", "cities.*"],
+        "max" => 10,
+        "current" => 0,
+        "relation" => "bookings.package_id=packages.id,bookings.destination_branch_id=branches.id,bookings.destination_city_id=cities.id",
+    ];
     $data = json_decode(file_get_contents("php://input"), true);
-    $handler->validateInput($data, ["from"]);
+    if (!empty($data)) {
+        $payload = (object) $data; 
+    }
+
 
     $db = new Database();
-    $stmt = $db->query("SELECT 
-    b.id AS booking_id,
-    b.slip_no,
-    b.consignee_name,
-    b.consignee_mobile,
-    b.consignor_name,
-    b.consignor_mobile,
-    b.transport_mode,
-    b.paid_type,
-    b.destination_city_id,
-    c.name AS destination_city_name,
-    b.destination_branch_id,
-    br.name AS destination_branch_name,
-    p.id AS package_id,
-    p.container_id,
-    p.count,
-    p.weight,
-    p.value,
-    p.contents,
-    p.charges,
-    p.cgst,
-    p.sgst,
-    p.igst,
-    b.created_at,
-    b.created_by,
-    p.created_at AS package_created_at,
-    p.created_by AS package_created_by
-FROM 
-    bookings b
-INNER JOIN 
-    packages p ON b.package_id = p.id
-INNER JOIN 
-    branches br ON b.destination_branch_id = br.id
-INNER JOIN 
-    cities c ON b.destination_city_id = c.id
-WHERE 
-    b.status = TRUE 
-    AND p.status = TRUE
-LIMIT 100 OFFSET ?;", [$data["from"]]);
+    $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation). " LIMIT ? OFFSET ?";
+
+    $stmt = $db->query ($sqlQuery, [$payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fix fetch issue
 
     if (!$list) {
@@ -72,71 +45,93 @@ $router->add("POST", "/booking/new", function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
+    $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $require_data = ["slip_no", "consignee_name", "consignee_mobile", "consignor_name", "consignor_mobile", "transport_mode", "paid_type", "destination_city_id", "destination_branch_id", "count", "value", "contents", "charges", "shipper", "cgst", "sgst", "igst", "weight"];
-    $handler->validateInput($data, $require_data);
+    $required_fields = [
+        "slip_no", "consignee_id", "consignor_id", "transport_mode",
+        "paid_type", "destination_city_id", "destination_branch_id", 
+        "count", "value", "contents", "charges", "shipper", 
+        "cgst", "sgst", "igst", "weight", "address"
+    ];
+    $handler->validateInput($data, $required_fields);
 
     $db = new Database();
     $db->beginTransaction(); // Start transaction
 
     try {
-        $stmt = $db->query("SELECT id FROM employees WHERE user_id = ?", [$_info->user_id]);
+        // Get employee branch ID
+        $stmt = $db->query("SELECT branch_id FROM employees WHERE user_id = ?", [$_info->user_id]);
         $branch = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$branch) {
-            throw new Exception("It is not a employee account.");
+            throw new Exception("It is not an employee account.");
         }
 
-        $smtp = $db->query("INSERT INTO packages (count, weight, value, contents, charges, shipper, cgst, sgst, igst, created_by) VALUES (?,?,?,?,?,?,?,?,?,?) RETURNING id", [
+        // Validate consignee existence
+        $stmt = $db->query("SELECT id FROM consignee WHERE id = ?", [$data["consignee_id"]]);
+        $consignee = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$consignee) {
+            throw new Exception("Consignee does not exist. Please provide a valid consignee.");
+        }
+        $consignee_id = $consignee['id'];
+
+        // Validate consignor existence
+        $stmt = $db->query("SELECT id FROM consignor WHERE id = ?", [$data["consignor_id"]]);
+        $consignor = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$consignor) {
+            throw new Exception("Consignor does not exist. Please provide a valid consignor.");
+        }
+        $consignor_id = $consignor['id'];
+
+        // Insert package
+        $stmt = $db->query("INSERT INTO packages (count, weight, value, contents, charges, shipper, created_by) 
+                            VALUES (?,?,?,?,?,?,?) RETURNING id", [
             $data["count"],
             $data["weight"],
             $data["value"],
             $data["contents"],
             $data["charges"],
             $data["shipper"],
-            $data["cgst"],
-            $data["sgst"],
-            $data["igst"],
             $_info->user_id
         ]);
+        $package_id = $stmt->fetchColumn();
+        if (!$package_id) throw new Exception("Package Creation Error");
 
-        $package_id = $smtp->fetchColumn();
-        if (!$package_id) {
-            throw new Exception("Package Creation Error");
-        }
-
+        // Insert booking
         $stmt = $db->query("INSERT INTO bookings(
-        branch_id, slip_no, consignee_name, consignee_mobile, consignor_name, consignor_mobile, transport_mode, package_id, paid_type, destination_city_id, destination_branch_id, created_by
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id", [
-            $branch['id'],
+            branch_id, slip_no, consignee_id, consignor_id, transport_mode, package_id, 
+            paid_type, cgst, sgst, igst, total_value, destination_city_id, destination_branch_id, address, created_by
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id", [
+            $branch['branch_id'],
             $data["slip_no"],
-            $data["consignee_name"],
-            $data["consignee_mobile"],
-            $data["consignor_name"],
-            $data["consignor_mobile"],
+            $consignee_id,
+            $consignor_id,
             $data["transport_mode"],
             $package_id,
             $data["paid_type"],
+            $data["cgst"],
+            $data["sgst"],
+            $data["igst"],
+            $data["value"],
             $data["destination_city_id"],
             $data["destination_branch_id"],
+            $data["address"],
             $_info->user_id
         ]);
 
         $receipt_no = $stmt->fetchColumn();
-        if (!$receipt_no) {
-            throw new Exception("Receipt Creation Error");
-        }
+        if (!$receipt_no) throw new Exception("Receipt Creation Error");
 
-        $db->commit(); // Commit transaction if everything is successful
+        $db->commit(); // Commit transaction if successful
         (new ApiResponse(200, "Receipt generated successfully", $receipt_no, 200))->toJson();
 
     } catch (Exception $e) {
-        $db->rollBack(); // Rollback transaction if any error occurs
+        $db->rollBack(); // Rollback transaction if error occurs
         (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
     }
 });
+
 
 ?>
