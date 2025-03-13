@@ -58,7 +58,6 @@ $router->add('POST', '/master/users/new', function () {
     $db = new Database();
     
     try {
-        $db->beginTransaction();
         
         $stmt = $db->query("SELECT id FROM users WHERE mobile = ?", [$data["mobile"]]);
         if ($stmt->fetch(PDO::FETCH_ASSOC)) {

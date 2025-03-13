@@ -167,4 +167,13 @@ class Database {
         $finalQuery = implode("; ", $queries);
         return ['query' => $finalQuery, 'params' => $params];
     }
+
+    public function rollback() {
+        $this->pdo->rollBack();
+    }
+
+    public function commit() {
+        $this->pdo->commit();
+    }
+    
 }
