@@ -4,65 +4,90 @@ require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Handler.php';
 
 global $router;
-global $pageID;
-
-$pageID = 7; // Change page ID for Employee Master
-
 $router->add('POST', '/master/employees', function () {
-    global $pageID;
+    $pageID=7;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
     $handler->validatePermission($pageID, $_info->user_id, "r");
+    $payload = (object) [
+        "fields" => ["employees.*"],
+        "max" => 10,
+        "current" => 0,
+        "relation" => null,
+    ];
 
     $data = json_decode(file_get_contents("php://input"), true);
-    $require_fids=["from"];
-    $handler->validateInput($data, $require_fids);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM employees LIMIT 10 OFFSET ?", [$data["from"]]);
+    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE status = TRUE LIMIT ? OFFSET ?";
+    $stmt = $db->query($sql, [$payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
 $router->add('POST', '/master/employees/byId', function () {
-    global $pageID;
+    $pageID=7;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
     $handler->validatePermission($pageID, $_info->user_id, "r");
 
+    $payload = (object) [
+        "fields" => ["employees.*"],
+        "relation" => null,
+        "employee_id" => 0,
+    ];
+
     $data = json_decode(file_get_contents("php://input"), true);
-    $require_fids = ["employee_id"];
-    $handler->validateInput($data, $require_fids);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
 
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM employees WHERE id = ?", [$data["employee_id"]]);
-    $list = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-
+    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE id = ?";
+    $stmt = $db->query($sql, [$payload->employee_id]);
+    $list = $stmt->fetch(PDO::FETCH_ASSOC);
+    if(!$list){
+        (new ApiResponse(400, "Invalid Employee ID", "", 400))->toJson();
+    }
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
 $router->add('POST', '/master/employees/byBranchId', function () {
-    global $pageID;
+    $pageID=7;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
     $handler->validatePermission($pageID, $_info->user_id, "r");
 
+    $payload = (object) [
+        "fields" => ["employees.*"],
+        "max" => 10,
+        "current" => 0,
+        "relation" => null,
+        "branch_id" => 0,
+    ];
+
     $data = json_decode(file_get_contents("php://input"), true);
-    $require_fids = ["branch_id", "from"];
-    $handler->validateInput($data, $require_fids);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
 
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM employees WHERE branch_id = ? LIMIT 10 OFFSET ?", [ $data["branch_id"], $data["from"]]);
+    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE branch_id = ? AND status = TRUE LIMIT ? OFFSET ?";
+    $stmt = $db->query($sql, [$payload->branch_id, $payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
 $router->add('POST', '/master/employees/new', function () {
-    global $pageID;
+    $pageID=7;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -113,7 +138,7 @@ $router->add('POST', '/master/employees/new', function () {
 });
 
 $router->add('POST', '/master/employees/delete', function () {
-    global $pageID;
+    $pageID=7;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -139,7 +164,7 @@ $router->add('POST', '/master/employees/delete', function () {
             return;
         }
 
-        $db->query("DELETE FROM employees WHERE id = ?", [$employee_id]);
+        $db->query("UPDATE employees SET status = FALSE WHERE id = ?", [$employee_id]);
 
         $db->commit();
         (new ApiResponse(200, "Employee deleted successfully."))->toJson();
@@ -148,4 +173,47 @@ $router->add('POST', '/master/employees/delete', function () {
         (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
     }
 });
+
+$router->add("POST", "/master/employees/update", function () {
+    $pageID=7;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "u"); // "d" for delete permission
+
+    $payload = (object) [
+        "updates" => [
+            'talbe.name' => 'Error'
+        ],
+        "conditions" => [
+            'talbe.id' => 0
+        ]
+    ];
+
+    $data = json_decode(file_get_contents("php://input"), true);
+
+
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
+    $db = new Database();
+    $sql = $db->generateDynamicUpdate($payload->updates, $payload->conditions);
+
+    // Debug: Print generated SQL query and parameters
+    error_log("SQL Query: " . $sql["query"]);
+    error_log("Parameters: " . json_encode($sql["params"]));
+
+    try {
+        $stmt = $db->query($sql["query"], $sql["params"]);
+
+        if ($stmt->rowCount() > 0) {
+            (new ApiResponse(200, "Update successful", $stmt->rowCount()))->toJson();
+        } else {
+            (new ApiResponse(500, "No rows updated"))->toJson();
+        }
+    } catch (Exception $e) {
+        (new ApiResponse(500, "Update failed", $e->getMessage()))->toJson();
+    }
+})
 ?>
