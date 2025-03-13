@@ -10,7 +10,7 @@ $pageID = 6; // Change page ID for branch master
 
 // GET ALL BRANCH
 $router->add('POST', '/master/branches', function () {
-    global $pageID;
+    $pageID=1;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -37,16 +37,26 @@ $router->add('POST', '/master/branches', function () {
 
 // GET ALL BRANCH BY ID
 $router->add('POST', '/master/branches/byId', function () {
-    global $pageID;
+    $pageID=1;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
     $handler->validatePermission($pageID, $_info->user_id, "r");
 
+    $payload = (object) [
+        "fields" => ["branches.*"],
+        "max" => 10,
+        "current" => 0,
+        "relation" => null,
+    ];
     $data = json_decode(file_get_contents("php://input"), true);
-    $handler->validateInput($data, ["branch_id"]);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+    
     $db = new Database();
-    $stmt = $db->query("SELECT id, name, alias_name, address, city_id, state_id, pin_code, contact_no, email, company_id, gst_no, cin_no, udyam_no, logo FROM branches WHERE branch_id = ?", [$data["branch_id"]]);
+    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE id = ?";
+    $stmt = $db->query($sql, [$payload->branch_id]);
     $list = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$list) {
         (new ApiResponse(400, "Invalid BRANCH ID", "", 400))->toJson();
@@ -114,25 +124,30 @@ $router->add('POST', '/master/branches/new', function () {
         }
 
         $stmt = $db->query(
-            "INSERT INTO branches (company_id, name,alias_name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, logo, created_by) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id",
+            "INSERT INTO branches 
+            (name, alias_name, address, city_id, state_id, company_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, cgst, sgst, igst, logo, created_by) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id",
             [
-                $data["company_id"],
                 $data["name"],
                 $data["alias_name"],
                 $data["address"],
                 $data["city_id"],
                 $data["state_id"],
+                $data["company_id"],
                 $data["pin_code"],
                 $data["contact_no"],
                 $data["email"],
                 $data["gst_no"],
                 $data["cin_no"],
                 $data["udyam_no"],
+                $data["cgst"],
+                $data["sgst"],
+                $data["igst"],
                 $data["logo"],
-                $_info->user_id
+                $_info->user_id // Ensure this exists
             ]
         );
+        
 
         $branch_id = $stmt->fetchColumn();
 

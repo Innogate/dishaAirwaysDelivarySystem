@@ -208,7 +208,7 @@ Authorization: Bearer {{token}}
     "from": 0
 }
 
-#### GET COMPANIES BY ID
+#### ! GET COMPANIES BY ID
 POST {{apiUrl}}/master/companies/byId
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -217,7 +217,7 @@ Authorization: Bearer {{token}}
     "company_id": 1
 }
 
-#### GET ALL COMPANIES BY STATE
+#### ! GET ALL COMPANIES BY STATE
 POST {{apiUrl}}/master/companies/byState
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -226,7 +226,7 @@ Authorization: Bearer {{token}}
     "state_id": 1
 }
 
-#### GET ALL COMPANIES BY STATE
+#### ! GET ALL COMPANIES BY STATE
 POST {{apiUrl}}/master/companies/byCityId
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -235,7 +235,7 @@ Authorization: Bearer {{token}}
     "city_id": 1
 }
 
-#### GET ALL COMPANIES BY STATE
+#### ! GET ALL COMPANIES BY STATE
 POST {{apiUrl}}/master/companies/byCityId
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -245,7 +245,7 @@ Authorization: Bearer {{token}}
     "city_id": 1
 }
 
-#### ADD NEW COMPANY
+#### ! ADD NEW COMPANY
 POST {{apiUrl}}/master/companies/new
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -264,7 +264,7 @@ Authorization: Bearer {{token}}
     "logo": "base64_encoded_string"
 }
 
-#### DELETE COMPANY
+#### ! DELETE COMPANY
 POST {{apiUrl}}/master/companies/delete
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -287,12 +287,14 @@ Authorization: Bearer {{token}}
 }
 
 ### Get Branch BY ID
-POST {{apiUrl}}/master/branches
+POST {{apiUrl}}/master/branches/byId
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "brach_id": 0
+    "fields" : ["branches.id","branches.name"],
+    "relation" : null,
+    "branch_id": 0
 }
 
 ### Get Branch BY CITY ID
@@ -324,11 +326,15 @@ Authorization: Bearer {{token}}
     "pin_code": "123456",
     "contact_no": "9876543210",
     "email": "branch@example.com",
-    "gst_no": 9090,
-    "cin_no": 9090,
-    "udyam_no": 9090,
-    "logo": 0
+    "gst_no": "9090",
+    "cin_no": "9090",
+    "udyam_no": "9090",
+    "cgst": 0.0,
+    "sgst": 0.0,
+    "igst": 0.0,
+    "logo": "logo"
 }
+
 
 
 #### UPDATE USERS
@@ -356,7 +362,7 @@ Authorization: Bearer {{token}}
 }
 
 
-### Fetch Employees
+### ! Fetch Employees
 POST {{apiUrl}}/master/employees
 Content-Type: application/json
 Authorization: Bearer {{token}}

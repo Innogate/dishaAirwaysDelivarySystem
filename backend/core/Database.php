@@ -175,5 +175,9 @@ class Database {
     public function commit() {
         $this->pdo->commit();
     }
+
+    public function beginTransaction(){
+        $this->pdo->beginTransaction();
+    }
     
 }
