@@ -758,6 +758,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.bookings (id, consignee_id, consignor_id, branch_id, slip_no, address, transport_mode, package_id, paid_type, cgst, sgst, igst, total_value, destination_city_id, destination_branch_id, created_at, created_by, status) FROM stdin;
+1	1	1	1	123456	23 lan wv	Air	1	Prepaid	18	18	0	1000	1	1	2025-03-16 06:08:50.887811	2	t
 \.
 
 
@@ -2007,6 +2008,7 @@ COPY public.companies (id, name, address, city_id, state_id, pin_code, contact_n
 --
 
 COPY public.consignee (id, consignee_name, consignee_mobile, created_at) FROM stdin;
+1	John Doe	9876543210	2025-03-16 06:08:41.683584
 \.
 
 
@@ -2015,6 +2017,7 @@ COPY public.consignee (id, consignee_name, consignee_mobile, created_at) FROM st
 --
 
 COPY public.consignor (id, consignor_name, consignor_mobile, created_at) FROM stdin;
+1	Jane Smith	8765432109	2025-03-16 06:08:47.117053
 \.
 
 
@@ -2040,6 +2043,7 @@ COPY public.employees (id, user_id, address, aadhar_no, joining_date, created_at
 --
 
 COPY public.packages (id, container_id, count, weight, value, contents, charges, shipper, created_at, created_by, status) FROM stdin;
+1	\N	3	4	1000	Electronics	150	XYZ Logistics	2025-03-16 06:08:50.887811	2	t
 \.
 
 
@@ -2073,6 +2077,7 @@ COPY public.permissions (id, page_id, permission_code, user_id, created_at, crea
 7	7	11111	1	2025-03-16 05:19:26.689243	1	2025-03-16 05:19:26.689243	t
 8	8	11111	1	2025-03-16 05:19:26.691035	1	2025-03-16 05:19:26.691035	t
 9	4	1111	2	2025-03-16 05:41:13.720204	1	2025-03-16 05:41:13.720204	t
+10	1	1111	2	2025-03-16 06:08:16.2944	1	2025-03-16 06:08:16.2944	t
 \.
 
 
@@ -2158,7 +2163,7 @@ SELECT pg_catalog.setval('public.bookings_consignor_id_seq', 1, false);
 -- Name: bookings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.bookings_id_seq', 1, false);
+SELECT pg_catalog.setval('public.bookings_id_seq', 3, true);
 
 
 --
@@ -2186,14 +2191,14 @@ SELECT pg_catalog.setval('public.companies_id_seq', 1, true);
 -- Name: consignee_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.consignee_id_seq', 1, false);
+SELECT pg_catalog.setval('public.consignee_id_seq', 1, true);
 
 
 --
 -- Name: consignor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.consignor_id_seq', 1, false);
+SELECT pg_catalog.setval('public.consignor_id_seq', 1, true);
 
 
 --
@@ -2214,7 +2219,7 @@ SELECT pg_catalog.setval('public.employees_id_seq', 1, true);
 -- Name: packages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.packages_id_seq', 1, false);
+SELECT pg_catalog.setval('public.packages_id_seq', 3, true);
 
 
 --
@@ -2228,7 +2233,7 @@ SELECT pg_catalog.setval('public.pages_id_seq', 8, true);
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.permissions_id_seq', 9, true);
+SELECT pg_catalog.setval('public.permissions_id_seq', 10, true);
 
 
 --
