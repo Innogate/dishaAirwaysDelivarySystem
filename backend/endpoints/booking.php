@@ -8,12 +8,12 @@ global $pageID;
 $pageID = 1;
 
 $router->add('POST', '/booking', function () {
-    $pageID=1;
+    $pageID = 1;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
-    
+
     $allow_tables = ["bookings", "packages", "branches", "cities"];
 
     $payload = (object) [
@@ -24,17 +24,46 @@ $router->add('POST', '/booking', function () {
     ];
     $data = json_decode(file_get_contents("php://input"), true);
     if (!empty($data)) {
-        $payload = (object) $data; 
+        $payload = (object) $data;
     }
 
 
     $db = new Database();
     if ($isAdmin) {
-        $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation) . " LIMIT ? OFFSET ?";
-        $stmt = $db->query ($sqlQuery, [$payload->max, $payload->current]);
+        $sqlQuery = "SELECT 
+    bookings.*, 
+    packages.*, 
+    branches.id AS branch_id, 
+    branches.name AS branch_name, 
+    cities.*
+FROM bookings
+JOIN packages ON bookings.package_id = packages.id
+JOIN branches ON bookings.destination_branch_id = branches.id
+JOIN cities ON bookings.destination_city_id = cities.id
+JOIN employees e1 ON bookings.created_by = e1.user_id
+WHERE e1.branch_id = (
+    SELECT e2.branch_id FROM employees e2 WHERE e2.user_id = ?
+)
+LIMIT ? OFFSET ?;
+";
+        $stmt = $db->query($sqlQuery, [$payload->max, $payload->current]);
     } else {
-        $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation). " JOIN employees e1 ON bookings.created_by = e1.user_id WHERE e1.branch_id = ( SELECT e2.branch_id FROM employees e2  WHERE e2.id = ?) LIMIT ? OFFSET ?";
-        $stmt = $db->query ($sqlQuery, [$_info->user_id, $payload->max, $payload->current]);
+        $sqlQuery = "SELECT 
+    bookings.*, 
+    packages.*, 
+    branches.id AS branch_id, 
+    branches.name AS branch_name, 
+    cities.*
+FROM bookings
+JOIN packages ON bookings.package_id = packages.id
+JOIN branches ON bookings.destination_branch_id = branches.id
+JOIN cities ON bookings.destination_city_id = cities.id
+JOIN employees e1 ON bookings.created_by = e1.user_id
+WHERE e1.branch_id = (
+    SELECT e2.branch_id FROM employees e2 WHERE e2.user_id = ?
+)
+LIMIT ? OFFSET ?;";
+        $stmt = $db->query($sqlQuery, [$_info->user_id, $payload->max, $payload->current]);
     }
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fix fetch issue
@@ -57,10 +86,23 @@ $router->add("POST", "/booking/new", function () {
     $data = json_decode(file_get_contents("php://input"), true);
 
     $required_fields = [
-        "slip_no", "consignee_id", "consignor_id", "transport_mode",
-        "paid_type", "destination_city_id", "destination_branch_id", 
-        "count", "value", "contents", "charges", "shipper", 
-        "cgst", "sgst", "igst", "weight", "address"
+        "slip_no",
+        "consignee_id",
+        "consignor_id",
+        "transport_mode",
+        "paid_type",
+        "destination_city_id",
+        "destination_branch_id",
+        "count",
+        "value",
+        "contents",
+        "charges",
+        "shipper",
+        "cgst",
+        "sgst",
+        "igst",
+        "weight",
+        "address"
     ];
     $handler->validateInput($data, $required_fields);
 
@@ -104,7 +146,8 @@ $router->add("POST", "/booking/new", function () {
             $_info->user_id
         ]);
         $package_id = $stmt->fetchColumn();
-        if (!$package_id) throw new Exception("Package Creation Error");
+        if (!$package_id)
+            throw new Exception("Package Creation Error");
 
         // Insert booking
         $stmt = $db->query("INSERT INTO bookings(
@@ -129,7 +172,8 @@ $router->add("POST", "/booking/new", function () {
         ]);
 
         $receipt_no = $stmt->fetchColumn();
-        if (!$receipt_no) throw new Exception("Receipt Creation Error");
+        if (!$receipt_no)
+            throw new Exception("Receipt Creation Error");
 
         $db->commit(); // Commit transaction if successful
         (new ApiResponse(200, "Receipt generated successfully", $receipt_no, 200))->toJson();

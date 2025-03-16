@@ -2072,6 +2072,7 @@ COPY public.permissions (id, page_id, permission_code, user_id, created_at, crea
 6	6	11111	1	2025-03-16 05:19:26.687421	1	2025-03-16 05:19:26.687421	t
 7	7	11111	1	2025-03-16 05:19:26.689243	1	2025-03-16 05:19:26.689243	t
 8	8	11111	1	2025-03-16 05:19:26.691035	1	2025-03-16 05:19:26.691035	t
+9	4	1111	2	2025-03-16 05:41:13.720204	1	2025-03-16 05:41:13.720204	t
 \.
 
 
@@ -2124,6 +2125,7 @@ COPY public.states (id, name, status, created_at) FROM stdin;
 COPY public.user_info (id, first_name, last_name, gender, birth_date, address, email, created_at, created_by, updated_at) FROM stdin;
 1	Admin	Defualt	M	2020-10-10 00:00:00	NOT EXSIT	test@email.com	2025-03-16 05:11:47.298946	1	2025-03-16 05:11:47.298946
 2	Test	Employee	Male	1990-01-01 00:00:00	123 Main St	john.doe@example.com	2025-03-16 05:22:24.9436	1	2025-03-16 05:22:24.9436
+3	John	Doe BED	Male	1990-01-01 00:00:00	123 Main St	john.doe@example.com	2025-03-16 05:48:17.817714	2	2025-03-16 05:48:17.817714
 \.
 
 
@@ -2134,6 +2136,7 @@ COPY public.user_info (id, first_name, last_name, gender, birth_date, address, e
 COPY public.users (id, mobile, password, created_at, created_by, updated_at, status) FROM stdin;
 1	1234567890	pass@1234	2025-03-16 05:11:03.119105	1	2025-03-16 05:11:03.119105	t
 2	9876542212	securePass123	2025-03-16 05:22:24.941304	1	2025-03-16 05:22:24.941304	t
+3	9876542231	securePass123	2025-03-16 05:48:17.81454	2	2025-03-16 05:48:17.81454	t
 \.
 
 
@@ -2225,7 +2228,7 @@ SELECT pg_catalog.setval('public.pages_id_seq', 8, true);
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.permissions_id_seq', 8, true);
+SELECT pg_catalog.setval('public.permissions_id_seq', 9, true);
 
 
 --
@@ -2246,7 +2249,7 @@ SELECT pg_catalog.setval('public.user_info_id_seq', 1, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 2, true);
+SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 
 
 --
