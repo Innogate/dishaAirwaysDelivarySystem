@@ -13,3 +13,4 @@
 5. Companies
 6. Branch
 7. Employees    
+8. Permission    

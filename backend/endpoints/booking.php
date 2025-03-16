@@ -12,7 +12,9 @@ $router->add('POST', '/booking', function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
+    
+    $allow_tables = ["bookings", "packages", "branches", "cities"];
 
     $payload = (object) [
         "fields" => ["bookings.*", "packages.*", "branches.*", "cities.*"],
@@ -27,9 +29,14 @@ $router->add('POST', '/booking', function () {
 
 
     $db = new Database();
-    $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation). " LIMIT ? OFFSET ?";
+    if ($isAdmin) {
+        $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation) . " LIMIT ? OFFSET ?";
+        $stmt = $db->query ($sqlQuery, [$payload->max, $payload->current]);
+    } else {
+        $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation). " JOIN employees e1 ON bookings.created_by = e1.user_id WHERE e1.branch_id = ( SELECT e2.branch_id FROM employees e2  WHERE e2.id = ?) LIMIT ? OFFSET ?";
+        $stmt = $db->query ($sqlQuery, [$_info->user_id, $payload->max, $payload->current]);
+    }
 
-    $stmt = $db->query ($sqlQuery, [$payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fix fetch issue
 
     if (!$list) {

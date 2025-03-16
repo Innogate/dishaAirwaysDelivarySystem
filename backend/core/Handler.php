@@ -11,33 +11,41 @@
                 $response->toJson();
             }
             if ($permission['permission_code'] == "11111") {
-                return True;
+                return true;
             }
 
             $permissionCodeExistArray = str_split($permission['permission_code']?? "");
             switch ($permissionCheck) {
                 case 'r':
                     if ($permissionCodeExistArray[0] == "1") {
-                        return true;
+                        return false;
                     }
+                    $response = new ApiResponse(401,"Unauthorized access not permit access this page contact admin for more info.", "", 300);
+                    $response->toJson();
                     break;
                 case 'w':
                     if ($permissionCodeExistArray[1] == "1") {
-                        return true;
+                        return false;
                     }
+                    $response = new ApiResponse(401,"Unauthorized access not permit access this page contact admin for more info.", "", 300);
+                    $response->toJson();
                     break;
                 case 'u':
                     if ($permissionCodeExistArray[2] == "1") {
-                        return true;
+                        return false;
                     }
+                    $response = new ApiResponse(401,"Unauthorized access not permit access this page contact admin for more info.", "", 300);
+                    $response->toJson();
                     break;
                 case 'd':
                     if ($permissionCodeExistArray[3] == "1") {
-                        return true;
+                        return false;
                     }
+                    $response = new ApiResponse(401,"Unauthorized access not permit access this page contact admin for more info.", "", 300);
+                    $response->toJson();
                     break;
                 default:
-                    $response = new ApiResponse(401,"Unauthorized access", "", 300);
+                    $response = new ApiResponse(401,"Unauthorized access not permit access this page contact admin for more info.", "", 300);
                     $response->toJson();
                     break;
             }
