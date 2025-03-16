@@ -19,7 +19,7 @@ $router->add('POST', '/master/users', function () {
         "current" => 1,
         "relation" => "users.id=user_info.id",
     ];
-    $handler->validatePermission($pageID, $_info->user_id, "r");
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "r");
     
     $data = json_decode(file_get_contents("php://input"), true);
     
@@ -31,8 +31,16 @@ $router->add('POST', '/master/users', function () {
     
     $db = new Database();
     $sqlQuery = $db->generateDynamicQuery($payload->fields, $payload->relation);
-    $sqlQuery = $sqlQuery . " WHERE status = TRUE LIMIT ? OFFSET ?";
-    $stmt = $db->query ($sqlQuery, [$payload->max, $payload->current]);
+    if ($isAdmin) {
+        $sqlQuery = $sqlQuery . " WHERE status = TRUE LIMIT ? OFFSET ?";
+        $stmt = $db->query ($sqlQuery, [$payload->max, $payload->current]);
+    }
+    else{
+        $sqlQuery .= " WHERE users.created_by IN (SELECT e1.user_id FROM employees e1 WHERE e1.branch_id = (SELECT e2.branch_id FROM employees e2 WHERE e2.user_id = ?)) LIMIT ? OFFSET ?;";
+        $stmt = $db->query ($sqlQuery, params: [$_info->user_id, $payload->max, $payload->current]);
+    }
+    
+    
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     
     (new ApiResponse(200, "Success", $list))->toJson();

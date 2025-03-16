@@ -166,10 +166,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "mobile": "9876542212",
+    "mobile": "9876542231",
     "password": "securePass123",
     "first_name": "John",
-    "last_name": "Doe",
+    "last_name": "Doe BED",
     "gender": "Male",
     "birth_date": "1990-01-01",
     "address": "123 Main St",
@@ -369,10 +369,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "fields" : ["employees.*"],
+    "fields" : ["employees.*","user_info.*"],
     "max" : 10,
     "current" : 0,
-    "relation" : null
+    "relation" : "employees.user_id=user_info.id"
 }
 
 ### Fetch Employees ById
