@@ -17,10 +17,8 @@ $router->add('POST', '/booking', function () {
     $allow_tables = ["bookings", "packages", "branches", "cities"];
 
     $payload = (object) [
-        "fields" => ["bookings.*", "packages.*", "branches.*", "cities.*"],
         "max" => 10,
-        "current" => 0,
-        "relation" => "bookings.package_id=packages.id,bookings.destination_branch_id=branches.id,bookings.destination_city_id=cities.id",
+        "current" => 0
     ];
     $data = json_decode(file_get_contents("php://input"), true);
     if (!empty($data)) {
@@ -40,10 +38,6 @@ FROM bookings
 JOIN packages ON bookings.package_id = packages.id
 JOIN branches ON bookings.destination_branch_id = branches.id
 JOIN cities ON bookings.destination_city_id = cities.id
-JOIN employees e1 ON bookings.created_by = e1.user_id
-WHERE e1.branch_id = (
-    SELECT e2.branch_id FROM employees e2 WHERE e2.user_id = ?
-)
 LIMIT ? OFFSET ?;
 ";
         $stmt = $db->query($sqlQuery, [$payload->max, $payload->current]);

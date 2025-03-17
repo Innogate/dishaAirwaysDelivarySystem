@@ -3,7 +3,7 @@ FROM node:lts-alpine
 ARG HOST_UID
 
 ENV CHROME_BIN='/usr/bin/chromium-browser'
-
+RUN apk add --no-cache bash git
 RUN deluser --remove-home node \
   && addgroup -S vscode -g 1000 \
   && adduser -S -G vscode -u 1000 -s /bin/bash vscode

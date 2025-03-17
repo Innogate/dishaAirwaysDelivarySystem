@@ -3,7 +3,7 @@ services:
     build:
       context: ./docker/build
       dockerfile: Dockerfile.angular
-    container_name: react-native-container
+    container_name: angular
     restart: unless-stopped
     volumes:
       - ./mobile:/app
