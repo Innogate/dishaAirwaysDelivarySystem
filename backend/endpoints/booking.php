@@ -29,10 +29,10 @@ $router->add('POST', '/booking', function () {
     $db = new Database();
     if ($isAdmin) {
         $sqlQuery = "SELECT 
-    bookings.*, 
     packages.*, 
     consignee.*, 
     consignor.*, 
+    bookings.*, 
     branches.id AS branch_id, 
     branches.name AS branch_name, 
     cities.name AS city_name
@@ -47,11 +47,11 @@ LIMIT ? OFFSET ?;
 ";
         $stmt = $db->query($sqlQuery, [$payload->max, $payload->current]);
     } else {
-        $sqlQuery = "SELECT 
-    bookings.*, 
+        $sqlQuery = "SELECT  
     packages.*, 
     consignee.*, 
     consignor.*, 
+    bookings.*,
     branches.id AS branch_id, 
     branches.name AS branch_name, 
     cities.name AS city_name
