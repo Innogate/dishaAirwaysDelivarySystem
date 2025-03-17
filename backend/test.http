@@ -400,9 +400,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "fields" : ["employees.*"],
-    "relation" : null,
-    "employee_id": 1,
+      "fields": ["employees.","users."],
+      "max": 100,
+      "current": 0,
+      "relation": "users.id=employees.user_id"
 }
 
 
