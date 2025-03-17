@@ -42,6 +42,7 @@ JOIN branches ON bookings.destination_branch_id = branches.id
 JOIN consignee ON bookings.consignee_id = consignee.id
 JOIN consignor ON bookings.consignor_id = consignor.id
 JOIN cities ON bookings.destination_city_id = cities.id
+ORDER BY bookings.created_at DESC
 LIMIT ? OFFSET ?;
 ";
         $stmt = $db->query($sqlQuery, [$payload->max, $payload->current]);
@@ -64,6 +65,7 @@ JOIN employees e1 ON bookings.created_by = e1.user_id
 WHERE e1.branch_id = (
     SELECT e2.branch_id FROM employees e2 WHERE e2.user_id = ?
 )
+ORDER BY bookings.created_at DESC
 LIMIT ? OFFSET ?;";
         $stmt = $db->query($sqlQuery, [$_info->user_id, $payload->max, $payload->current]);
     }
@@ -127,7 +129,8 @@ $router->add("POST", "/booking/new", function () {
         $token = $stmt->fetch(PDO::FETCH_ASSOC);
         // check toke unused garter then 0 or not 
         if (!$token) {
-            (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();(new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
+            (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
+            (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
         }
 
         if ($token["unused"] <= 0) {
@@ -200,12 +203,8 @@ $router->add("POST", "/booking/new", function () {
 
         $db->commit(); // Commit transaction if successful
         (new ApiResponse(200, "Receipt generated successfully", $slip_no, 200))->toJson();
-
     } catch (Exception $e) {
         $db->rollBack(); // Rollback transaction if error occurs
         (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
     }
 });
-
-
-?>
