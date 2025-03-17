@@ -1,10 +1,12 @@
 <?php
+
 require_once __DIR__ . '/function.php';
 
 class Database {
     private $pdo;
 
     public function __construct() {
+        // Load configuration
         $config = require __DIR__ . '/../config/config.php';
         $dsn = "pgsql:host={$config['db']['host']};dbname={$config['db']['dbname']}";
 
@@ -16,16 +18,32 @@ class Database {
         }
     }
 
+    // Execute a query with optional parameters
     public function query($sql, $params = []) {
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
+            $this->logDatabaseActivity($sql, $params); // Log successful query execution
             return $stmt;
         } catch (PDOException $e) {
+            $this->logDatabaseActivity($sql, $params, "Query failed: " . $e->getMessage()); // Log error
             die((new ApiResponse(500, "Query failed", $e->getMessage()))->toJson());
         }
     }
 
+    // Log database activity to a file
+    private function logDatabaseActivity($query, $params, $message = "Query executed") {
+        $logFile = __DIR__ . '/db_activity.log';
+        $logEntry = [
+            'query' => $query,
+            'params' => $params,
+            'message' => $message,
+            'timestamp' => date('Y-m-d H:i:s')
+        ];
+        file_put_contents($logFile, json_encode($logEntry) . PHP_EOL, FILE_APPEND);
+    }
+
+    // Fetch foreign key relationships
     private function getForeignKeys() {
         $stmt = $this->pdo->query(
             "SELECT 
@@ -36,15 +54,16 @@ class Database {
              ON kcu.constraint_name = ccu.constraint_name
              WHERE kcu.table_schema = 'public';"
         );
-        
+
         $foreignKeys = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $foreignKeys[$row['table_name']][$row['foreign_table_name']] = 
+            $foreignKeys[$row['table_name']][$row['foreign_table_name']] =
                 "{$row['table_name']}.{$row['column_name']} = {$row['foreign_table_name']}.{$row['foreign_column_name']}";
         }
         return $foreignKeys;
     }
 
+    // Generate dynamic SELECT query
     public function generateDynamicQuery(array $columns, ?string $joinBy = null) {
         $tables = [];
         $joins = [];
@@ -68,7 +87,7 @@ class Database {
             }
         }
 
-        if (!$joinBy && count($tables) > 1) { // Ensure multiple tables exist before attempting joins
+        if (!$joinBy && count($tables) > 1) {
             $foreignKeys = $this->getForeignKeys();
             foreach ($tables as $table) {
                 if (isset($foreignKeys[$table])) {
@@ -109,40 +128,38 @@ class Database {
         return $query;
     }
 
+    // Generate dynamic UPDATE query
     public function generateDynamicUpdate(array $updates, array $conditions) {
         if (empty($updates)) {
             die((new ApiResponse(400, "No update data provided"))->toJson());
         }
-    
+
         $tables = [];
         $updateClauses = [];
         $whereClauses = [];
         $params = [];
-    
-        // Process updates
+
         foreach ($updates as $column => $value) {
             if (!str_contains($column, ".")) {
                 die((new ApiResponse(400, "Invalid column format: $column"))->toJson());
             }
-    
+
             list($table, $col) = explode(".", $column, 2);
             $tables[$table] = $table;
             $updateClauses[$table][] = "$col = ?";
             $params[] = $value;
         }
-    
-        // Process conditions
+
         foreach ($conditions as $column => $value) {
             if (!str_contains($column, ".")) {
                 die((new ApiResponse(400, "Invalid condition format: $column"))->toJson());
             }
-    
+
             list($table, $col) = explode(".", $column, 2);
             $whereClauses[$table][] = "$col = ?";
             $params[] = $value;
         }
-    
-        // Build SQL Queries
+
         $queries = [];
         foreach ($updateClauses as $table => $updates) {
             $updateQuery = "UPDATE $table SET " . implode(", ", $updates);
@@ -151,14 +168,13 @@ class Database {
             }
             $queries[] = $updateQuery;
         }
-    
-        // Combine queries using transactions for consistency
+
         $finalQuery = "" . implode("; ", $queries) . "";
-    
+
         return ['query' => $finalQuery, 'params' => $params];
     }
-    
 
+    // Transaction management
     public function rollback() {
         $this->pdo->rollBack();
     }
@@ -167,8 +183,19 @@ class Database {
         $this->pdo->commit();
     }
 
-    public function beginTransaction(){
+    public function beginTransaction() {
         $this->pdo->beginTransaction();
     }
-    
+
+    // Generate database activity report
+    public function generateDbReport() {
+        $logFile = __DIR__ . '/db_activity.log';
+        $logs = file($logFile, FILE_IGNORE_NEW_LINES);
+        $activities = array_map('json_decode', $logs);
+
+        echo "Database Activity Report\n";
+        foreach ($activities as $activity) {
+            echo "{$activity->timestamp} - {$activity->message}: {$activity->query}\n";
+        }
+    }
 }

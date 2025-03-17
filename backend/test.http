@@ -48,7 +48,7 @@ Authorization: Bearer {{token}}
         "states.name": "WP"
     },
     "conditions":{
-        "states.id": 36
+        "states.id": 1
     }
 }
 
