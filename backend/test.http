@@ -375,6 +375,16 @@ Authorization: Bearer {{token}}
     "relation" : "employees.user_id=user_info.id"
 }
 
+### GET ALL USER LIST THAT NOT A EMPLOYE
+POST {{apiUrl}}/master/employees/notExist
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "max" : 10,
+    "current" : 0,
+}
+
 ### Fetch Employees ById
 POST {{apiUrl}}/master/employees/byId
 Content-Type: application/json

@@ -30,6 +30,40 @@ $router->add('POST', '/master/employees', function () {
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
+$router->add('POST', '/master/employees/notExist', function () {
+    $pageID=7;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "r");
+    $payload = (object) [
+        "max" => 10,
+        "current" => 0,
+    ];
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
+    $db = new Database();
+    $sql = "SELECT u.*, ui.*
+FROM users u
+JOIN user_info ui ON u.id = ui.id
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM employees e
+    WHERE e.user_id = u.id
+)
+LIMIT ? OFFSET ?;
+";
+    $stmt = $db->query($sql, [$payload->max, $payload->current]);
+    $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    (new ApiResponse(200, "Success", $list))->toJson();
+});
+
+
 $router->add('POST', '/master/employees/byId', function () {
     $pageID=7;
     $jwt = new JwtHandler();
