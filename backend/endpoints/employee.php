@@ -23,7 +23,7 @@ $router->add('POST', '/master/employees', function () {
     }
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE status = TRUE  LIMIT    ?    OFFSET     ?";
+    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . "  LIMIT    ?    OFFSET     ?";
     $stmt = $db->query($sql, [$payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 

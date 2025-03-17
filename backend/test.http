@@ -378,10 +378,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "fields" : ["employees.*","user_info.*"],
+    "fields" : ["employees.*","users.*"],
     "max" : 10,
     "current" : 0,
-    "relation" : "employees.user_id=user_info.id"
+    "relation" : "employees.user_id=users.id"
 }
 
 ### GET ALL USER LIST THAT NOT A EMPLOYE
