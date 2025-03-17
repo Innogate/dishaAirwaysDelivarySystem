@@ -31,12 +31,16 @@ $router->add('POST', '/booking', function () {
         $sqlQuery = "SELECT 
     bookings.*, 
     packages.*, 
+    consignee.*, 
+    consignor.*, 
     branches.id AS branch_id, 
     branches.name AS branch_name, 
-    cities.*
+    cities.name AS city_name
 FROM bookings
 JOIN packages ON bookings.package_id = packages.id
 JOIN branches ON bookings.destination_branch_id = branches.id
+JOIN consignee ON bookings.consignee_id = consignee.id
+JOIN consignor ON bookings.consignor_id = consignor.id
 JOIN cities ON bookings.destination_city_id = cities.id
 LIMIT ? OFFSET ?;
 ";
@@ -45,12 +49,16 @@ LIMIT ? OFFSET ?;
         $sqlQuery = "SELECT 
     bookings.*, 
     packages.*, 
+    consignee.*, 
+    consignor.*, 
     branches.id AS branch_id, 
     branches.name AS branch_name, 
-    cities.*
+    cities.name AS city_name
 FROM bookings
 JOIN packages ON bookings.package_id = packages.id
 JOIN branches ON bookings.destination_branch_id = branches.id
+JOIN consignee ON bookings.consignee_id = consignee.id
+JOIN consignor ON bookings.consignor_id = consignor.id
 JOIN cities ON bookings.destination_city_id = cities.id
 JOIN employees e1 ON bookings.created_by = e1.user_id
 WHERE e1.branch_id = (
