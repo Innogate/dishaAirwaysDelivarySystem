@@ -6,7 +6,7 @@ ENV CHROME_BIN='/usr/bin/chromium-browser'
 
 RUN deluser --remove-home node \
   && addgroup -S vscode -g 1000 \
-  && adduser -S -G vscode -u 1000 vscode
+  && adduser -S -G vscode -u 1000 -s /bin/bash vscode
 
 WORKDIR /app/angular
 

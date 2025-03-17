@@ -102,12 +102,27 @@ $router->add('POST', '/master/branches/new', function () {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $handler->validateInput($data, ["company_id", "name", "address", "alias_name", "city_id", "state_id", "pin_code", "contact_no", "email", "gst_no", "cin_no", "udyam_no", "logo"]);
+    $handler->validateInput($data, ["company_id", "name", "address", "alias_name", "city_id", "state_id", "pin_code", "contact_no", "email", "gst_no", "cin_no", "udyam_no"]);
 
     $db = new Database();
 
     try {
         $db->beginTransaction();
+
+        // Check if mobile number already exists
+        $stmt = $db->query("SELECT id FROM users WHERE mobile = ?", [$data["contact_no"]]);
+        if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+            (new ApiResponse(409, "Mobile number already exists."))->toJson();
+            return;
+        }
+
+        // Insert user
+        $stmt = $db->query("INSERT INTO users (mobile, password, created_by) VALUES (?, ?, ?) RETURNING id", 
+            [$data["contact_no"], $data["password"]??"defualtPassword", $_info->user_id]
+        );
+
+        $user_id = $stmt->fetchColumn();
+
 
         // Check if the provided company_id exists
         $stmt = $db->query("SELECT id FROM companies WHERE id = ?", [$data["company_id"]]);
@@ -150,6 +165,12 @@ $router->add('POST', '/master/branches/new', function () {
         
 
         $branch_id = $stmt->fetchColumn();
+
+
+        $stmt = $db->query("INSERT INTO permissions (page_id, permission_code, user_id, created_by) VALUES (?, ?, ?, ?)", ["4", "1111", $user_id, $_info->user_id]);
+        $stmt = $db->query("INSERT INTO permissions (page_id, permission_code, user_id, created_by) VALUES (?, ?, ?, ?)", ["7", "1111", $user_id, $_info->user_id]);
+        $stmt = $db->query("INSERT INTO permissions (page_id, permission_code, user_id, created_by) VALUES (?, ?, ?, ?)", ["8", "1111", $user_id, $_info->user_id]);
+
 
         $db->commit();
         (new ApiResponse(200, "Branch created successfully.", $branch_id))->toJson();
