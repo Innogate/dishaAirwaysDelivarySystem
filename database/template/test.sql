@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
--- Dumped by pg_dump version 17.2
+-- Dumped by pg_dump version 17.4 (Debian 17.4-1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -364,6 +364,45 @@ ALTER SEQUENCE public.containers_id_seq OWNED BY public.containers.id;
 
 
 --
+-- Name: credit_node; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.credit_node (
+    id integer NOT NULL,
+    branch_id integer NOT NULL,
+    start_no integer,
+    end_no integer,
+    unused integer GENERATED ALWAYS AS ((end_no - start_no)) STORED,
+    user_id integer,
+    created_at timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.credit_node OWNER TO test;
+
+--
+-- Name: credit_node_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.credit_node_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.credit_node_id_seq OWNER TO test;
+
+--
+-- Name: credit_node_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.credit_node_id_seq OWNED BY public.credit_node.id;
+
+
+--
 -- Name: employees; Type: TABLE; Schema: public; Owner: test
 --
 
@@ -702,6 +741,13 @@ ALTER TABLE ONLY public.consignor ALTER COLUMN id SET DEFAULT nextval('public.co
 --
 
 ALTER TABLE ONLY public.containers ALTER COLUMN id SET DEFAULT nextval('public.containers_id_seq'::regclass);
+
+
+--
+-- Name: credit_node id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.credit_node ALTER COLUMN id SET DEFAULT nextval('public.credit_node_id_seq'::regclass);
 
 
 --
@@ -2030,6 +2076,14 @@ COPY public.containers (id, bag_no, name, agent_id, created_at, created_by) FROM
 
 
 --
+-- Data for Name: credit_node; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.credit_node (id, branch_id, start_no, end_no, user_id, created_at) FROM stdin;
+\.
+
+
+--
 -- Data for Name: employees; Type: TABLE DATA; Schema: public; Owner: test
 --
 
@@ -2060,6 +2114,7 @@ COPY public.pages (id, name, created_at) FROM stdin;
 6	Branch	2025-03-16 05:13:25.262436
 7	Employees	2025-03-16 05:13:31.077881
 8	Permission	2025-03-16 05:13:55.571107
+9	credit node	2025-03-17 07:51:49.277757
 \.
 
 
@@ -2078,6 +2133,7 @@ COPY public.permissions (id, page_id, permission_code, user_id, created_at, crea
 8	8	11111	1	2025-03-16 05:19:26.691035	1	2025-03-16 05:19:26.691035	t
 9	4	1111	2	2025-03-16 05:41:13.720204	1	2025-03-16 05:41:13.720204	t
 10	1	1111	2	2025-03-16 06:08:16.2944	1	2025-03-16 06:08:16.2944	t
+11	9	1111	1	2025-03-17 07:52:13.36346	1	2025-03-17 07:52:13.36346	t
 \.
 
 
@@ -2209,6 +2265,13 @@ SELECT pg_catalog.setval('public.containers_id_seq', 1, false);
 
 
 --
+-- Name: credit_node_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.credit_node_id_seq', 1, false);
+
+
+--
 -- Name: employees_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
@@ -2226,14 +2289,14 @@ SELECT pg_catalog.setval('public.packages_id_seq', 3, true);
 -- Name: pages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.pages_id_seq', 8, true);
+SELECT pg_catalog.setval('public.pages_id_seq', 9, true);
 
 
 --
 -- Name: permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.permissions_id_seq', 10, true);
+SELECT pg_catalog.setval('public.permissions_id_seq', 11, true);
 
 
 --
@@ -2319,6 +2382,14 @@ ALTER TABLE ONLY public.consignor
 
 ALTER TABLE ONLY public.containers
     ADD CONSTRAINT containers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: credit_node credit_node_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.credit_node
+    ADD CONSTRAINT credit_node_pkey PRIMARY KEY (id);
 
 
 --
@@ -2503,6 +2574,22 @@ ALTER TABLE ONLY public.companies
 
 ALTER TABLE ONLY public.containers
     ADD CONSTRAINT containers_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(id);
+
+
+--
+-- Name: credit_node credit_node_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.credit_node
+    ADD CONSTRAINT credit_node_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id);
+
+
+--
+-- Name: credit_node credit_node_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.credit_node
+    ADD CONSTRAINT credit_node_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

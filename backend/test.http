@@ -362,6 +362,15 @@ Authorization: Bearer {{token}}
     "branch_id": 5
 }
 
+### EMPLOYEE LOGIN
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "9876542212",
+    "passwd": "securePass123"
+}
 
 ### Fetch Employees
 POST {{apiUrl}}/master/employees
@@ -518,7 +527,6 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "slip_no": "123456",
   "consignee_id": 1,
   "consignor_id": 1,
   "transport_mode": "Air",
@@ -535,4 +543,45 @@ Authorization: Bearer {{token}}
   "cgst": 18,
   "sgst": 18,
   "igst": 0
+}
+
+
+#### TOKEN
+POST {{apiUrl}}/credit/token
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "current": 0,
+    "max": 10
+}
+
+### GET TOKEN BY ID
+POST {{apiUrl}}/credit/token/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "token_id": 1
+}
+
+
+### CREATE NEW TOKEN
+POST {{apiUrl}}/credit/token/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "branch_id": 1,
+    "start_no": 5000,
+    "end_no": 6500
+}
+
+### DELETE TOKEN BY ID
+POST {{apiUrl}}/credit/token/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "token_id": 2
 }

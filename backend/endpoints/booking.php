@@ -80,7 +80,6 @@ $router->add("POST", "/booking/new", function () {
     $data = json_decode(file_get_contents("php://input"), true);
 
     $required_fields = [
-        "slip_no",
         "consignee_id",
         "consignor_id",
         "transport_mode",
@@ -98,8 +97,8 @@ $router->add("POST", "/booking/new", function () {
         "weight",
         "address"
     ];
-    $handler->validateInput($data, $required_fields);
 
+    $handler->validateInput($data, $required_fields);
     $db = new Database();
     $db->beginTransaction(); // Start transaction
 
@@ -111,6 +110,28 @@ $router->add("POST", "/booking/new", function () {
         if (!$branch) {
             throw new Exception("It is not an employee account.");
         }
+
+
+        // GET TOKEN FROM credit_node table take last recode
+        $sql = "SELECT * FROM credit_node WHERE branch_id = ? ORDER BY id DESC LIMIT 1;
+";
+        $stmt = $db->query($sql, [$branch["branch_id"]]);
+        $token = $stmt->fetch(PDO::FETCH_ASSOC);
+        // check toke unused garter then 0 or not 
+        if (!$token) {
+            (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();(new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
+        }
+
+        if ($token["unused"] <= 0) {
+            (new ApiResponse(400, "Maximum token used", "Contact to main branch for token", 400))->toJson();
+        }
+
+        $slip_no = ($token["end_no"] - $token["unused"]) + 1;
+
+        // update token unused
+        $sql = "UPDATE credit_node SET unused = unused - 1 WHERE id = ?";
+        $stmt = $db->query($sql, [$token["id"]]);
+
 
         // Validate consignee existence
         $stmt = $db->query("SELECT id FROM consignee WHERE id = ?", [$data["consignee_id"]]);
@@ -149,7 +170,7 @@ $router->add("POST", "/booking/new", function () {
             paid_type, cgst, sgst, igst, total_value, destination_city_id, destination_branch_id, address, created_by
         ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id", [
             $branch['branch_id'],
-            $data["slip_no"],
+            $slip_no,
             $consignee_id,
             $consignor_id,
             $data["transport_mode"],

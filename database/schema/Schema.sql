@@ -39,6 +39,19 @@ CREATE TABLE user_info (
     FOREIGN KEY (id) REFERENCES users(id)
 );
 
+CREATE TABLE credit_node (
+    id SERIAL PRIMARY KEY NOT NULL,
+    branch_id INTEGER NOT NULL,
+    start_no INTEGER,
+    end_no INTEGER,
+    unused INTEGER,
+    user_id INTEGER,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (branch_id) REFERENCES branches(id)
+);
+
+
 CREATE TABLE companies (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NULL,
