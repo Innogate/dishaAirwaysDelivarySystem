@@ -191,7 +191,7 @@ $router->add("POST", "/booking/new", function () {
             throw new Exception("Receipt Creation Error");
 
         $db->commit(); // Commit transaction if successful
-        (new ApiResponse(200, "Receipt generated successfully", $receipt_no, 200))->toJson();
+        (new ApiResponse(200, "Receipt generated successfully", $slip_no, 200))->toJson();
 
     } catch (Exception $e) {
         $db->rollBack(); // Rollback transaction if error occurs
