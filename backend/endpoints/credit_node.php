@@ -15,7 +15,7 @@
         $data = json_decode(file_get_contents("php://input"), true);
         $require_filed = [ "max", "current"];
         $handler->validateInput($data, $require_filed);
-        $sql = "SELECT * FROM credit_node LIMIT ? OFFSET ?";
+        $sql = "SELECT credit_node.*, branches.name as branch_name, cities.name as city_name FROM credit_node JOIN branches ON credit_node.branch_id = branches.id JOIN cities ON branches.city_id = cities.id LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$data["max"], $data["current"]]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         (new ApiResponse(200, "Success", $list))->toJson();

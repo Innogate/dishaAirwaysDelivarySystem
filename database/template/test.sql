@@ -372,7 +372,7 @@ CREATE TABLE public.credit_node (
     branch_id integer NOT NULL,
     start_no integer,
     end_no integer,
-    unused integer GENERATED ALWAYS AS ((end_no - start_no)) STORED,
+    unused integer,
     user_id integer,
     created_at timestamp without time zone DEFAULT now()
 );
@@ -2079,7 +2079,8 @@ COPY public.containers (id, bag_no, name, agent_id, created_at, created_by) FROM
 -- Data for Name: credit_node; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.credit_node (id, branch_id, start_no, end_no, user_id, created_at) FROM stdin;
+COPY public.credit_node (id, branch_id, start_no, end_no, unused, user_id, created_at) FROM stdin;
+1	1	5000	6500	1500	1	2025-03-18 11:56:08.78893
 \.
 
 
@@ -2268,7 +2269,7 @@ SELECT pg_catalog.setval('public.containers_id_seq', 1, false);
 -- Name: credit_node_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.credit_node_id_seq', 1, false);
+SELECT pg_catalog.setval('public.credit_node_id_seq', 33, true);
 
 
 --
