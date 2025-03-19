@@ -102,7 +102,7 @@ $router->add('POST', '/master/branches/new', function () {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $handler->validateInput($data, ["company_id", "name", "address", "alias_name", "city_id", "state_id",  "contact_no", "gst_no", "cin_no"]);
+    $handler->validateInput($data, ["company_id", "name", "city_id", "state_id",  "contact_no"]);
 
     $db = new Database();
 
