@@ -207,3 +207,13 @@ CREATE TABLE bookings (
     FOREIGN KEY (consignor_id) REFERENCES consignor(id),
     FOREIGN KEY (created_by) REFERENCES users(id)
 );
+
+CREATE Table tracking (
+    id SERIAL PRIMARY KEY NOT NULL,
+    slip_no VARCHAR UNIQUE NULL,
+    status VARCHAR NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    branch_id INT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches(id),
+    FOREIGN KEY (slip_no) REFERENCES bookings(slip_no)
+);

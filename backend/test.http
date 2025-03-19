@@ -586,3 +586,23 @@ Authorization: Bearer {{token}}
 {
     "token_id": 2
 }
+
+
+### TRACKING GET
+POST {{apiUrl}}/track/bySlipId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "slip_no": 2
+}
+
+### TRACKING GET
+POST {{apiUrl}}/track/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "slip_no": 2,
+    "status": 2
+}

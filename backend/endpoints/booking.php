@@ -130,7 +130,6 @@ $router->add("POST", "/booking/new", function () {
         // check toke unused garter then 0 or not 
         if (!$token) {
             (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
-            (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
         }
 
         if ($token["unused"] <= 0) {
@@ -202,6 +201,8 @@ $router->add("POST", "/booking/new", function () {
             throw new Exception("Receipt Creation Error");
 
         $db->commit(); // Commit transaction if successful
+        $sql = "INSERT INTO tracking (slip_no, status, branch_id, created_at) VALUES (?, ?, ?, ?)";
+        $stmt = $db->query($sql, [$slip_no, '1', $branch['branch_id']]);
         (new ApiResponse(200, "Receipt generated successfully", $slip_no, 200))->toJson();
     } catch (Exception $e) {
         $db->rollBack(); // Rollback transaction if error occurs
