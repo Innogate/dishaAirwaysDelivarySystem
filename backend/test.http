@@ -619,12 +619,24 @@ Authorization: Bearer {{token}}
 
 
 ### GET ACCESS BY ID
-POST {{apiUrl}}/master/access
+POST {{apiUrl}}/master/access/userId
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": 1
+    "user_id": 2
+
+}
+
+### GET ACCESS BY ID
+POST {{apiUrl}}/master/access/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id": 2,
+    "permission_code": 1111,
+    "page_id": 1
 
 }
 
