@@ -183,11 +183,12 @@ Authorization: Bearer {{token}}
 
 {
     "updates": {
-        "user_info.first_name": "Test",
+        "users.mobile": "1234567890",
         "user_info.last_name": "Employee"
     },
     "conditions":{
-        "user_info.id": 2
+        "user_info.id": 2,
+        "users.id": 2
     }
 }
 
@@ -605,4 +606,34 @@ Authorization: Bearer {{token}}
 {
     "slip_no": 2,
     "status": 2
+}
+
+### GET MY ACCESS
+POST {{apiUrl}}/master/access
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+
+}
+
+
+### GET ACCESS BY ID
+POST {{apiUrl}}/master/access
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id": 1
+
+}
+
+
+### GET PAGES BY ID
+GET {{apiUrl}}/master/pages
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+
 }
