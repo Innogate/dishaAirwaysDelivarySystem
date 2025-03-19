@@ -129,7 +129,7 @@ $router->add('POST', '/master/employees/new', function () {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $requiredFields = ["user_id", "address", "adhara_no", "joining_date", "branch_id", "type"];
+    $requiredFields = ["user_id", "branch_id"];
     foreach ($requiredFields as $field) {
         if (!isset($data[$field]) || empty(trim($data[$field]))) {
             (new ApiResponse(400, "All fields are required."))->toJson();

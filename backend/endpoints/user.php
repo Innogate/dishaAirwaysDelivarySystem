@@ -55,7 +55,7 @@ $router->add('POST', '/master/users/new', function () {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $requiredFields = ["mobile", "password", "first_name", "last_name", "gender", "birth_date", "address", "email"];
+    $requiredFields = ["mobile", "password", "first_name", "last_name", "gender", "birth_date", "email"];
     foreach ($requiredFields as $field) {
         if (!isset($data[$field]) || empty(trim($data[$field]))) {
             (new ApiResponse(400, "All fields are required."))->toJson();
