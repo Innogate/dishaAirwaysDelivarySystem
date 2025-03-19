@@ -201,7 +201,7 @@ $router->add("POST", "/booking/new", function () {
             throw new Exception("Receipt Creation Error");
 
         $db->commit(); // Commit transaction if successful
-        $sql = "INSERT INTO tracking (slip_no, status, branch_id, created_at) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO tracking (slip_no, status, branch_id) VALUES (?, ?, ?)";
         $stmt = $db->query($sql, [$slip_no, '1', $branch['branch_id']]);
         (new ApiResponse(200, "Receipt generated successfully", $slip_no, 200))->toJson();
     } catch (Exception $e) {
