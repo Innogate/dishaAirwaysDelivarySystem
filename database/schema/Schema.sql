@@ -39,19 +39,6 @@ CREATE TABLE user_info (
     FOREIGN KEY (id) REFERENCES users(id)
 );
 
-CREATE TABLE credit_node (
-    id SERIAL PRIMARY KEY NOT NULL,
-    branch_id INTEGER NOT NULL,
-    start_no INTEGER,
-    end_no INTEGER,
-    unused INTEGER,
-    user_id INTEGER,
-    created_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (branch_id) REFERENCES branches(id)
-);
-
-
 CREATE TABLE companies (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR NULL,
@@ -78,6 +65,7 @@ CREATE TABLE branches (
     name VARCHAR NULL,
     alias_name VARCHAR NULL,
     address VARCHAR NULL,
+    user_id SERIAL NOT NULL,
     city_id INT NULL,
     state_id INT NULL,
     company_id INT NULL,
@@ -98,8 +86,22 @@ CREATE TABLE branches (
     FOREIGN KEY (city_id) REFERENCES cities(id),
     FOREIGN KEY (state_id) REFERENCES states(id),
     FOREIGN KEY (company_id) REFERENCES companies(id),
-    FOREIGN KEY (created_by) REFERENCES users(id)
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE credit_node (
+    id SERIAL PRIMARY KEY NOT NULL,
+    branch_id INTEGER NOT NULL,
+    start_no INTEGER,
+    end_no INTEGER,
+    unused INTEGER,
+    user_id INTEGER,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (branch_id) REFERENCES branches(id)
+);
+
 
 CREATE TABLE pages (
     id SERIAL PRIMARY KEY NOT NULL,

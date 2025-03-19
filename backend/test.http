@@ -319,13 +319,13 @@ Authorization: Bearer {{token}}
 
 {
     "company_id": 1,
-    "name": "Delhi Disha airways 3",
+    "name": "Delhi Disha airways",
     "address": "123 Street, City",
     "alias_name": "Delhi Airways",
     "city_id": 1,
     "state_id": 1,
     "pin_code": "123456",
-    "contact_no": "9876543320",
+    "contact_no": "9876543321",
     "email": "branch3@example.com",
     "gst_no": "9090",
     "cin_no": "9090",
@@ -345,10 +345,10 @@ Authorization: Bearer {{token}}
 
 {
     "updates": {
-        "branches.name": " NAME"
+        "contact_no": "1234509877"
     },
     "conditions":{
-        "branches.id": 1
+        "id": 1
     }
 }
 
@@ -368,7 +368,7 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "9876542212",
+    "id": "9876542231",
     "passwd": "securePass123"
 }
 
@@ -444,7 +444,7 @@ Authorization: Bearer {{token}}
 }
 
 #### UPDATE Employee
-POST {{apiUrl}}/master/branches/update
+POST {{apiUrl}}/master/employees/update
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

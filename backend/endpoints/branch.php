@@ -10,7 +10,7 @@ $pageID = 6; // Change page ID for branch master
 
 // GET ALL BRANCH
 $router->add('POST', '/master/branches', function () {
-    $pageID=1;
+    $pageID = 1;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -37,7 +37,7 @@ $router->add('POST', '/master/branches', function () {
 
 // GET ALL BRANCH BY ID
 $router->add('POST', '/master/branches/byId', function () {
-    $pageID=1;
+    $pageID = 1;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -53,7 +53,7 @@ $router->add('POST', '/master/branches/byId', function () {
     if (!empty($data)) {
         $payload = (object) $data;
     }
-    
+
     $db = new Database();
     $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE id = ?";
     $stmt = $db->query($sql, [$payload->branch_id]);
@@ -117,8 +117,9 @@ $router->add('POST', '/master/branches/new', function () {
         }
 
         // Insert user
-        $stmt = $db->query("INSERT INTO users (mobile, password, created_by) VALUES (?, ?, ?) RETURNING id", 
-            [$data["contact_no"], $data["password"]??"defualtPassword", $_info->user_id]
+        $stmt = $db->query(
+            "INSERT INTO users (mobile, password, created_by) VALUES (?, ?, ?) RETURNING id",
+            [$data["contact_no"], $data["password"] ?? "defualtPassword", $_info->user_id]
         );
 
         $user_id = $stmt->fetchColumn();
@@ -140,13 +141,14 @@ $router->add('POST', '/master/branches/new', function () {
 
         $stmt = $db->query(
             "INSERT INTO branches 
-            (name, alias_name, address, city_id, state_id, company_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, cgst, sgst, igst, logo, created_by) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id",
+            (name, alias_name, address, city_id, user_id, state_id, company_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, cgst, sgst, igst, logo, created_by) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id",
             [
                 $data["name"],
                 $data["alias_name"],
                 $data["address"],
                 $data["city_id"],
+                $user_id,
                 $data["state_id"],
                 $data["company_id"],
                 $data["pin_code"],
@@ -162,7 +164,7 @@ $router->add('POST', '/master/branches/new', function () {
                 $_info->user_id // Ensure this exists
             ]
         );
-        
+
 
         $branch_id = $stmt->fetchColumn();
 
@@ -214,47 +216,98 @@ $router->add('POST', '/master/branches/delete', function () {
     }
 });
 
-// UPDATE DB 
 $router->add('POST', '/master/branches/update', function () {
+    // Define the page ID for permissions check
     $pageID = 2;
+    
+    // Create instances of JwtHandler and Handler for authentication and permission validation
     $jwt = new JwtHandler();
     $handler = new Handler();
+
+    // Validate JWT and permissions
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "u"); // "d" for delete permission
+    $handler->validatePermission($pageID, $_info->user_id, "u"); // "u" for update permission
 
-    $payload = (object) [
-        "updates" => [
-            'talbe.name' => 'Error'
-        ],
-        "conditions" => [
-            'talbe.id' => 0
-        ]
-    ];
-
+    // Decode the JSON payload from the incoming request
     $data = json_decode(file_get_contents("php://input"), true);
 
+    // Define a default payload structure
+    $payload = (object) [
+        "conditions" => [
+            'branches.id' => 0,
+        ],
+        "updates" => []
+    ];
 
+    // If the payload data is not empty, overwrite the default payload with the incoming data
     if (!empty($data)) {
         $payload = (object) $data;
+    } else {
+        // If payload is empty, return an error response
+        (new ApiResponse(400, "Invalid payload", $data))->toJson();
+        return;
     }
 
+    // Initialize Database connection
     $db = new Database();
-    $sql = $db->generateDynamicUpdate($payload->updates, $payload->conditions);
 
-    // Debug: Print generated SQL query and parameters
-    error_log("SQL Query: " . $sql["query"]);
-    error_log("Parameters: " . json_encode($sql["params"]));
+    // Prepare the update query and parameters for the branches table
+    $updateQuery = "UPDATE branches SET ";
+    $updateParams = [];
+    $setFields = [];
+
+    // Dynamically build the SET clause for the update query
+    foreach ($payload->updates as $column => $value) {
+        $setFields[] = "$column = ?";
+        $updateParams[] = $value;
+    }
+
+    // Ensure there is at least one field to update
+    if (empty($setFields)) {
+        (new ApiResponse(400, "No fields to update"))->toJson();
+        return;
+    }
+
+    // Add the WHERE clause to the update query
+    $updateQuery .= implode(", ", $setFields) . " WHERE id = ?"; 
+    $updateParams[] = $payload->conditions['id'];
+
+    // Debug: Print generated SQL query and parameters for troubleshooting
+    error_log("SQL Query: " . $updateQuery);
+    error_log("Parameters: " . json_encode($updateParams));
 
     try {
-        $stmt = $db->query($sql["query"], $sql["params"]);
+        // Execute the update query for the branches table
+        $stmt = $db->query($updateQuery, $updateParams);
 
+        // Check if any rows were updated
         if ($stmt->rowCount() > 0) {
-            (new ApiResponse(200, "Update successful", $stmt->rowCount()))->toJson();
+            // Retrieve the associated user_id from the branches table
+            $stmt = $db->query("SELECT user_id, contact_no FROM branches WHERE id = ?", [$payload->conditions['id']]);
+            $branchData = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($branchData) {
+                // Check if the contact_no in the branch has been updated
+                if (isset($payload->updates['contact_no'])) {
+                    // Update the user's mobile number in the users table if the branch mobile has been updated
+                    $stmt = $db->query("UPDATE users SET mobile = ? WHERE id = ?", [
+                        $payload->updates['contact_no'], 
+                        $branchData["user_id"]
+                    ]);
+                }
+            }
+
+            // Respond with a success message
+            (new ApiResponse(200, "Update successful", null))->toJson();
         } else {
+            // Respond if no rows were updated
             (new ApiResponse(500, "No rows updated"))->toJson();
         }
     } catch (Exception $e) {
+        // Handle any errors and respond with the error message
         (new ApiResponse(500, "Update failed", $e->getMessage()))->toJson();
     }
 });
-?>
+
+
+
