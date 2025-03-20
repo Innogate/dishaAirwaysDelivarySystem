@@ -105,7 +105,8 @@ $router->add("POST", "/booking/new", function () {
         "sgst",
         "igst",
         "weight",
-        "address"
+        "address",
+        "total"
     ];
 
     $handler->validateInput($data, $required_fields);
@@ -138,9 +139,6 @@ $router->add("POST", "/booking/new", function () {
 
         $slip_no = ($token["end_no"] - $token["unused"]) + 1;
 
-        // update token unused
-        $sql = "UPDATE credit_node SET unused = unused - 1 WHERE id = ?";
-        $stmt = $db->query($sql, [$token["id"]]);
 
 
         // Validate consignee existence
@@ -189,7 +187,7 @@ $router->add("POST", "/booking/new", function () {
             $data["cgst"],
             $data["sgst"],
             $data["igst"],
-            $data["value"],
+            $data["total"],
             $data["destination_city_id"],
             $data["destination_branch_id"],
             $data["address"],
@@ -199,6 +197,10 @@ $router->add("POST", "/booking/new", function () {
         $receipt_no = $stmt->fetchColumn();
         if (!$receipt_no)
             throw new Exception("Receipt Creation Error");
+
+        // update token unused
+        $sql = "UPDATE credit_node SET unused = unused - 1 WHERE id = ?";
+        $stmt = $db->query($sql, [$token["id"]]);
 
         $db->commit(); // Commit transaction if successful
         $sql = "INSERT INTO tracking (slip_no, status, branch_id) VALUES (?, ?, ?)";
