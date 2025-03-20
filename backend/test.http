@@ -409,6 +409,17 @@ Authorization: Bearer {{token}}
 }
 
 
+
+#### FETCH MY EMPLOYEE ID
+POST {{apiUrl}}/master/employees/myInfo
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+      "fields": ["employees.","users."],
+      "relation": null,
+}
+
 ### Fetch Employees by BrachId
 POST {{apiUrl}}/master/employees/byBranchId
 Content-Type: application/json

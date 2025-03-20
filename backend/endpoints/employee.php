@@ -92,6 +92,30 @@ $router->add('POST', '/master/employees/byId', function () {
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
+$router->add('POST', '/master/employees/myInfo', function () {
+    $jwt = new JwtHandler();
+    $_info = $jwt->validate();
+
+    $payload = (object) [
+        "fields" => ["employees.*"],
+        "relation" => null
+    ];
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
+    $db = new Database();
+    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE user_id = ?";
+    $stmt = $db->query($sql, [$_info->user_id]);
+    $list = $stmt->fetch(PDO::FETCH_ASSOC);
+    if(!$list){
+        (new ApiResponse(400, "Invalid User ID", "", 400))->toJson();
+    }
+    (new ApiResponse(200, "Success", $list))->toJson();
+});
+
 $router->add('POST', '/master/employees/byBranchId', function () {
     $pageID=7;
     $jwt = new JwtHandler();
