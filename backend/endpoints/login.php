@@ -17,9 +17,8 @@
         // password_verify
         if ($data['passwd'] == $user['password']) {
             $response = new ApiResponse(200, "Success", [
-                "token" => $jwt->generateToken(["user_id" => $user['id'],
-                "id" => $user['id']
-                ])]);
+                "token" => $jwt->generateToken(["user_id" => $user['id']]),
+                "user_id" => $user['id']]);
             $response->toJson();
             return;
         } else {
