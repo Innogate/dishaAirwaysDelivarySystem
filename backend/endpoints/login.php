@@ -16,7 +16,10 @@
         }
         // password_verify
         if ($data['passwd'] == $user['password']) {
-            $response = new ApiResponse(200, "Success", ["token" => $jwt->generateToken(["user_id" => $user['id']])]);
+            $response = new ApiResponse(200, "Success", [
+                "token" => $jwt->generateToken(["user_id" => $user['id'],
+                "id" => $user['id']
+                ])]);
             $response->toJson();
             return;
         } else {

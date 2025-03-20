@@ -404,7 +404,8 @@ Authorization: Bearer {{token}}
       "fields": ["employees.","users."],
       "max": 100,
       "current": 0,
-      "relation": "users.id=employees.user_id"
+      "relation": null,
+      "user_id": 1
 }
 
 

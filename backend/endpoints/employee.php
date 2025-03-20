@@ -74,7 +74,7 @@ $router->add('POST', '/master/employees/byId', function () {
     $payload = (object) [
         "fields" => ["employees.*"],
         "relation" => null,
-        "employee_id" => 0,
+        "user_id" => 0,
     ];
 
     $data = json_decode(file_get_contents("php://input"), true);
@@ -83,8 +83,8 @@ $router->add('POST', '/master/employees/byId', function () {
     }
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE id = ?";
-    $stmt = $db->query($sql, [$payload->employee_id]);
+    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE user_id = ?";
+    $stmt = $db->query($sql, [$payload->user_id]);
     $list = $stmt->fetch(PDO::FETCH_ASSOC);
     if(!$list){
         (new ApiResponse(400, "Invalid Employee ID", "", 400))->toJson();
