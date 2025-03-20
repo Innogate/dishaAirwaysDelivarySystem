@@ -10,5 +10,16 @@
         exit;
     }
  }
- 
+ function convertToDbFormat($dateString) {
+    // Create a DateTime object from the given date string
+    $date = DateTime::createFromFormat('d-m-Y', $dateString);
+
+    // Check if the date was successfully created
+    if ($date === false) {
+        return "Invalid date format";
+    }
+
+    // Format the date into YYYY-MM-DD
+    return $date->format('Y-m-d');
+}
 ?>

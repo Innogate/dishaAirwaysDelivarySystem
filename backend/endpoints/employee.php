@@ -184,7 +184,7 @@ $router->add('POST', '/master/employees/new', function () {
         $stmt = $db->query(
             "INSERT INTO employees (user_id, address, aadhar_no, joining_date, branch_id, type, created_by) 
             VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id",
-            [$data["user_id"], $data["address"], $data["adhara_no"], $data["joining_date"], $brach_id["id"], $data["type"], $_info->user_id]
+            [$data["user_id"], $data["address"], $data["adhara_no"], convertToDbFormat($data["joining_date"]), $brach_id["id"], $data["type"], $_info->user_id]
         );
         $employee_id = $stmt->fetch(PDO::FETCH_ASSOC)["id"];
         $db->commit();
