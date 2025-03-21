@@ -1,0 +1,68 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+#### GET ALL STATES
+POST {{apiUrl}}/master/states
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "max" : 102,
+    "current" : 0
+}
+
+#### GET ALL STATE BY ID
+POST {{apiUrl}}/master/states/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "state_id": 1
+}
+
+#### ADD NEW STATE
+POST {{apiUrl}}/master/states/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "state_name": "ZSD"
+}
+
+
+#### UPDATE STATES
+POST {{apiUrl}}/master/states/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "states.state_name": "WP"
+    },
+    "conditions":{
+        "states.state_id": 1
+    }
+}
+
+#### DELETE STATE
+POST {{apiUrl}}/master/states/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "state_id": 35
+}

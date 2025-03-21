@@ -4,19 +4,15 @@ require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Handler.php';
 
 global $router;
-global $pageID;
 
-$pageID = 2;
+// GET ALL STATES
 $router->add('POST', '/master/states', function () {
-    $pageID = 2;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
     $payload = (object) [
-        "fields" => ["states.*"],
         "max" => 10,
-        "current" => 1,
-        "relation" => null,
+        "current" => 1
     ];
     $data = json_decode(file_get_contents("php://input"), true);
 
@@ -25,7 +21,7 @@ $router->add('POST', '/master/states', function () {
     }
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE status = TRUE ORDER BY name ASC LIMIT ? OFFSET ?";
+    $sql = "SELECT * FROM states WHERE status = TRUE ORDER BY state_name ASC LIMIT ? OFFSET ?";
 
     $stmt = $db->query($sql, [$payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -37,26 +33,19 @@ $router->add('POST', '/master/states', function () {
     $response->toJson();
 });
 
+// GET STATE BY ID
 $router->add('POST', '/master/states/byId', function () {
     $pageID = 2;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
 
-    $payload = (object) [
-        "fields" => ["states.*"],
-        "max" => 10,
-        "current" => 1,
-        "state_id" => 0,
-        "relation" => null,
-    ];
     $data = json_decode(file_get_contents("php://input"), true);
-    if (!empty($data)) {
-        $payload = (object) $data;
-    }
+    $required_fields = ["state_id"];
+    $handler->validateInput($data, $required_fields);
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery($payload->fields, $payload->relation) . " WHERE id = ?";
+    $sql = "SELECT * FROM states WHERE state_id = ?";
     $stmt = $db->query($sql, [$data["state_id"]]);
     $list = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$list) {
@@ -89,7 +78,7 @@ $router->add('POST', '/master/states/new', function () {
     $normalizedStateName = strtolower(trim($data["state_name"]));
 
     // Check if the state already exists
-    $stmt = $db->query("SELECT id FROM states WHERE LOWER(TRIM(name)) = ?", [$normalizedStateName]);
+    $stmt = $db->query("SELECT state_id FROM states WHERE LOWER(TRIM(state_name)) = ?", [$normalizedStateName]);
     $existingState = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($existingState) {
@@ -99,7 +88,7 @@ $router->add('POST', '/master/states/new', function () {
     }
 
     // Insert with original user-provided state name
-    $stmt = $db->query("INSERT INTO states (name) VALUES (?) RETURNING id", [$data["state_name"]]);
+    $stmt = $db->query("INSERT INTO states (state_name) VALUES (?) RETURNING state_id", [$data["state_name"]]);
     $entry_id = $stmt->fetchColumn();
 
     $response = new ApiResponse(200, "Success", $entry_id);
@@ -128,7 +117,7 @@ $router->add('POST', '/master/states/delete', function () {
     $db = new Database();
 
     // Check if the state exists
-    $stmt = $db->query("SELECT id FROM states WHERE id = ?", [$state_id]);
+    $stmt = $db->query("SELECT state_id FROM states WHERE state_id = ?", [$state_id]);
     $existingState = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$existingState) {
@@ -141,7 +130,7 @@ $router->add('POST', '/master/states/delete', function () {
     $stmt = $db->query("UPDATE cities SET status=FALSE WHERE state_id = ?", [$state_id]);
 
     // Delete the state
-    $stmt = $db->query("UPDATE states SET status=FALSE  WHERE id = ?", [$state_id]);
+    $stmt = $db->query("UPDATE states SET status=FALSE  WHERE state_id = ?", [$state_id]);
 
 
     $response = new ApiResponse(200, "State deleted successfully.");
@@ -158,10 +147,10 @@ $router->add('POST', '/master/states/update', function () {
 
     $payload = (object) [
         "updates" => [
-            'sates.name' => 'Error'
+            'sates.state_name' => 'Error'
         ],
         "conditions" => [
-            'sates.id' => 0
+            'sates.state_id' => 0
         ]
     ];
 

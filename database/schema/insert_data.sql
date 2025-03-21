@@ -1,4 +1,4 @@
-INSERT INTO states (id, name) VALUES
+INSERT INTO states (state_id, state_name) VALUES
 (1, 'Andaman and Nicobar Islands'),
 (2, 'Andhra Pradesh'),
 (3, 'Arunachal Pradesh'),
@@ -34,7 +34,7 @@ INSERT INTO states (id, name) VALUES
 (33, 'Uttarakhand'),
 (34, 'West Bengal');
 
-INSERT INTO cities (name, state_id) VALUES
+INSERT INTO cities (city_name, state_id) VALUES
 ('Mumbai', 20),
 ('Delhi', 9),
 ('Bengaluru', 16),

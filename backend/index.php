@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $router = new Router();
 
 // Load routes dynamically from endpoints folder
-foreach (glob(__DIR__ . '/endpoints/*.php') as $filename) {
+foreach (glob(__DIR__ . '/services/*.php') as $filename) {
     require_once $filename;
 }
 

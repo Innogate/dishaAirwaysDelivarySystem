@@ -1,0 +1,101 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+### VERIFY
+GET {{apiUrl}}/verify
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+#### GET ALL CITIES
+POST {{apiUrl}}/master/cities
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "fields" : ["cities.city_id","cities.city_name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null
+}
+
+#### GET CITY By id
+POST {{apiUrl}}/master/cities/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_id": 1,
+    "fields" : ["cities.city_id","cities.city_name"],
+    "relation" : null
+}
+
+
+
+#### GET CITIES BY STATE ID
+POST {{apiUrl}}/master/cities/byStateId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "fields" : ["cities.city_id","cities.city_name"],
+    "max" : 12,
+    "current" : 0,
+    "relation" : null,
+    "state_id": 5
+}
+
+#### ADD NEW CITY
+POST {{apiUrl}}/master/cities/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_name": "ZSDC",
+    "state_id": 1
+}
+
+#### UPDATE CITY
+POST {{apiUrl}}/master/cities/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "cities.city_name": "WPC"
+    },
+    "conditions":{
+        "cities.city_id": 1
+    }
+}
+
+
+#### DELETE CITY
+POST {{apiUrl}}/master/cities/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "city_id": 1
+}

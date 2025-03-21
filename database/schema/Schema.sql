@@ -1,219 +1,164 @@
+-- States Table: Stores states
 CREATE TABLE states (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NULL,
+    state_id SERIAL PRIMARY KEY,
+    state_name VARCHAR(255) NOT NULL,
     status BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Cities Table: Stores cities related to states
 CREATE TABLE cities (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NULL,
-    state_id INT NULL,
+    city_id SERIAL PRIMARY KEY,
+    city_name VARCHAR(255) NOT NULL,
+    state_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (state_id) REFERENCES states(id)
+    FOREIGN KEY (state_id) REFERENCES states(state_id) ON DELETE CASCADE
 );
 
+-- Users Table: Stores user credentials and personal information (merged with user_info)
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    mobile VARCHAR NULL UNIQUE,
-    password VARCHAR NULL,
+    user_id SERIAL PRIMARY KEY,
+    mobile VARCHAR(15) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    gender VARCHAR(10),
+    birth_date DATE,
+    address VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
     created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
+    created_by INT NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE user_info (
-    id SERIAL PRIMARY KEY NOT NULL,
-    first_name VARCHAR NULL,
-    last_name VARCHAR NULL,
-    gender VARCHAR NULL,
-    birth_date TIMESTAMP NULL,
-    address VARCHAR NULL,
-    email VARCHAR NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
-    updated_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (id) REFERENCES users(id)
-);
-
-CREATE TABLE companies (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NULL,
-    address VARCHAR NULL,
-    city_id INT NULL,
-    state_id INT NULL,
-    pin_code VARCHAR NULL,
-    contact_no VARCHAR NULL,
-    email VARCHAR NULL,
-    gst_no VARCHAR NULL,
-    cin_no VARCHAR NULL,
-    udyam_no VARCHAR NULL,
-    logo VARCHAR NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
-    updated_at TIMESTAMP DEFAULT NOW(),
-    status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (city_id) REFERENCES cities(id),
-    FOREIGN KEY (state_id) REFERENCES states(id)
-);
-
+-- Branches Table: Stores branches related to companies
 CREATE TABLE branches (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NULL,
-    alias_name VARCHAR NULL,
-    address VARCHAR NULL,
-    user_id SERIAL NOT NULL,
-    city_id INT NULL,
-    state_id INT NULL,
-    company_id INT NULL,
-    pin_code VARCHAR NULL,
-    contact_no VARCHAR NULL,
-    email VARCHAR NULL,
-    gst_no VARCHAR NULL,
-    cin_no VARCHAR NULL,
-    udyam_no VARCHAR NULL,
+    branch_id SERIAL PRIMARY KEY,
+    branch_name VARCHAR(255) NOT NULL,
+    alias_name VARCHAR(255),
+    address VARCHAR(255),
+    user_id INT NOT NULL,
+    city_id INT NOT NULL,
+    state_id INT NOT NULL,
+    pin_code VARCHAR(10),
+    contact_no VARCHAR(15),
+    email VARCHAR(255),
+    gst_no VARCHAR(50),
+    cin_no VARCHAR(50),
+    udyam_no VARCHAR(50),
     cgst FLOAT DEFAULT 0.0,
     sgst FLOAT DEFAULT 0.0,
     igst FLOAT DEFAULT 0.0,
-    logo VARCHAR NULL,
+    logo VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
+    created_by INT NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (city_id) REFERENCES cities(id),
-    FOREIGN KEY (state_id) REFERENCES states(id),
-    FOREIGN KEY (company_id) REFERENCES companies(id),
-    FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (city_id) REFERENCES cities(city_id) ON DELETE CASCADE,
+    FOREIGN KEY (state_id) REFERENCES states(state_id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
+-- Credit Nodes Table: Stores credit numbers related to branches
 CREATE TABLE credit_node (
-    id SERIAL PRIMARY KEY NOT NULL,
-    branch_id INTEGER NOT NULL,
-    start_no INTEGER,
-    end_no INTEGER,
-    unused INTEGER,
-    user_id INTEGER,
+    credit_node_id SERIAL PRIMARY KEY,
+    branch_id INT NOT NULL,
+    start_no INT,
+    end_no INT,
+    unused INT,
+    user_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (branch_id) REFERENCES branches(id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE
 );
 
-
+-- Pages Table: Stores pages available for permissions
 CREATE TABLE pages (
-    id SERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR NULL,
+    page_id SERIAL PRIMARY KEY,
+    page_name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Permissions Table: Stores user permissions related to pages
 CREATE TABLE permissions (
-    id SERIAL PRIMARY KEY NOT NULL,
-    page_id INT NULL,
-    permission_code VARCHAR NULL,
-    user_id INT NULL,
+    permission_id SERIAL PRIMARY KEY,
+    page_id INT NOT NULL,
+    permission_code VARCHAR(50) NOT NULL,
+    user_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
+    created_by INT NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (page_id) REFERENCES pages(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (created_by) REFERENCES users(id)
+    FOREIGN KEY (page_id) REFERENCES pages(page_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
+-- Employees Table: Stores employee-related information
 CREATE TABLE employees (
-    id SERIAL PRIMARY KEY NOT NULL,
-    user_id INT NULL,
-    address VARCHAR NULL,
-    aadhar_no VARCHAR NULL,
+    employee_id SERIAL PRIMARY KEY,
+    employee_name VARCHAR(255) NOT NULL,
+    employee_mobile VARCHAR(15) NOT NULL,
+    address VARCHAR(255),
+    aadhar_no VARCHAR(12) UNIQUE,
     joining_date TIMESTAMP DEFAULT NOW(),
     created_at TIMESTAMP DEFAULT NOW(),
-    branch_id INT NULL,
-    type VARCHAR NULL,
-    created_by INT NULL,
+    branch_id INT NOT NULL,
+    type VARCHAR(50),
+    created_by INT NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (created_by) REFERENCES users(id),
-    FOREIGN KEY (branch_id) REFERENCES branches(id)
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
 );
-
-CREATE TABLE containers (
-    id SERIAL PRIMARY KEY NOT NULL,
-    bag_no VARCHAR NULL,
-    name VARCHAR NULL,
-    agent_id VARCHAR NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
-    FOREIGN KEY (created_by) REFERENCES users(id)
-);
-
-CREATE TABLE packages (
-    id SERIAL PRIMARY KEY NOT NULL,
-    container_id INT NULL,
-    count INTEGER NULL,
-    weight FLOAT NULL,
-    value FLOAT NULL,
-    contents VARCHAR,
-    charges INTEGER NULL,
-    shipper VARCHAR NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
-    status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (container_id) REFERENCES containers(id),
-    FOREIGN KEY (created_by) REFERENCES users(id)
-);
-
-CREATE TABLE consignee (
-    id SERIAL PRIMARY KEY NOT NULL,
-    consignee_name VARCHAR NULL,
-    consignee_mobile VARCHAR NULL,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE consignor (
-    id SERIAL PRIMARY KEY NOT NULL,
-    consignor_name VARCHAR NULL,
-    consignor_mobile VARCHAR NULL,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
+-- Bookings Table: Stores booking information including consignee, consignor, and packages
 CREATE TABLE bookings (
-    id SERIAL PRIMARY KEY NOT NULL,
-    consignee_id SERIAL NOT NULL,
-    consignor_id SERIAL NOT NULL,
-    branch_id INT NULL,
-    slip_no VARCHAR UNIQUE NULL,
-    address VARCHAR NULL,
-    transport_mode VARCHAR NULL,
-    package_id INT NULL,
-    paid_type VARCHAR NULL,
+    booking_id SERIAL PRIMARY KEY,
+    consignee_name VARCHAR(255) NOT NULL,
+    consignee_mobile VARCHAR(15) NOT NULL,
+    consignor_name VARCHAR(255) NOT NULL,
+    consignor_mobile VARCHAR(15) NOT NULL,
+    branch_id INT NOT NULL,
+    slip_no VARCHAR(50) UNIQUE NOT NULL,
+    booking_address VARCHAR(255),
+    transport_mode VARCHAR(50),
+    paid_type VARCHAR(50),
     cgst FLOAT DEFAULT 0.0,
     sgst FLOAT DEFAULT 0.0,
     igst FLOAT DEFAULT 0.0,
-    total_value FLOAT NULL,
-    destination_city_id INT NULL,
-    destination_branch_id INT NULL,
+    total_value FLOAT NOT NULL,
+    package_count INT NOT NULL,
+    package_weight FLOAT NOT NULL,
+    package_value FLOAT NOT NULL,
+    package_contents TEXT,
+    shipper_name VARCHAR(255),
+    destination_city_id INT NOT NULL,
+    destination_branch_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
-    created_by INT NULL,
+    created_by INT NOT NULL,
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (branch_id) REFERENCES branches(id),
-    FOREIGN KEY (package_id) REFERENCES packages(id),
-    FOREIGN KEY (destination_city_id) REFERENCES cities(id),
-    FOREIGN KEY (destination_branch_id) REFERENCES branches(id),
-    FOREIGN KEY (consignee_id) REFERENCES consignee(id),
-    FOREIGN KEY (consignor_id) REFERENCES consignor(id),
-    FOREIGN KEY (created_by) REFERENCES users(id)
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
+    FOREIGN KEY (destination_city_id) REFERENCES cities(city_id) ON DELETE CASCADE,
+    FOREIGN KEY (destination_branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
-CREATE Table tracking (
-    id SERIAL PRIMARY KEY NOT NULL,
-    slip_no VARCHAR UNIQUE NULL,
-    status VARCHAR NULL,
+-- Tracking Table: Stores tracking information for bookings
+CREATE TABLE tracking (
+    tracking_id SERIAL PRIMARY KEY,
+    slip_no VARCHAR(50) UNIQUE NOT NULL,
+    tracking_status VARCHAR(255),
     created_at TIMESTAMP DEFAULT NOW(),
-    branch_id INT NULL,
-    FOREIGN KEY (branch_id) REFERENCES branches(id),
-    FOREIGN KEY (slip_no) REFERENCES bookings(slip_no)
+    branch_id INT NOT NULL,
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
+    FOREIGN KEY (slip_no) REFERENCES bookings(slip_no) ON DELETE CASCADE
 );
+
+-- Adding Indexes for faster queries (Optional but recommended for large databases)
+CREATE INDEX idx_users_mobile ON users(mobile);
+CREATE INDEX idx_branches_email ON branches(email);
+CREATE INDEX idx_bookings_slip_no ON bookings(slip_no);

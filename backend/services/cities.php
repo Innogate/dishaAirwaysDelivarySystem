@@ -4,13 +4,8 @@
     require_once __DIR__ .'/../core/Handler.php';
 
     global $router;
-    global $pageID;
-
-    $pageID = 3; // Assuming a different page ID for cities
-
     // Get list of cities with pagination
     $router->add('POST', '/master/cities', function () {
-        global $pageID;
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
@@ -26,7 +21,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE status = TRUE ORDER BY name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE status = TRUE ORDER BY city_name ASC LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
@@ -58,7 +53,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE id = ?";
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ?";
         $stmt = $db->query($sql, [$payload->city_id]);
         $list = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$list) {
@@ -90,7 +85,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ? AND status = TRUE ORDER BY name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ? AND status = TRUE ORDER BY city_name ASC LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$payload->state_id, $payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
@@ -103,7 +98,7 @@
 
     // Add a new city
     $router->add('POST', '/master/cities/new', function () {
-        global $pageID;
+        $pageID=3;
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
@@ -121,7 +116,7 @@
         $db = new Database();
     
         // Check if the state ID exists
-        $stmt = $db->query("SELECT id FROM states WHERE id = ?", [$data["state_id"]]);
+        $stmt = $db->query("SELECT state_id FROM states WHERE state_id = ?", [$data["state_id"]]);
         $existingState = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if (!$existingState) {
@@ -134,7 +129,7 @@
         $normalizedCityName = strtolower(trim($data["city_name"]));
     
         // Check if the city already exists in the same state
-        $stmt = $db->query("SELECT id FROM cities WHERE LOWER(TRIM(name)) = ? AND state_id = ?", [$normalizedCityName, $data["state_id"]]);
+        $stmt = $db->query("SELECT city_id FROM cities WHERE LOWER(TRIM(city_name)) = ? AND state_id = ?", [$normalizedCityName, $data["state_id"]]);
         $existingCity = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if ($existingCity) {
@@ -144,7 +139,7 @@
         }
     
         // Insert with original user-provided city name
-        $stmt = $db->query("INSERT INTO cities (name, state_id) VALUES (?, ?) RETURNING id", [$data["city_name"], $data["state_id"]]);
+        $stmt = $db->query("INSERT INTO cities (city_name, state_id) VALUES (?, ?) RETURNING city_id", [$data["city_name"], $data["state_id"]]);
         $entry_id = $stmt->fetchColumn();
     
         $response = new ApiResponse(200, "Success", $entry_id);
@@ -154,7 +149,7 @@
 
     // Delete a city by ID
     $router->add('POST', '/master/cities/delete', function () {
-        global $pageID;
+        $pageID=3;
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
@@ -174,7 +169,7 @@
         $db = new Database();
 
         // Check if the city exists
-        $stmt = $db->query("SELECT id FROM cities WHERE id = ?", [$city_id]);
+        $stmt = $db->query("SELECT city_id FROM cities WHERE city_id = ?", [$city_id]);
         $existingCity = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$existingCity) {
@@ -184,7 +179,7 @@
         }
 
         // Delete the city
-        $stmt = $db->query("UPDATE cities SET status = FALSE WHERE id = ?", [$city_id]);
+        $stmt = $db->query("UPDATE cities SET status = FALSE WHERE city_id = ?", [$city_id]);
 
         $response = new ApiResponse(200, "City deleted successfully.");
         $response->toJson();
@@ -192,7 +187,7 @@
 
     // UPDATE DB 
     $router->add('POST', '/master/cities/update', function () {
-        $pageID = 2;
+        $pageID = 3;
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
@@ -200,10 +195,10 @@
     
         $payload = (object) [
             "updates" => [
-                'talbe.name' => 'Error'
+                'cities.city_name' => 'Error'
             ],
             "conditions" => [
-                'talbe.id' => 0
+                'cities.city_id' => 0
             ]
         ];
     
