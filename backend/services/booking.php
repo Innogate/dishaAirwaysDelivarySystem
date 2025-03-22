@@ -149,9 +149,9 @@ $router->add("POST", "/booking/new", function () {
         slip_no, booking_address, transport_mode, paid_type, cgst, sgst, igst, 
         total_value, package_count, package_weight, package_value, package_contents, 
         shipper_name, destination_city_id, destination_branch_id, xp_branch_id, 
-        created_by
+        created_by, on_account, to_pay
     ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )";
 
         $stmt = $db->query($sql, [
@@ -177,6 +177,8 @@ $router->add("POST", "/booking/new", function () {
             $data["destination_branch_id"],
             $data["xp_branch_id"],
             $_info->user_id,
+            $data["on_account"],
+            $data["to_pay"],
         ]);
 
         // INSET IN tracking table

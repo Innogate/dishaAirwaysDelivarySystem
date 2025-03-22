@@ -34,6 +34,18 @@ Authorization: Bearer {{token}}
 }
 
 
+#### GET ALL DELETED USERS
+POST {{apiUrl}}/master/users/deleted
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "fields" : [],
+    "max" : 10,
+    "current" : 0
+}
+
+
 #### GET MY USERS
 GET {{apiUrl}}/master/users/myInfo
 Content-Type: application/json
@@ -46,14 +58,14 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "mobile": "9876542231",
+    "mobile": "9876542233",
     "password": "securePass123",
     "first_name": "John",
-    "last_name": "Doe BED",
+    "last_name": "Doe TS",
     "gender": "Male",
     "birth_date": "1990-01-01",
     "address": "123 Main St",
-    "email": "john.doe@example.com"
+    "email": "john3.doe@example.com"
 }
 
 #### UPDATE USERS
@@ -76,5 +88,5 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": "2"
+    "user_id": "4"
 }

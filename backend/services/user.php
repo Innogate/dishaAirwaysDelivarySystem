@@ -32,15 +32,58 @@ $router->add('POST', '/master/users', function () {
     $sqlQuery = $db->generateDynamicQuery("users",  $payload->fields);
 
     if ($isAdmin && $_info->branch_id == null) {
-        $sqlQuery = $sqlQuery . " WHERE status = TRUE LIMIT  ?  OFFSET  ?;";
+        $sqlQuery = $sqlQuery . " WHERE status = TRUE ORDER BY first_name     LIMIT  ?  OFFSET  ?;";
         $stmt = $db->query($sqlQuery, [$payload->max, $payload->current]);
     } else {
-        $sqlQuery .= " WHERE user_id IN (
+        $sqlQuery .= " WHERE created_by IN (
     SELECT user_id FROM representatives 
     WHERE branch_id = (
         SELECT branch_id FROM representatives 
         WHERE user_id = ?
-    )); LIMIT ? OFFSET ?;";
+    )) AND status = TRUE ORDER BY first_name LIMIT ? OFFSET ?;";
+        $stmt = $db->query($sqlQuery, params: [$_info->user_id, $payload->max, $payload->current]);
+    }
+
+
+    $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    (new ApiResponse(200, "Success", $list))->toJson();
+});
+
+
+$router->add('POST', '/master/users/deleted', function () {
+    $pageID=4;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $payload = (object) [
+        "fields" => [],
+        "max" => 10,
+        "current" => 1
+    ];
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "r");
+
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
+
+
+    $db = new Database();
+    $sqlQuery = $db->generateDynamicQuery("users",  $payload->fields);
+
+    if ($isAdmin && $_info->branch_id == null) {
+        $sqlQuery = $sqlQuery . " WHERE status = FALSE ORDER BY first_name     LIMIT  ?  OFFSET  ?;";
+        $stmt = $db->query($sqlQuery, [$payload->max, $payload->current]);
+    } else {
+        $sqlQuery .= " WHERE created_by IN (
+    SELECT user_id FROM representatives 
+    WHERE branch_id = (
+        SELECT branch_id FROM representatives 
+        WHERE user_id = ?
+    )) AND status = FALSE ORDER BY first_name LIMIT ? OFFSET ?;";
         $stmt = $db->query($sqlQuery, params: [$_info->user_id, $payload->max, $payload->current]);
     }
 

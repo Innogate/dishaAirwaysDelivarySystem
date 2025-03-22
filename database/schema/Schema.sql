@@ -136,6 +136,8 @@ CREATE TABLE bookings (
     booking_address VARCHAR(255),
     transport_mode VARCHAR(50),
     paid_type VARCHAR(50),
+    on_account VARCHAR(50),
+    to_pay VARCHAR(50),
     cgst FLOAT DEFAULT 0.0,
     sgst FLOAT DEFAULT 0.0,
     igst FLOAT DEFAULT 0.0,
