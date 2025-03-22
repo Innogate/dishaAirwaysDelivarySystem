@@ -1,0 +1,80 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+### VERIFY
+GET {{apiUrl}}/verify
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+#### GET ALL USERS
+POST {{apiUrl}}/master/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "fields" : [],
+    "max" : 10,
+    "current" : 0
+}
+
+
+#### GET MY USERS
+GET {{apiUrl}}/master/users/myInfo
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+#### ADD NEW USER
+POST {{apiUrl}}/master/users/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "mobile": "9876542231",
+    "password": "securePass123",
+    "first_name": "John",
+    "last_name": "Doe BED",
+    "gender": "Male",
+    "birth_date": "1990-01-01",
+    "address": "123 Main St",
+    "email": "john.doe@example.com"
+}
+
+#### UPDATE USERS
+POST {{apiUrl}}/master/users/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "mobile": "1234567890",
+        "last_name": "admin"
+    },
+    "conditions":"user_id=1"
+    
+}
+
+#### DELETE USER
+POST {{apiUrl}}/master/users/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id": "2"
+}

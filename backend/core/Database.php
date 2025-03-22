@@ -63,116 +63,55 @@ class Database {
     }
 
     // Generate dynamic SELECT query
-    public function generateDynamicQuery(array $columns, ?string $joinBy = null) {
-        $tables = [];
-        $joins = [];
-        $selectedColumns = [];
-
-        foreach ($columns as $col) {
-            if (strpos($col, ".*") !== false) {
-                $table = str_replace(".*", "", $col);
-                $selectedColumns[] = "$table.*";
-            } else {
-                $parts = explode(".", $col);
-                if (count($parts) === 2) {
-                    list($table, $column) = $parts;
-                    $selectedColumns[] = "$table.$column";
-                } else {
-                    die((new ApiResponse(400, "Invalid column format: $col"))->toJson());
-                }
-            }
-            if (!in_array($table, $tables)) {
-                $tables[] = $table;
-            }
+    public function generateDynamicQuery($table, $fields) {
+        // Validate input
+        if (empty($table)) {
+            throw new InvalidArgumentException("Invalid table name");
         }
-
-        if (!$joinBy && count($tables) > 1) {
-            $foreignKeys = $this->getForeignKeys();
-            foreach ($tables as $table) {
-                if (isset($foreignKeys[$table])) {
-                    foreach ($foreignKeys[$table] as $relatedTable => $condition) {
-                        if (in_array($relatedTable, $tables) && !in_array("JOIN $relatedTable ON $condition", $joins)) {
-                            $joins[] = "JOIN $relatedTable ON $condition";
-                        }
-                    }
-                }
-            }
+        
+        // If fields are empty, select all (*)
+        if (empty($fields) || !is_array($fields)) {
+            $fieldsString = "*";
+        } else {
+            // Escape field names to prevent SQL injection
+            $escapedFields = array_map(function($field) {
+                return str_replace("\"", "", $field); // Remove double quotes for PostgreSQL
+            }, $fields);
+            
+            // Convert array to string
+            $fieldsString = implode(", ", $escapedFields);
         }
-
-        if ($joinBy) {
-            foreach (explode(",", $joinBy) as $condition) {
-                $condition = trim($condition);
-                if (strpos($condition, "=") !== false) {
-                    list($left, $right) = explode("=", $condition);
-                    $leftTable = explode(".", trim($left))[0];
-                    $rightTable = explode(".", trim($right))[0];
-
-                    if (in_array($leftTable, $tables) && in_array($rightTable, $tables)) {
-                        $joins[] = "JOIN $rightTable ON $condition";
-                    }
-                }
-            }
-        }
-
-        if (empty($tables)) {
-            die((new ApiResponse(400, "No valid tables detected"))->toJson());
-        }
-
-        $fromTable = $tables[0];
-        $query = "SELECT " . implode(", ", $selectedColumns) . " FROM $fromTable";
-        if (!empty($joins)) {
-            $query .= " " . implode(" ", $joins);
-        }
-
+        
+        // Generate query
+        $query = "SELECT $fieldsString FROM $table";
+        
         return $query;
     }
-
-    // Generate dynamic UPDATE query
-    public function generateDynamicUpdate(array $updates, array $conditions) {
-        if (empty($updates)) {
-            die((new ApiResponse(400, "No update data provided"))->toJson());
+    
+    
+    // Example Usage
+    public function generateDynamicUpdate($table, $data, $condition) {
+        // Validate input
+        if (empty($table) || empty($data) || !is_array($data)) {
+            throw new InvalidArgumentException("Invalid table name or data");
         }
-
-        $tables = [];
-        $updateClauses = [];
-        $whereClauses = [];
-        $params = [];
-
-        foreach ($updates as $column => $value) {
-            if (!str_contains($column, ".")) {
-                die((new ApiResponse(400, "Invalid column format: $column"))->toJson());
-            }
-
-            list($table, $col) = explode(".", $column, 2);
-            $tables[$table] = $table;
-            $updateClauses[$table][] = "$col = ?";
-            $params[] = $value;
+        
+        // Prepare set statements
+        $setStatements = [];
+        $values = [];
+        foreach ($data as $column => $value) {
+            $escapedColumn = str_replace("\"", "", $column); // Remove double quotes for PostgreSQL
+            $setStatements[] = "$escapedColumn = ?";
+            $values[] = $value;
         }
-
-        foreach ($conditions as $column => $value) {
-            if (!str_contains($column, ".")) {
-                die((new ApiResponse(400, "Invalid condition format: $column"))->toJson());
-            }
-
-            list($table, $col) = explode(".", $column, 2);
-            $whereClauses[$table][] = "$col = ?";
-            $params[] = $value;
-        }
-
-        $queries = [];
-        foreach ($updateClauses as $table => $updates) {
-            $updateQuery = "UPDATE $table SET " . implode(", ", $updates);
-            if (!empty($whereClauses[$table])) {
-                $updateQuery .= " WHERE " . implode(" AND ", $whereClauses[$table]);
-            }
-            $queries[] = $updateQuery;
-        }
-
-        $finalQuery = "" . implode("; ", $queries) . "";
-
-        return ['query' => $finalQuery, 'params' => $params];
+        
+        $setString = implode(", ", $setStatements);
+        
+        // Generate query
+        $query = "UPDATE $table SET $setString WHERE $condition";
+        
+        return [$query, $values];
     }
-
     // Transaction management
     public function rollback() {
         $this->pdo->rollBack();

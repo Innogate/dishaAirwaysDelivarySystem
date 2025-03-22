@@ -6,58 +6,7 @@ Content-Type: application/json
 
 
 
-#### GET ALL USERS
-POST {{apiUrl}}/master/users
-Content-Type: application/json
-Authorization: Bearer {{token}}
 
-{
-    "fields" : ["users.*","user_info.*"],
-    "max" : 10,
-    "current" : 0,
-    "relation" : "users.id=user_info.id"
-}
-
-#### ADD NEW USER
-POST {{apiUrl}}/master/users/new
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "mobile": "9876542231",
-    "password": "securePass123",
-    "first_name": "John",
-    "last_name": "Doe BED",
-    "gender": "Male",
-    "birth_date": "1990-01-01",
-    "address": "123 Main St",
-    "email": "john.doe@example.com"
-}
-
-#### UPDATE USERS
-POST {{apiUrl}}/master/users/update
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "updates": {
-        "users.mobile": "1234567890",
-        "user_info.last_name": "Employee"
-    },
-    "conditions":{
-        "user_info.id": 2,
-        "users.id": 2
-    }
-}
-
-#### DELETE USER
-POST {{apiUrl}}/master/users/delete
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "user_id": "2"
-}
 
 #### ! GET ALL COMPANIES 
 POST {{apiUrl}}/master/companies
