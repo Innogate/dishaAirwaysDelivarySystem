@@ -1,0 +1,56 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+#### TOKEN
+POST {{apiUrl}}/credit/token
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "current": 0,
+    "max": 10
+}
+
+### GET TOKEN BY ID
+POST {{apiUrl}}/credit/token/byId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "token_id": 5
+}
+
+
+### CREATE NEW TOKEN
+POST {{apiUrl}}/credit/token/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "branch_id": 6,
+    "start_no": 5000,
+    "end_no": 6500
+}
+
+### DELETE TOKEN BY ID
+POST {{apiUrl}}/credit/token/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "token_id": 4
+}

@@ -191,60 +191,6 @@ Authorization: Bearer {{token}}
 }
 
 
-### Create Consignee
-POST {{apiUrl}}/consignee/new
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "consignee_name": "John Doe",
-    "consignee_mobile": "9876543210"
-}
-
-### Get List of All Consignees
-GET {{apiUrl}}/consignee/list
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-
-
-
-### Get Consignee by Mobile Number
-POST {{apiUrl}}/consignee/byMobile
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "mobile": "9876543210"
-}
-
-### Create Consignor
-POST {{apiUrl}}/consignor/new
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "consignor_name": "Jane Smith",
-    "consignor_mobile": "8765432109"
-}
-
-### Get List of All Consignors
-GET {{apiUrl}}/consignor/list
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-
-### Get Consignor by Mobile Number
-POST {{apiUrl}}/consignor/byMobile
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-
-    "mobile":"8765432109"
-}
-
-
 ### Get Booking List
 POST {{apiUrl}}/booking
 Content-Type: application/json
@@ -279,46 +225,6 @@ Authorization: Bearer {{token}}
   "igst": 0
 }
 
-
-#### TOKEN
-POST {{apiUrl}}/credit/token
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "current": 0,
-    "max": 10
-}
-
-### GET TOKEN BY ID
-POST {{apiUrl}}/credit/token/byId
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "token_id": 1
-}
-
-
-### CREATE NEW TOKEN
-POST {{apiUrl}}/credit/token/new
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "branch_id": 1,
-    "start_no": 5000,
-    "end_no": 6500
-}
-
-### DELETE TOKEN BY ID
-POST {{apiUrl}}/credit/token/delete
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "token_id": 2
-}
 
 
 ### TRACKING GET
