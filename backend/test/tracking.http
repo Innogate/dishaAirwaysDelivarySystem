@@ -1,0 +1,34 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+### TRACKING GET
+POST {{apiUrl}}/track/bySlipId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "slip_no": 2
+}
+
+### TRACKING GET
+POST {{apiUrl}}/track/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "slip_no": 2,
+    "status": 2
+}

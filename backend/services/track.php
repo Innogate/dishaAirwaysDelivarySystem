@@ -3,13 +3,11 @@
     require_once __DIR__ . '/../core/Database.php';
     require_once __DIR__ .'/../core/Handler.php';
 
-    global $pageID;
-
     // GET BY SLIP ID
     $router->add("POST", '/track/bySlipId', function () {
         $jwt = new JwtHandler();
         $handler = new Handler();
-        $_info = $jwt->validate();  // Ensure this throws an error or returns an error response if validation fails
+        $_info = $jwt->validate();
 
         // Get and validate input
         $data = json_decode(file_get_contents("php://input"), true);
