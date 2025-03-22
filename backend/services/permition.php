@@ -25,8 +25,6 @@ $router->add('POST', '/master/access/userId', function () {
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
-
-
 $router->add('POST', '/master/access', function () {
     $pageID = 8;
     $jwt = new JwtHandler();
@@ -52,7 +50,7 @@ $router->add('POST', '/master/access/update', function () {
     $_info = $jwt->validate();
     
     // Validate user permission for the page
-    $handler->validatePermission($pageID, $_info->user_id, 'u');
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, 'u');
     
     // Required fields for input validation
     $require_field = ['user_id', 'permission_code', 'page_id'];
@@ -62,7 +60,17 @@ $router->add('POST', '/master/access/update', function () {
     
     // Validate input data
     $handler->validateInput($data, $require_field);
-    
+
+    // Check if the user is an admin
+    if (!$isAdmin && $_info->user_id != null) {
+        // split down the permission code into an array
+        $permission_code = explode(',', $data['permission_code']);
+        // check ;ast digit 1 or not 
+        if (end($permission_code) == '1') {
+            (new ApiResponse(403, "You don't have permission to perform this action"))->toJson();
+        }
+    }
+
     // Connect to the database
     $db = new Database();
     

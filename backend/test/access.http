@@ -1,0 +1,59 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+
+### GET MY ACCESS
+POST {{apiUrl}}/master/access
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+
+}
+
+
+### GET ACCESS BY ID
+POST {{apiUrl}}/master/access/userId
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id": 2
+
+}
+
+### GET ACCESS BY ID
+POST {{apiUrl}}/master/access/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "user_id": 1,
+    "permission_code": "0111",
+    "page_id": 1
+
+}
+
+
+### GET PAGES BY ID
+GET {{apiUrl}}/master/pages
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+
+}
