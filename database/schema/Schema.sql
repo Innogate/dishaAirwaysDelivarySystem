@@ -147,13 +147,15 @@ CREATE TABLE bookings (
     shipper_name VARCHAR(255),
     destination_city_id INT NOT NULL,
     destination_branch_id INT NOT NULL,
+    xp_branch_id INT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     created_by INT NOT NULL,
     status BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
     FOREIGN KEY (destination_city_id) REFERENCES cities(city_id) ON DELETE CASCADE,
     FOREIGN KEY (destination_branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (xp_branch_id) REFERENCES branches(branch_id) ON DELETE SET NULL
 );
 
 -- Tracking Table: Stores tracking information for bookings

@@ -1,0 +1,68 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+### Get Booking List
+POST {{apiUrl}}/booking
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    
+}
+
+
+
+### Get Booking List
+POST {{apiUrl}}/booking/received
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    
+}
+
+
+
+#### Add New Booking
+POST {{apiUrl}}/booking/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "consignee_name": "John Doe",
+    "consignee_mobile": "9876543210",
+    "consignor_name": "Jane Smith",
+    "consignor_mobile": "9876543211",
+    "branch_id": 1,
+    "slip_no": "SLP12345",
+    "booking_address": "123 Street, City",
+    "transport_mode": "Air",
+    "paid_type": "Prepaid",
+    "cgst": 5.0,
+    "sgst": 5.0,
+    "igst": 0.0,
+    "total_value": 1000.0,
+    "package_count": 2,
+    "package_weight": 10.5,
+    "package_value": 500.0,
+    "package_contents": "Electronics",
+    "shipper_name": "ABC Logistics",
+    "destination_city_id": 2,
+    "destination_branch_id": 3,
+    "xp_branch_id": null,
+    "created_by": 1
+}
+
