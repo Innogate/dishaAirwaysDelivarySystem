@@ -117,7 +117,7 @@ CREATE TABLE employees (
     joining_date TIMESTAMP DEFAULT NOW(),
     created_at TIMESTAMP DEFAULT NOW(),
     branch_id INT NOT NULL,
-    type VARCHAR(50),
+    designation VARCHAR(100),
     created_by INT NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
