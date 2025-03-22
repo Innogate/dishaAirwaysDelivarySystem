@@ -40,7 +40,6 @@ CREATE TABLE branches (
     branch_name VARCHAR(255) NOT NULL UNIQUE,
     branch_short_name VARCHAR(10) NOT NULL UNIQUE,
     alias_name VARCHAR(255),
-    representative_user SERIAL NOT NULL,
     address VARCHAR(255),
     city_id INT NOT NULL,
     state_id INT NOT NULL,
@@ -60,9 +59,21 @@ CREATE TABLE branches (
     status BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (city_id) REFERENCES cities(city_id) ON DELETE CASCADE,
     FOREIGN KEY (state_id) REFERENCES states(state_id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
-    FOREIGN KEY (representative_user) REFERENCES users(user_id) ON DELETE SET NULL
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
 );
+
+CREATE TABLE representatives (
+    representative_id SERIAL PRIMARY KEY,
+    branch_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW(),
+    status BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
+)
 
 -- Credit Nodes Table: Stores credit numbers related to branches
 CREATE TABLE credit_node (

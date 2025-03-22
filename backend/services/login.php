@@ -23,7 +23,7 @@
         }
  
         if ($data['passwd'] == $user['password']) {
-            $stmt = $db->query('SELECT branch_id FROM branches WHERE representative_user = ?', [ $user['user_id'] ]);
+            $stmt = $db->query('SELECT branch_id FROM representatives WHERE user_id = ?', [ $user['user_id'] ]);
             $brach = $stmt->fetch(mode: PDO::FETCH_ASSOC);
             if ($brach) {
                 $branch_id = $brach['branch_id'];
