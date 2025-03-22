@@ -3,7 +3,7 @@
 require_once __DIR__ . '/function.php';
 
 class Database {
-    private $pdo;
+    public $pdo;
 
     public function __construct() {
         // Load configuration
@@ -23,7 +23,6 @@ class Database {
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            $this->logDatabaseActivity($sql, $params); // Log successful query execution
             return $stmt;
         } catch (PDOException $e) {
             $this->logDatabaseActivity($sql, $params, "Query failed: " . $e->getMessage()); // Log error

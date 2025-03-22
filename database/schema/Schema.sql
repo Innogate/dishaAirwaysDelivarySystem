@@ -1,4 +1,4 @@
--- States Table: Stores states
+-- States Table: Stores states -- * DONE NOT CHANGEABLE
 CREATE TABLE states (
     state_id SERIAL PRIMARY KEY,
     state_name VARCHAR(255) NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE states (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Cities Table: Stores cities related to states
+-- Cities Table: Stores cities related to states -- * DONE NOT CHANGEABLE
 CREATE TABLE cities (
     city_id SERIAL PRIMARY KEY,
     city_name VARCHAR(255) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE cities (
     FOREIGN KEY (state_id) REFERENCES states(state_id) ON DELETE CASCADE
 );
 
--- Users Table: Stores user credentials and personal information (merged with user_info)
+-- Users Table: Stores user credentials and personal information -- * DONE NOT CHANGEABLE
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     mobile VARCHAR(15) NOT NULL UNIQUE,
@@ -37,10 +37,11 @@ CREATE TABLE users (
 -- Branches Table: Stores branches related to companies
 CREATE TABLE branches (
     branch_id SERIAL PRIMARY KEY,
-    branch_name VARCHAR(255) NOT NULL,
+    branch_name VARCHAR(255) NOT NULL UNIQUE,
+    branch_short_name VARCHAR(10) NOT NULL UNIQUE,
     alias_name VARCHAR(255),
+    representative_user SERIAL NOT NULL,
     address VARCHAR(255),
-    user_id INT NOT NULL,
     city_id INT NOT NULL,
     state_id INT NOT NULL,
     pin_code VARCHAR(10),
@@ -57,10 +58,10 @@ CREATE TABLE branches (
     created_by INT NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (city_id) REFERENCES cities(city_id) ON DELETE CASCADE,
     FOREIGN KEY (state_id) REFERENCES states(state_id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (representative_user) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 -- Credit Nodes Table: Stores credit numbers related to branches
@@ -69,10 +70,7 @@ CREATE TABLE credit_node (
     branch_id INT NOT NULL,
     start_no INT,
     end_no INT,
-    unused INT,
-    user_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE
 );
 
@@ -88,7 +86,7 @@ CREATE TABLE permissions (
     permission_id SERIAL PRIMARY KEY,
     page_id INT NOT NULL,
     permission_code VARCHAR(50) NOT NULL,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     created_by INT NOT NULL,
     updated_at TIMESTAMP DEFAULT NOW(),
