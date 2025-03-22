@@ -34,6 +34,12 @@ Authorization: Bearer {{token}}
     
 }
 
+### Get Booking List
+GET {{apiUrl}}/autofill/newBooking
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
 
 
 #### Add New Booking
