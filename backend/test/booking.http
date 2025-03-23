@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "1234567890",
-    "passwd": "pass@1234"
+    "id": "9876542233",
+    "passwd": "securePass123"
 }
 
 ### Get Booking List
@@ -25,7 +25,7 @@ Authorization: Bearer {{token}}
 
 
 
-### Get Booking List
+### Get Booking List FOR resiver
 POST {{apiUrl}}/booking/received
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -53,7 +53,7 @@ Authorization: Bearer {{token}}
     "consignor_name": "Jane Smith",
     "consignor_mobile": "9876543211",
     "branch_id": 1,
-    "slip_no": "SLP12345",
+    "slip_no": 10000,
     "booking_address": "123 Street, City",
     "transport_mode": "Air",
     "paid_type": "Prepaid",

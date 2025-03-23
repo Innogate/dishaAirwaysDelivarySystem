@@ -41,7 +41,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "branch_id": 6,
+    "branch_id": 1,
     "start_no": 5000,
     "end_no": 6500
 }
@@ -52,5 +52,5 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "token_id": 4
+    "token_id": 2
 }

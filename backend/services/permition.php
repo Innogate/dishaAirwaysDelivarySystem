@@ -18,7 +18,7 @@ $router->add('POST', '/master/access/userId', function () {
 
 
     $db = new Database();
-    $sql = "SELECT * FROM permissions WHERE user_id = ?";
+    $sql = "SELECT * FROM permissions JOIN pages ON permissions.page_id = pages.page_id WHERE user_id = ?";
     $stmt = $db->query($sql, [$data["user_id"]]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -86,8 +86,8 @@ $router->add('POST', '/master/access/update', function () {
         $message = "Permission updated successfully";
     } else {
         // User doesn't have access, so insert a new record
-        $sqlInsert = "INSERT INTO permissions (user_id, permission_code, page_id) VALUES (?, ?, ?)";
-        $db->query($sqlInsert, [$data['user_id'], $data['permission_code'], $data['page_id']]);
+        $sqlInsert = "INSERT INTO permissions (user_id, permission_code, page_id, created_by) VALUES (?, ?, ?, ?)";
+        $db->query($sqlInsert, [$data['user_id'], $data['permission_code'], $data['page_id'], $_info->user_id]);
         $message = "Permission granted successfully";
     }
 
