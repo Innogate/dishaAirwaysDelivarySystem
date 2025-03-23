@@ -21,7 +21,7 @@ $router->add('POST', '/master/states', function () {
     }
 
     $db = new Database();
-    $sql = "SELECT * FROM states WHERE status = TRUE ORDER BY state_name ASC LIMIT ? OFFSET ?";
+    $sql = "SELECT * FROM states ORDER BY state_name ASC LIMIT ? OFFSET ?";
 
     $stmt = $db->query($sql, [$payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -147,11 +147,9 @@ $router->add('POST', '/master/states/update', function () {
 
     $payload = (object) [
         "updates" => [
-            'sates.state_name' => 'Error'
+            'state_name' => 'Error'
         ],
-        "conditions" => [
-            'sates.state_id' => 0
-        ]
+        "conditions" => 'state_id=0'
     ];
 
     $data = json_decode(file_get_contents("php://input"), true);
@@ -162,17 +160,13 @@ $router->add('POST', '/master/states/update', function () {
     }
 
     $db = new Database();
-    $sql = $db->generateDynamicUpdate($payload->updates, $payload->conditions);
-
-    // Debug: Print generated SQL query and parameters
-    error_log("SQL Query: " . $sql["query"]);
-    error_log("Parameters: " . json_encode($sql["params"]));
+    $sql = $db->generateDynamicUpdate("states", $payload->updates, $payload->conditions);
 
     try {
-        $stmt = $db->query($sql["query"], $sql["params"]);
+        $stmt = $db->query($sql[0], $sql[1]);
 
         if ($stmt->rowCount() > 0) {
-            (new ApiResponse(200,"Update successful", $stmt->rowCount()))->toJson();
+            (new ApiResponse(200,"Update successful"))->toJson();
         } else {
             (new ApiResponse(500,"No rows updated"))->toJson();
         }

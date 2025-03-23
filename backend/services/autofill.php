@@ -1,11 +1,3 @@
-<!-- SELECT consignee_name, consignor_name, destination_city_id, destination_branch_id, COUNT(*) as entry_count
-FROM bookings
-WHERE branch_id = :branch_id  -- Replace :branch_id with the specific branch ID
-GROUP BY consignee_name, consignor_name, destination_city_id, destination_branch_id
-HAVING COUNT(*) > 1
-ORDER BY entry_count DESC;
- -->
-
 <?php
 require_once __DIR__ . '/../core/JwtHandler.php';
 require_once __DIR__ . '/../core/Database.php';

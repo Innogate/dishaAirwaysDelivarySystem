@@ -136,4 +136,63 @@ class Database {
             echo "{$activity->timestamp} - {$activity->message}: {$activity->query}\n";
         }
     }
+
+    private function modifySelectQueryWithForeignKeys($sql) {
+        // Extract the table name from the query
+        preg_match('/FROM\s+(\w+)/i', $sql, $matches);
+        if (!isset($matches[1])) {
+            return $sql; // Return original query if no table is found
+        }
+    
+        $table = $matches[1];
+        $foreignKeys = $this->getForeignKeys();
+    
+        // If the table has foreign keys, modify the query
+        if (isset($foreignKeys[$table])) {
+            $joins = [];
+            $selectFields = [];
+    
+            // Extract selected fields
+            preg_match('/SELECT\s+(.+?)\s+FROM/i', $sql, $fieldMatches);
+            $selectedFields = isset($fieldMatches[1]) ? explode(',', $fieldMatches[1]) : ['*'];
+            $selectedFields = array_map('trim', $selectedFields);
+    
+            foreach ($selectedFields as $key => $field) {
+                // If selecting all fields, replace with explicit field list
+                if ($field == '*') {
+                    $stmt = $this->pdo->query("SELECT column_name FROM information_schema.columns WHERE table_name = '$table'");
+                    $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    $selectedFields = array_merge($selectedFields, $columns);
+                    unset($selectedFields[$key]);
+                    continue;
+                }
+            }
+    
+            // Modify the query to join foreign key tables
+            foreach ($foreignKeys[$table] as $foreignTable => $joinCondition) {
+                $joins[] = "LEFT JOIN $foreignTable ON $joinCondition";
+    
+                // Extract the foreign key column name
+                preg_match('/\.(\w+) = /', $joinCondition, $fkMatches);
+                if (isset($fkMatches[1])) {
+                    $foreignColumn = $fkMatches[1];
+    
+                    // Replace the foreign key column with the related table’s data
+                    if (in_array("$table.$foreignColumn", $selectedFields) || in_array($foreignColumn, $selectedFields)) {
+                        $selectedFields[] = "$foreignTable.*"; // Select all columns from the foreign table
+                        unset($selectedFields[array_search("$table.$foreignColumn", $selectedFields)]);
+                    }
+                }
+            }
+    
+            // Rebuild the query
+            $newFields = implode(", ", array_unique($selectedFields));
+            $newJoins = implode(" ", $joins);
+            $sql = preg_replace('/SELECT\s+.+?\s+FROM/i', "SELECT $newFields FROM", $sql);
+            $sql .= " " . $newJoins;
+        }
+    
+        return $sql;
+    }
+    
 }

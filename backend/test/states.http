@@ -31,7 +31,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "state_id": 1
+    "state_id": 35
 }
 
 #### ADD NEW STATE
@@ -51,11 +51,9 @@ Authorization: Bearer {{token}}
 
 {
     "updates": {
-        "states.state_name": "WP"
+        "state_name": "WP"
     },
-    "conditions":{
-        "states.state_id": 1
-    }
+    "conditions":"state_id=35"
 }
 
 #### DELETE STATE
