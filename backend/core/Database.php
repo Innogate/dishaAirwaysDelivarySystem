@@ -137,7 +137,7 @@ class Database {
         }
     }
 
-    private function modifySelectQueryWithForeignKeys($sql) {
+    public function modifySelectQueryWithForeignKeys($sql) {
         // Extract the table name from the query
         preg_match('/FROM\s+(\w+)/i', $sql, $matches);
         if (!isset($matches[1])) {

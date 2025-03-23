@@ -53,7 +53,7 @@ Authorization: Bearer {{token}}
     "consignor_name": "Jane Smith",
     "consignor_mobile": "9876543211",
     "branch_id": 1,
-    "slip_no": 10000,
+    "slip_no": 5000,
     "booking_address": "123 Street, City",
     "transport_mode": "Air",
     "paid_type": "Prepaid",
@@ -66,9 +66,11 @@ Authorization: Bearer {{token}}
     "package_value": 500.0,
     "package_contents": "Electronics",
     "shipper_name": "ABC Logistics",
-    "destination_city_id": 2,
-    "destination_branch_id": 3,
+    "destination_city_id": 1,
+    "destination_branch_id": 1,
     "xp_branch_id": null,
-    "created_by": 1
+    "created_by": 1,
+    "to_pay": "Y",
+    "on_account": "1020034"
 }
 

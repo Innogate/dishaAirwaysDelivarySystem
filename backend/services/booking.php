@@ -33,6 +33,7 @@ $router->add('POST', '/booking', function () {
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
         $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE branch_id = ?  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        // $sql = $db->modifySelectQueryWithForeignKeys($sql);
         $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
 
@@ -109,6 +110,8 @@ $router->add("POST", "/booking/new", function () {
         "package_count",
         "package_weight",
         "package_value",
+        "to_pay",
+        "on_account",
     ];
 
     $handler->validateInput($data, $required_fields);
@@ -130,13 +133,13 @@ $router->add("POST", "/booking/new", function () {
 
         // check sleep no in range
         $slip_no = (int)$data["slip_no"];
-        if ($slip_no < $token["start"] || $slip_no > $token["end"]) {
-            (new ApiResponse(400, "Receipt number out of range", "Contact to main branch for token", 400))->toJson();
+        if ($slip_no < $token["start_no"] || $slip_no > $token["end_no"]) {
+            (new ApiResponse(400, "Slip number out of range", "Contact to main branch for token", 400))->toJson();
             return;
         }
 
         // check slip no used or not
-        $stmt = $db->query("SELECT * FROM booking WHERE slip_no = ?", [$slip_no]);
+        $stmt = $db->query("SELECT * FROM bookings WHERE slip_no = ?", [$slip_no]);
         $booking = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($booking) {
             (new ApiResponse(400, "Receipt number already used", "Contact to main branch for token", 400))->toJson();
@@ -145,15 +148,15 @@ $router->add("POST", "/booking/new", function () {
 
         // INSET IN booking table
         $sql = "INSERT INTO bookings (
-        consignee_name, consignee_mobile, consignor_name, consignor_mobile, branch_id, 
-        slip_no, booking_address, transport_mode, paid_type, cgst, sgst, igst, 
-        total_value, package_count, package_weight, package_value, package_contents, 
-        shipper_name, destination_city_id, destination_branch_id, xp_branch_id, 
-        created_by, on_account, to_pay
-    ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-    )";
-
+            consignee_name, consignee_mobile, consignor_name, consignor_mobile, branch_id, 
+            slip_no, booking_address, transport_mode, paid_type, cgst, sgst, igst, 
+            total_value, package_count, package_weight, package_value, package_contents, 
+            shipper_name, destination_city_id, destination_branch_id, xp_branch_id, 
+            created_by, on_account, to_pay
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )";
+        
         $stmt = $db->query($sql, [
             $data["consignee_name"],
             $data["consignee_mobile"],
@@ -182,7 +185,7 @@ $router->add("POST", "/booking/new", function () {
         ]);
 
         // INSET IN tracking table
-        $sql = "INSERT INTO tracking (slip_no, status, branch_id) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO tracking (slip_no, tracking_status, branch_id) VALUES (?, ?, ?)";
         $stmt = $db->query($sql, [$slip_no, '0', $_info->branch_id]);
         $db->commit();
         (new ApiResponse(200, "Receipt generated successfully", $slip_no, 200))->toJson();
