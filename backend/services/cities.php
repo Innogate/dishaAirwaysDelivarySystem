@@ -10,10 +10,9 @@
         $handler = new Handler();
         $_info = $jwt->validate();
         $payload = (object) [
-            "fields" => ["cities.*"],
+            "fields" => [],
             "max" => 10,
-            "current" => 1,
-            "relation" => null,
+            "current" => 1
         ];
         $data = json_decode(file_get_contents("php://input"), true);
         if (!empty($data)) {
@@ -21,9 +20,9 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE status = TRUE ORDER BY city_name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery("cities", $payload->fields)." WHERE status = TRUE ORDER BY city_name ASC LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
-        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (!$list) {
             $list = [];
         }
@@ -40,11 +39,8 @@
         $_info = $jwt->validate();
 
         $payload = (object) [
-            "fields" => ["cities.*"],
-            "max" => 10,
-            "city_id" => 0,
-            "current" => 1,
-            "relation" => null,
+            "fields" => [],
+            "city_id" => 0
         ];
         $data = json_decode(file_get_contents("php://input"), true);
 
@@ -53,11 +49,11 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ?";
+        $sql = $db->generateDynamicQuery("cities", $payload->fields)." WHERE city_id = ?";
         $stmt = $db->query($sql, [$payload->city_id]);
         $list = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$list) {
-            $response = new ApiResponse(400, "Invalid City ID", "", 400);
+            $response = new ApiResponse(400, "Invalid City ID", $sql, 400);
             $response->toJson();
         }
 
@@ -73,10 +69,9 @@
         $_info = $jwt->validate();
 
         $payload = (object) [
-            "fields" => ["cities.*"],
+            "fields" => [],
             "max" => 10,
             "current" => 1,
-            "relation" => null,
             "state_id" => 0
         ];
         $data = json_decode(file_get_contents("php://input"), true);
@@ -85,7 +80,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery($payload->fields, $payload->relation)." WHERE state_id = ? AND status = TRUE ORDER BY city_name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery("cities", $payload->fields)." WHERE state_id = ? AND status = TRUE ORDER BY city_name ASC LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$payload->state_id, $payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);;
         if (!$list) {
@@ -195,11 +190,9 @@
     
         $payload = (object) [
             "updates" => [
-                'cities.city_name' => 'Error'
+                'city_name' => 'Error'
             ],
-            "conditions" => [
-                'cities.city_id' => 0
-            ]
+            "conditions" => 'city_id=0'
         ];
     
         $data = json_decode(file_get_contents("php://input"), true);
@@ -210,14 +203,11 @@
         }
     
         $db = new Database();
-        $sql = $db->generateDynamicUpdate($payload->updates, $payload->conditions);
-    
-        // Debug: Print generated SQL query and parameters
-        error_log("SQL Query: " . $sql["query"]);
-        error_log("Parameters: " . json_encode($sql["params"]));
+        $sql = $db->generateDynamicUpdate("cities", $payload->updates, $payload->conditions);
+
     
         try {
-            $stmt = $db->query($sql["query"], $sql["params"]);
+            $stmt = $db->query($sql[0], $sql[1]);
     
             if ($stmt->rowCount() > 0) {
                 (new ApiResponse(200,"Update successful", $stmt->rowCount()))->toJson();

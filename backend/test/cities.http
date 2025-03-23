@@ -4,12 +4,6 @@
 GET {{apiUrl}}/version
 Content-Type: application/json
 
-@apiUrl = http://localhost:8000
-@token = {{login.response.body.body.token}}
-### VERSION AND CHECK SERVER CONNECTION
-GET {{apiUrl}}/version
-Content-Type: application/json
-
 
 ### ? Login with the created user
 # @name login
@@ -34,10 +28,9 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-   "fields" : ["cities.city_id","cities.city_name"],
+   "fields" : [],
     "max" : 12,
-    "current" : 0,
-    "relation" : null
+    "current" : 0
 }
 
 #### GET CITY By id
@@ -46,9 +39,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "city_id": 1,
-    "fields" : ["cities.city_id","cities.city_name"],
-    "relation" : null
+    "fields" : [],
+    "city_id": "1216"
 }
 
 
@@ -59,11 +51,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "fields" : ["cities.city_id","cities.city_name"],
+    "fields" : [],
     "max" : 12,
     "current" : 0,
-    "relation" : null,
-    "state_id": 5
+    "state_id": 1
 }
 
 #### ADD NEW CITY
@@ -72,7 +63,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "city_name": "ZSDC",
+    "city_name": "WWWWWW",
     "state_id": 1
 }
 
@@ -83,11 +74,9 @@ Authorization: Bearer {{token}}
 
 {
     "updates": {
-        "cities.city_name": "WPC"
+        "city_name": "WPC"
     },
-    "conditions":{
-        "cities.city_id": 1
-    }
+    "conditions":"city_id=1216"
 }
 
 
