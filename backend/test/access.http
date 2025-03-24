@@ -43,7 +43,7 @@ Authorization: Bearer {{token}}
 
 {
     "user_id": 1,
-    "permission_code": "0111",
+    "permission_code": "1111",
     "page_id": 1
 
 }

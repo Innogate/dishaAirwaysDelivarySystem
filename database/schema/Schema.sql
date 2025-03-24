@@ -147,7 +147,7 @@ CREATE TABLE bookings (
     booking_id SERIAL PRIMARY KEY,
     consignee_name VARCHAR(255) NOT NULL,
     consignee_mobile VARCHAR(15) NOT NULL,
-    consignor_charge VARCHAR(255) NOT NULL,
+    consignor_name VARCHAR(255) NOT NULL,
     consignor_mobile VARCHAR(15) NOT NULL,
     branch_id INT NOT NULL,
     slip_no VARCHAR(50) UNIQUE NOT NULL,
@@ -170,14 +170,13 @@ CREATE TABLE bookings (
     xp_branch_id INT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     created_by INT NOT NULL,
-    manifest_id SERIAL DEFAULT NULL,
+    manifest_id VARCHAR(255) DEFAULT NULL,
     status BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
     FOREIGN KEY (destination_city_id) REFERENCES cities(city_id) ON DELETE CASCADE,
     FOREIGN KEY (destination_branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
-    FOREIGN KEY (xp_branch_id) REFERENCES branches(branch_id) ON DELETE SET NULL,
-    FOREIGN KEY (manifest_id) REFERENCES manifests(manifest_id) ON DELETE SET NULL
+    FOREIGN KEY (xp_branch_id) REFERENCES branches(branch_id) ON DELETE SET NULL
 );
 
 -- Tracking Table: Stores tracking information for bookings

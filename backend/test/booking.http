@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "9876542233",
-    "passwd": "securePass123"
+    "id": "1234567891",
+    "passwd": "123456"
 }
 
 ### Get Booking List
@@ -29,10 +29,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    fields: [],
-    max: 14,
-    current: 0,
-    destination_branch_id: 1
+    "fields": [],
+    "max": 14,
+    "current": 0,
+    "destination_branch_id": 1
 }
 
 
@@ -47,7 +47,7 @@ Authorization: Bearer {{token}}
     
 }
 
-### Get Booking List
+### ! Get Booking List : HAVE A PROBLEM DON'T USE THAT
 GET {{apiUrl}}/autofill/newBooking
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -65,7 +65,7 @@ Authorization: Bearer {{token}}
     "consignee_mobile": "9876543210",
     "consignor_name": "Jane Smith",
     "consignor_mobile": "9876543211",
-    "branch_id": 1,
+    "branch_id": 2,
     "slip_no": 5000,
     "booking_address": "123 Street, City",
     "transport_mode": "Air",
@@ -80,7 +80,7 @@ Authorization: Bearer {{token}}
     "package_contents": "Electronics",
     "shipper_charges": "ABC Logistics",
     "destination_city_id": 1,
-    "destination_branch_id": 1,
+    "destination_branch_id": 2,
     "xp_branch_id": null,
     "created_by": 1,
     "to_pay": "Y",

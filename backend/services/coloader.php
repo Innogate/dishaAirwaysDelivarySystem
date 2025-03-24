@@ -20,7 +20,7 @@
         }
 
         $db = new Database();
-        $sql = $db->generateDynamicQuery("coloader", $payload->fields)." WHERE branch_id = ? ORDER BY city_name ASC LIMIT ? OFFSET ?";
+        $sql = $db->generateDynamicQuery("coloader", $payload->fields)." WHERE coloader_branch = ? ORDER BY coloader_city ASC LIMIT ? OFFSET ?";
         $stmt = $db->query($sql, [$_info->branch_id ,$payload->max, $payload->current]);
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (!$list) {
@@ -37,11 +37,15 @@
         $jwt = new JwtHandler();
         $handler = new Handler();
         $_info = $jwt->validate();
-        $handler->validatePermission($pageID, $_info->user_id, "w");
+        $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
     
         $data = json_decode(file_get_contents("php://input"), true);
-
+        $requredFields = ["coloader_name", "coloader_contuct", "coloader_address", "coloader_postal_code", "coloader_email", "coloader_city"];
+        $handler->validateInput($data, $requredFields);
     
+        if($isAdmin){
+            (new ApiResponse(200, "You don't have permission to create a coloader only branch admin can do it",null))->toJson();
+        }
         $db = new Database();
 
         $stmt = $db->query("insert into coloader ( coloader_name, coloader_contuct, coloader_address, coloader_postal_code, coloader_email, coloader_city, coloader_branch)values(?, ?, ?, ?, ?, ?, ?);",
@@ -57,9 +61,9 @@
 
         ]);
         if($stmt){
-            (new ApiResponse(200, "Success", null)).toJson();
+            (new ApiResponse(200, "Success", null))->toJson();
         }
-        (new ApiResponse(200, "Faild to create coloader",null)).toJson();
+        (new ApiResponse(200, "Faild to create coloader",null))->toJson();
     });
     
 
