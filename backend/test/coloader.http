@@ -1,0 +1,71 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+### VERIFY
+GET {{apiUrl}}/verify
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+#### GET ALL COLOADER
+POST {{apiUrl}}/master/coloader
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "fields" : [],
+    "max" : 12,
+    "current" : 0
+}
+
+
+#### ADD NEW Coloader
+POST {{apiUrl}}/master/coloader/new
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "coloader_name":"", 
+    "coloader_contuct":"", 
+    "coloader_address":"",    
+    "coloader_postal_code":"",
+    "coloader_email":"",
+    "coloader_city":"" 
+}
+
+#### UPDATE CITY
+POST {{apiUrl}}/master/coloader/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "coloader_name": "WPC"
+    },
+    "conditions":"cploader_id=1"
+}
+
+
+#### DELETE CITY
+POST {{apiUrl}}/master/coloader/delete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "coloader_id": 1
+}

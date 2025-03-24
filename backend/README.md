@@ -15,3 +15,5 @@
 7. Employees    
 8. Permission
 9. Booking Sleeps
+10. Coloader
+11. Manifest
