@@ -124,6 +124,24 @@ CREATE TABLE employees (
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
 );
+
+CREATE TABLE coloader (
+    coloader_id SERIAL PRIMARY KEY,
+    coloader_name VARCHAR(200),
+    coloader_contuct VARCHAR(20),
+    coloader_address VARCHAR(50),
+    coloader_postal_code VARCHAR(20),
+    coloader_email VARCHAR(20),
+    coloader_city VARCHAR(20),
+    coloader_branch VARCHAR(20)
+);
+
+CREATE TABLE manifests(
+    manifest_id SERIAL PRIMARY KEY,
+    coloader_id SERIAL NOT NULL,
+    coloader_transport_mode VARCHAR(20)
+);
+
 -- Bookings Table: Stores booking information including consignee, consignor, and packages
 CREATE TABLE bookings (
     booking_id SERIAL PRIMARY KEY,
@@ -152,12 +170,14 @@ CREATE TABLE bookings (
     xp_branch_id INT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     created_by INT NOT NULL,
+    manifest_id SERIAL DEFAULT NULL,
     status BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
     FOREIGN KEY (destination_city_id) REFERENCES cities(city_id) ON DELETE CASCADE,
     FOREIGN KEY (destination_branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
-    FOREIGN KEY (xp_branch_id) REFERENCES branches(branch_id) ON DELETE SET NULL
+    FOREIGN KEY (xp_branch_id) REFERENCES branches(branch_id) ON DELETE SET NULL,
+    FOREIGN KEY (manifest_id) REFERENCES manifests(manifest_id) ON DELETE SET NULL
 );
 
 -- Tracking Table: Stores tracking information for bookings
@@ -171,16 +191,6 @@ CREATE TABLE tracking (
     FOREIGN KEY (slip_no) REFERENCES bookings(slip_no) ON DELETE CASCADE
 );
 
-CREATE TABLE coloader (
-    coloader_id SERIAL PRIMARY KEY NOT NULL,
-    coloader_name VARCHAR(200),
-    coloader_contuct VARCHAR(20),
-    coloader_address VARCHAR(50),
-    coloader_postal_code VARCHAR(20),
-    coloader_email VARCHAR(20),
-    coloader_city VARCHAR(20),
-    coloader_branch VARCHAR(20)
-);
 
 -- Adding Indexes for faster queries (Optional but recommended for large databases)
 CREATE INDEX idx_users_mobile ON users(mobile);
