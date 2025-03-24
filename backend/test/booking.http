@@ -23,6 +23,19 @@ Authorization: Bearer {{token}}
     
 }
 
+### Get Booking List by destination_branch_id
+POST {{apiUrl}}/booking
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    fields: [],
+    max: 14,
+    current: 0,
+    destination_branch_id: 1
+}
+
+
 
 
 ### Get Booking List FOR resiver

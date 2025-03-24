@@ -46,6 +46,45 @@ $router->add('POST', '/booking', function () {
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
+// GET ALL BOOKING BY city_id
+$router->add('POST', '/booking/getByDestination', function () {
+    $pageID = 1;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
+
+    $payload = (object) [
+        "fields" => [],
+        "max" => 10,
+        "current" => 0,
+        "destination_city_id"=> 0,
+    ];
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
+
+    $db = new Database();
+    if ($isAdmin && $_info->branch_id == null) {
+        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE destination_branch_id = ?  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $stmt = $db->query($sql, [$payload->destination_branch_id,$payload->max, $payload->current]);
+    } else {
+        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE branch_id = ? AND destination_branch_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        // $sql = $db->modifySelectQueryWithForeignKeys($sql);
+        $stmt = $db->query($sql, [$_info->branch_id, $payload->destination_branch_id, $payload->max, $payload->current]);
+    }
+
+    $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!$list) {
+        $list = [];
+    }
+
+    (new ApiResponse(200, "Success", $list))->toJson();
+});
 
 // received
 $router->add('POST', '/booking/received', function () {
