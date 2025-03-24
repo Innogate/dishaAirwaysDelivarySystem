@@ -190,7 +190,7 @@ $router->add("POST", "/booking/new", function () {
             consignee_name, consignee_mobile, consignor_name, consignor_mobile, branch_id, 
             slip_no, booking_address, transport_mode, paid_type, cgst, sgst, igst, 
             total_value, package_count, package_weight, package_value, package_contents, 
-            shipper_name, destination_city_id, destination_branch_id, xp_branch_id, 
+            shipper_charges, destination_city_id, destination_branch_id, xp_branch_id, 
             created_by, on_account, to_pay
         ) VALUES (
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -214,7 +214,7 @@ $router->add("POST", "/booking/new", function () {
             $data["package_weight"],
             $data["package_value"],
             $data["package_contents"],
-            $data["shipper_name"],
+            $data["shipper_charges"],
             $data["destination_city_id"],
             $data["destination_branch_id"],
             $data["xp_branch_id"],

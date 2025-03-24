@@ -129,7 +129,7 @@ CREATE TABLE bookings (
     booking_id SERIAL PRIMARY KEY,
     consignee_name VARCHAR(255) NOT NULL,
     consignee_mobile VARCHAR(15) NOT NULL,
-    consignor_name VARCHAR(255) NOT NULL,
+    consignor_charge VARCHAR(255) NOT NULL,
     consignor_mobile VARCHAR(15) NOT NULL,
     branch_id INT NOT NULL,
     slip_no VARCHAR(50) UNIQUE NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE bookings (
     package_weight FLOAT NOT NULL,
     package_value FLOAT NOT NULL,
     package_contents TEXT,
-    shipper_name VARCHAR(255),
+    shipper_charges VARCHAR(255),
     destination_city_id INT NOT NULL,
     destination_branch_id INT NOT NULL,
     xp_branch_id INT NULL,
@@ -169,6 +169,17 @@ CREATE TABLE tracking (
     branch_id INT NOT NULL,
     FOREIGN KEY (branch_id) REFERENCES branches(branch_id) ON DELETE CASCADE,
     FOREIGN KEY (slip_no) REFERENCES bookings(slip_no) ON DELETE CASCADE
+);
+
+CREATE TABLE coloader (
+    coloader_id SERIAL PRIMARY KEY NOT NULL,
+    coloader_name VARCHAR(200),
+    coloader_contuct VARCHAR(20),
+    coloader_address VARCHAR(50),
+    coloader_postal_code VARCHAR(20),
+    coloader_email VARCHAR(20),
+    coloader_city VARCHAR(20),
+    coloader_branch VARCHAR(20)
 );
 
 -- Adding Indexes for faster queries (Optional but recommended for large databases)

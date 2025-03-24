@@ -78,7 +78,7 @@ Authorization: Bearer {{token}}
     "package_weight": 10.5,
     "package_value": 500.0,
     "package_contents": "Electronics",
-    "shipper_name": "ABC Logistics",
+    "shipper_charges": "ABC Logistics",
     "destination_city_id": 1,
     "destination_branch_id": 1,
     "xp_branch_id": null,
