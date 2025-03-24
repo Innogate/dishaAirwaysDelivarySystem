@@ -47,7 +47,7 @@ $router->add('POST', '/booking', function () {
 });
 
 // GET ALL BOOKING BY city_id
-$router->add('POST', '/booking/getByDestination', function () {
+$router->add('POST', '/booking/manifest', function () {
     $pageID = 1;
     $jwt = new JwtHandler();
     $handler = new Handler();
@@ -69,10 +69,10 @@ $router->add('POST', '/booking/getByDestination', function () {
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id == null) {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE destination_branch_id = ?  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE destination_branch_id = ? AND manifest_id = null  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         $stmt = $db->query($sql, [$payload->destination_branch_id,$payload->max, $payload->current]);
     } else {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE branch_id = ? AND destination_branch_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE branch_id = ? AND destination_branch_id = ? AND manifest_id = null ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         // $sql = $db->modifySelectQueryWithForeignKeys($sql);
         $stmt = $db->query($sql, [$_info->branch_id, $payload->destination_branch_id, $payload->max, $payload->current]);
     }
@@ -85,6 +85,7 @@ $router->add('POST', '/booking/getByDestination', function () {
 
     (new ApiResponse(200, "Success", $list))->toJson();
 });
+
 
 // received
 $router->add('POST', '/booking/received', function () {
