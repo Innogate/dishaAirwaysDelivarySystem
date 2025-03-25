@@ -84,6 +84,8 @@ Authorization: Bearer {{token}}
     "xp_branch_id": null,
     "created_by": 1,
     "to_pay": "Y",
-    "on_account": "1020034"
+    "on_account": "1020034",
+    "declared_value": 200,
+    "other_charges": 200
 }
 
