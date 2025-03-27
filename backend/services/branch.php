@@ -34,7 +34,7 @@ $router->add('POST', '/master/branches/byId', function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "r");
+    // $handler->validatePermission($pageID, $_info->user_id, "r");
 
     $payload = (object) [
         "fields" => [],
