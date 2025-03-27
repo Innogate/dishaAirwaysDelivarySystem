@@ -1,4 +1,15 @@
 services:
+  angular:
+    build:
+      context: .
+      dockerfile: docker/build/Dockerfile.build.angular
+    container_name: angular
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    working_dir: /app
+    command: sleep infinity
+    
   db:
     image: postgres
     container_name: db-container

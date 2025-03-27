@@ -1,0 +1,13 @@
+FROM node:lts-alpine
+
+ARG HOST_UID
+
+ENV CHROME_BIN='/usr/bin/chromium-browser'
+RUN apk add --no-cache bash git
+COPY ./mobile /app
+
+WORKDIR /app
+
+RUN npm install -g npm@latest @angular/cli
+
+CMD ["sleep", "infinity"]
