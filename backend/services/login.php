@@ -28,7 +28,16 @@
             if ($brach) {
                 $branch_id = $brach['branch_id'];
             } else {
-                $branch_id = null;
+                // check user in branch_user
+                $sql = "SELECT branch_id FROM branch_user WHERE user_id = ?";
+                $stmt = $db->query($sql, [ $user['user_id'] ]);
+                $branch = $stmt->fetch(mode: PDO::FETCH_ASSOC);
+                if ($branch) {
+                    $branch_id = $branch['branch_id'];
+                }
+                else{
+                    $branch_id = null;
+                }
             }
             $response = new ApiResponse(200, "Success", body: [
                 "token" => $jwt->generateToken([

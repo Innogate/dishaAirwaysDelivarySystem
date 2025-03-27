@@ -98,6 +98,18 @@ ALTER SEQUENCE public.bookings_booking_id_seq OWNED BY public.bookings.booking_i
 
 
 --
+-- Name: branch_user; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.branch_user (
+    branch_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+ALTER TABLE public.branch_user OWNER TO test;
+
+--
 -- Name: branches; Type: TABLE; Schema: public; Owner: test
 --
 
@@ -697,6 +709,217 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 
 
 --
+-- Data for Name: bookings; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.bookings (booking_id, consignee_name, consignee_mobile, consignor_name, consignor_mobile, branch_id, slip_no, booking_address, transport_mode, paid_type, on_account, to_pay, cgst, sgst, igst, total_value, package_count, package_weight, package_value, package_contents, shipper_charges, destination_city_id, destination_branch_id, xp_branch_id, created_at, created_by, manifest_id, status, other_charges, declared_value) FROM stdin;
+\.
+
+
+--
+-- Data for Name: branch_user; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.branch_user (branch_id, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: branches; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.branches (branch_id, branch_name, branch_short_name, alias_name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, cgst, sgst, igst, logo, created_at, created_by, updated_at, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: cities; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.cities (city_id, city_name, state_id, created_at, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: coloader; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.coloader (coloader_id, coloader_name, coloader_contuct, coloader_address, coloader_postal_code, coloader_email, coloader_city, coloader_branch) FROM stdin;
+\.
+
+
+--
+-- Data for Name: credit_node; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.credit_node (credit_node_id, branch_id, start_no, end_no, created_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: employees; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.employees (employee_id, employee_name, employee_mobile, address, aadhar_no, joining_date, created_at, branch_id, designation, created_by, updated_at, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: manifests; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.manifests (manifest_id, coloader_id, coloader_transport_mode) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pages; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.pages (page_id, page_name, created_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: permissions; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.permissions (permission_id, page_id, permission_code, user_id, created_at, created_by, updated_at, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: representatives; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.representatives (representative_id, branch_id, user_id, created_at, created_by, updated_at, status) FROM stdin;
+\.
+
+
+--
+-- Data for Name: states; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.states (state_id, state_name, status, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tracking; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.tracking (tracking_id, slip_no, tracking_status, created_at, branch_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: test
+--
+
+COPY public.users (user_id, mobile, password, first_name, last_name, gender, birth_date, address, email, created_at, created_by, updated_at, status) FROM stdin;
+1	1234567890	pass@1234	super	admin	\N	\N	\N	\N	2025-03-27 20:13:43.01858	1	2025-03-27 20:13:43.01858	t
+\.
+
+
+--
+-- Name: bookings_booking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.bookings_booking_id_seq', 1, false);
+
+
+--
+-- Name: branches_branch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.branches_branch_id_seq', 1, false);
+
+
+--
+-- Name: cities_city_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.cities_city_id_seq', 1, false);
+
+
+--
+-- Name: coloader_coloader_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.coloader_coloader_id_seq', 1, false);
+
+
+--
+-- Name: credit_node_credit_node_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.credit_node_credit_node_id_seq', 1, false);
+
+
+--
+-- Name: employees_employee_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.employees_employee_id_seq', 1, false);
+
+
+--
+-- Name: manifests_coloader_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.manifests_coloader_id_seq', 1, false);
+
+
+--
+-- Name: manifests_manifest_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.manifests_manifest_id_seq', 1, false);
+
+
+--
+-- Name: pages_page_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.pages_page_id_seq', 1, false);
+
+
+--
+-- Name: permissions_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.permissions_permission_id_seq', 1, false);
+
+
+--
+-- Name: representatives_representative_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.representatives_representative_id_seq', 1, false);
+
+
+--
+-- Name: states_state_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.states_state_id_seq', 1, false);
+
+
+--
+-- Name: tracking_tracking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.tracking_tracking_id_seq', 1, false);
+
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.users_user_id_seq', 1, true);
+
+
+--
 -- Name: bookings bookings_pkey; Type: CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -911,6 +1134,22 @@ ALTER TABLE ONLY public.bookings
 
 
 --
+-- Name: branch_user branch_user_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branch_user
+    ADD CONSTRAINT branch_user_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(branch_id) ON DELETE CASCADE;
+
+
+--
+-- Name: branch_user branch_user_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branch_user
+    ADD CONSTRAINT branch_user_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
 -- Name: branches branches_city_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -1026,12 +1265,3 @@ ALTER TABLE ONLY public.tracking
 -- PostgreSQL database dump complete
 --
 
--- creat brach_user_table
-CREATE TABLE public.branch_user (
-    branch_id integer NOT NULL,
-    user_id integer NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES public.branches(branch_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE
-)
-
-ALTER TABLE public.branch_user OWNER TO test;

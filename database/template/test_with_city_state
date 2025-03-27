@@ -1992,17 +1992,6 @@ COPY public.manifests (manifest_id, coloader_id, coloader_transport_mode) FROM s
 --
 
 COPY public.pages (page_id, page_name, created_at) FROM stdin;
-1	Booking	2025-03-27 20:26:28.918462
-2	States	2025-03-27 20:26:28.921239
-3	Cities	2025-03-27 20:26:28.922784
-4	Users	2025-03-27 20:26:28.924093
-5	Companies	2025-03-27 20:26:28.925382
-6	Branch	2025-03-27 20:26:28.926623
-7	Employees	2025-03-27 20:26:28.927684
-8	Permission	2025-03-27 20:26:28.928918
-9	Booking Sleeps	2025-03-27 20:26:28.930017
-10	Coloader	2025-03-27 20:26:28.930994
-11	Manifest	2025-03-27 20:26:28.932086
 \.
 
 
@@ -2011,17 +2000,6 @@ COPY public.pages (page_id, page_name, created_at) FROM stdin;
 --
 
 COPY public.permissions (permission_id, page_id, permission_code, user_id, created_at, created_by, updated_at, status) FROM stdin;
-1	1	11111	1	2025-03-27 20:28:22.498029	1	2025-03-27 20:28:22.498029	t
-2	2	11111	1	2025-03-27 20:28:22.502812	1	2025-03-27 20:28:22.502812	t
-3	3	11111	1	2025-03-27 20:28:22.504784	1	2025-03-27 20:28:22.504784	t
-4	4	11111	1	2025-03-27 20:28:22.506756	1	2025-03-27 20:28:22.506756	t
-5	5	11111	1	2025-03-27 20:28:22.508351	1	2025-03-27 20:28:22.508351	t
-6	6	11111	1	2025-03-27 20:28:22.510179	1	2025-03-27 20:28:22.510179	t
-7	7	11111	1	2025-03-27 20:28:22.511948	1	2025-03-27 20:28:22.511948	t
-8	8	11111	1	2025-03-27 20:28:22.513722	1	2025-03-27 20:28:22.513722	t
-9	9	11111	1	2025-03-27 20:28:22.524724	1	2025-03-27 20:28:22.524724	t
-10	10	11111	1	2025-03-27 20:28:22.528508	1	2025-03-27 20:28:22.528508	t
-11	11	11111	1	2025-03-27 20:28:22.529637	1	2025-03-27 20:28:22.529637	t
 \.
 
 
@@ -2152,14 +2130,14 @@ SELECT pg_catalog.setval('public.manifests_manifest_id_seq', 1, false);
 -- Name: pages_page_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.pages_page_id_seq', 11, true);
+SELECT pg_catalog.setval('public.pages_page_id_seq', 1, false);
 
 
 --
 -- Name: permissions_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.permissions_permission_id_seq', 11, true);
+SELECT pg_catalog.setval('public.permissions_permission_id_seq', 1, false);
 
 
 --

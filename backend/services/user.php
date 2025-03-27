@@ -113,7 +113,7 @@ $router->add('POST', '/master/users/new', function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "w");
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
 
     $data = json_decode(file_get_contents("php://input"), true);
 
@@ -138,6 +138,13 @@ $router->add('POST', '/master/users/new', function () {
         );
         $user_id = $stmt->fetchColumn();
 
+        // inset into brach user
+        if (!$isAdmin && $_info->branch_id != null) {
+            $stmt = $db->query(
+                "INSERT INTO branch_user (branch_id, user_id) VALUES (?, ?)",
+                [$_info->branch_id, $user_id]
+            );
+        }
        
     } catch (Exception $e) {
         $db->pdo->rollBack();
