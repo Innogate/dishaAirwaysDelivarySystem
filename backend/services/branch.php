@@ -21,8 +21,9 @@ $router->add('POST', '/master/branches', function () {
 
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery("branches", $payload->fields) . " WHERE status = TRUE LIMIT ? OFFSET ?";
+    $sql = $db->generateDynamicQuery("branches", $payload->fields) . " JOIN representatives ON representatives.branch_id = branches.branch_id WHERE branches.status = TRUE LIMIT ? OFFSET ?";
     $stmt = $db->query($sql, [$payload->max, $payload->current]);
+
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();
@@ -102,7 +103,8 @@ $router->add('POST', '/master/branches/new', function () {
         "state_id",
         "city_id",
         "contact_no",
-        "representative_user_id"
+        "representative_id",
+        "manifest_sires"
     ]);
 
     $db = new Database();
@@ -147,8 +149,9 @@ $router->add('POST', '/master/branches/new', function () {
         cgst, 
         sgst, 
         igst, 
-        logo, 
-        created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING branch_id", [
+        logo,
+        manifest_sires,
+        created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING branch_id", [
             $data["branch_name"],
             $data["branch_short_name"],
             $data["alias_name"],
@@ -165,6 +168,7 @@ $router->add('POST', '/master/branches/new', function () {
             $data["sgst"],
             $data["igst"],
             $data["logo"],
+            $data["manifest_sires"],
             $_info->user_id
             
         ]);
@@ -180,7 +184,7 @@ $router->add('POST', '/master/branches/new', function () {
         // INSERT REPRESENTATIVE
         $stmt = $db->query("INSERT INTO representatives (branch_id, user_id, created_by) VALUES (?,?,?)", [
             $branch_id,
-            $data["representative_user_id"],
+            $data["representative_id"],
             $_info->user_id
         ]);
 
@@ -255,7 +259,9 @@ $router->add('POST', '/master/branches/update', function () {
         (new ApiResponse(400, "Invalid payload", $data))->toJson();
         return;
     }
-
+    // pop fild from from payload upates
+     $representative_id = $payload->updates["representative_id"];
+     unset($payload->updates["representative_id"]);
     // Initialize Database connection
     $db = new Database();
     $db->pdo->beginTransaction();
@@ -263,11 +269,16 @@ $router->add('POST', '/master/branches/update', function () {
 
         // Update the branch in the database
         $sql = $db->generateDynamicUpdate("branches", $payload->updates, $payload->conditions);
+        // (new ApiResponse(200,$sql[1]))->toJson();
         $stmt = $db->query($sql[0], $sql[1]);
+
+        // upate representative
+        $sql = "UPDATE representatives SET user_id = ? WHERE branch_id = ?";
+        $db->query($sql, [$representative_id, $payload->updates["branch_id"]]);
 
         // Commit the transaction and return a success response
         $db->pdo->commit();
-        (new ApiResponse(200, "Branch updated successfully", $stmt->fetchColumn()))->toJson();
+        (new ApiResponse(200, "Branch updated successfully", null))->toJson();
     } catch (Exception $e) {
         // Handle any errors and respond with the error message
         (new ApiResponse(500, "Update failed", $e->getMessage()))->toJson();

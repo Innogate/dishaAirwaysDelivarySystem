@@ -98,6 +98,18 @@ ALTER SEQUENCE public.bookings_booking_id_seq OWNED BY public.bookings.booking_i
 
 
 --
+-- Name: branch_user; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.branch_user (
+    branch_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+ALTER TABLE public.branch_user OWNER TO test;
+
+--
 -- Name: branches; Type: TABLE; Schema: public; Owner: test
 --
 
@@ -122,11 +134,19 @@ CREATE TABLE public.branches (
     created_at timestamp without time zone DEFAULT now(),
     created_by integer NOT NULL,
     updated_at timestamp without time zone DEFAULT now(),
-    status boolean DEFAULT true
+    status boolean DEFAULT true,
+    manifest_sires character varying(255) DEFAULT NULL::character varying
 );
 
 
 ALTER TABLE public.branches OWNER TO test;
+
+--
+-- Name: COLUMN branches.manifest_sires; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.branches.manifest_sires IS 'comment';
+
 
 --
 -- Name: branches_branch_id_seq; Type: SEQUENCE; Schema: public; Owner: test
@@ -911,6 +931,22 @@ ALTER TABLE ONLY public.bookings
 
 
 --
+-- Name: branch_user branch_user_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branch_user
+    ADD CONSTRAINT branch_user_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(branch_id) ON DELETE CASCADE;
+
+
+--
+-- Name: branch_user branch_user_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.branch_user
+    ADD CONSTRAINT branch_user_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
 -- Name: branches branches_city_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -1026,12 +1062,3 @@ ALTER TABLE ONLY public.tracking
 -- PostgreSQL database dump complete
 --
 
--- creat brach_user_table
-CREATE TABLE public.branch_user (
-    branch_id integer NOT NULL,
-    user_id integer NOT NULL,
-    FOREIGN KEY (branch_id) REFERENCES public.branches(branch_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE
-)
-
-ALTER TABLE public.branch_user OWNER TO test;
