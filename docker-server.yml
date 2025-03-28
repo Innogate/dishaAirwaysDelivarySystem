@@ -9,6 +9,8 @@ services:
       - "4200:4200"
     working_dir: /app
     command: sleep infinity
+    volumes:
+      - ./mobile:/app
     
   db:
     image: postgres
