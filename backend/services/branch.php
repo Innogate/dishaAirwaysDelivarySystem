@@ -126,6 +126,10 @@ $router->add('POST', '/master/branches/new', function () {
             return;
         }
         
+        $data["cgst"] = $data["cgst"] ?? 0;
+        $data["sgst"] = $data["sgst"] ?? 0;
+        $data["igst"] = $data["igst"] ?? 0;
+        
         // INSERT BRANCH
         $stmt = $db->query("INSERT INTO branches (
         branch_name, 
