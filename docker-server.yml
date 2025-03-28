@@ -21,7 +21,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - ./database/data:/var/lib/postgresql/data
       - ./database/template:/docker-entrypoint-initdb.d
 
   php:
