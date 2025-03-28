@@ -4,9 +4,8 @@ ARG HOST_UID
 
 ENV CHROME_BIN='/usr/bin/chromium-browser'
 RUN apk add --no-cache bash git
-COPY ./mobile /app
-
 WORKDIR /app
+RUN git clone https://github.com/Innogate/DelivaryWebapp.git /app
 
 RUN npm install -g npm@latest @angular/cli
 

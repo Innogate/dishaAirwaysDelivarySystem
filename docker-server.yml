@@ -8,9 +8,7 @@ services:
     ports:
       - "4200:4200"
     working_dir: /app
-    command: sleep infinity
-    volumes:
-      - ./mobile:/app
+    command:  bash start.sh
     
   db:
     image: postgres
