@@ -32,7 +32,7 @@ $router->add('POST', '/booking', function () {
         $sql = $db->generateDynamicQuery("bookings", $payload->fields) . "  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE branch_id = ?  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $sql = " SELECT bookings.*, branches.branch_name FROM bookings JOIN branches ON branches.branch_id = bookings.destination_branch_id WHERE bookings.branch_id = ?  ORDER BY bookings.created_at DESC LIMIT ? OFFSET ?;";
         // $sql = $db->modifySelectQueryWithForeignKeys($sql);
         $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
@@ -173,8 +173,13 @@ $router->add("POST", "/booking/new", function () {
         //     (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
         // }
 
+        // take branch branch_short_name
+        $sql = "SELECT branch_short_name FROM branches WHERE branch_id = ?;";
+        $stmt = $db->query($sql, [$_info->branch_id]);
+        $branch = $stmt->fetch(PDO::FETCH_ASSOC);
+
         // check sleep no in range
-        $slip_no = (int)$data["slip_no"];
+        $slip_no =$branch["branch_short_name"].$data["slip_no"];
         // if ($slip_no < $token["start_no"] || $slip_no > $token["end_no"]) {
         //     (new ApiResponse(400, "Slip number out of range", "Contact to main branch for token", 400))->toJson();
         //     return;
