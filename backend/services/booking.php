@@ -131,7 +131,10 @@ $router->add("POST", "/booking/new", function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission
+    if ($isAdmin) {
+        (new ApiResponse(200,"You are admin accout branch or branch employee account requred", $pageID))->toJson();
+    }
 
     $data = json_decode(file_get_contents("php://input"), true);
 
@@ -160,23 +163,22 @@ $router->add("POST", "/booking/new", function () {
 
     try {
 
-        // GET TOKEN FROM credit_node table take last recode
-        $sql = "SELECT * FROM credit_node WHERE branch_id = ? ORDER BY credit_node_id DESC LIMIT 1;
-";
-        $stmt = $db->query($sql, [$_info->branch_id]);
-        $token = $stmt->fetch(PDO::FETCH_ASSOC);
+        // // GET TOKEN FROM credit_node table take last recode
+        // $sql = "SELECT * FROM credit_node WHERE branch_id = ? ORDER BY credit_node_id DESC LIMIT 1;";
+        // $stmt = $db->query($sql, [$_info->branch_id]);
+        // $token = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // check toke unused garter then 0 or not 
-        if (!$token) {
-            (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
-        }
+        // // check toke unused garter then 0 or not 
+        // if (!$token) {
+        //     (new ApiResponse(400, "Don't have any token", "Contact to main branch for token", 400))->toJson();
+        // }
 
         // check sleep no in range
         $slip_no = (int)$data["slip_no"];
-        if ($slip_no < $token["start_no"] || $slip_no > $token["end_no"]) {
-            (new ApiResponse(400, "Slip number out of range", "Contact to main branch for token", 400))->toJson();
-            return;
-        }
+        // if ($slip_no < $token["start_no"] || $slip_no > $token["end_no"]) {
+        //     (new ApiResponse(400, "Slip number out of range", "Contact to main branch for token", 400))->toJson();
+        //     return;
+        // }
 
         // check slip no used or not
         $stmt = $db->query("SELECT * FROM bookings WHERE slip_no = ?", [$slip_no]);
