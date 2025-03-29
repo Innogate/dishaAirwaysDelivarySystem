@@ -29,10 +29,23 @@ $router->add('POST', '/booking', function () {
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id == null) {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . "  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $sql = "SELECT 
+    b.*, 
+    br.branch_name AS branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
-        $sql = " SELECT bookings.*, branches.branch_name FROM bookings JOIN branches ON branches.branch_id = bookings.destination_branch_id WHERE bookings.branch_id = ?  ORDER BY bookings.created_at DESC LIMIT ? OFFSET ?;";
+        $sql = "SELECT 
+    b.*, 
+    br.branch_name AS booking_branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id
+ WHERE b.branch_id = ?  ORDER BY b.created_at DESC LIMIT ? OFFSET ?;";
         // $sql = $db->modifySelectQueryWithForeignKeys($sql);
         $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
@@ -109,10 +122,22 @@ $router->add('POST', '/booking/received', function () {
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id == null) {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . "  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $sql = "SELECT 
+    b.*, 
+    br.branch_name AS booking_branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE destination_branch_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $sql = "SELECT 
+    b.*, 
+    br.branch_name AS booking_branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE b.destination_branch_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
 
@@ -179,7 +204,7 @@ $router->add("POST", "/booking/new", function () {
         $branch = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // check sleep no in range
-        $slip_no =$branch["branch_short_name"].$data["slip_no"];
+        $slip_no =$branch["branch_short_name"]."-".$data["slip_no"];
         // if ($slip_no < $token["start_no"] || $slip_no > $token["end_no"]) {
         //     (new ApiResponse(400, "Slip number out of range", "Contact to main branch for token", 400))->toJson();
         //     return;
