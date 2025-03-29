@@ -1,18 +1,4 @@
 services:
-  angular:
-    build:
-      context: ./docker/build
-      dockerfile: Dockerfile.angular
-    container_name: angular
-    restart: unless-stopped
-    volumes:
-      - ./mobile:/app
-      - ./docker/containers/react-native:/home/vscode
-    ports:
-      - "4200:4200"
-    working_dir: /app
-    command: sleep infinity
-  
   db:
     image: postgres
     container_name: db-container
