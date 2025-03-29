@@ -59,7 +59,8 @@ JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
-$router->add('POST', '/booking/manifest', function () {
+// GET ALL BOOKING BY BRANCH ID
+$router->add('POST', '/booking/byDestinationBranch', function () {
     $pageID = 1;
     $jwt = new JwtHandler();
     $handler = new Handler();
@@ -70,7 +71,7 @@ $router->add('POST', '/booking/manifest', function () {
         "fields" => [],
         "max" => 10,
         "current" => 0,
-        "destination_branch_id"=> 0,
+        "destination_branch_id" => 0
     ];
 
     $data = json_decode(file_get_contents("php://input"), true);
@@ -81,63 +82,25 @@ $router->add('POST', '/booking/manifest', function () {
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id == null) {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE destination_branch_id = ? AND manifest_id = null  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
-        $stmt = $db->query($sql, [$payload->destination_branch_id,$payload->max, $payload->current]);
+        $sql = "SELECT 
+    b.*, 
+    br.branch_name AS branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE b.destination_branch_id = ?  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $stmt = $db->query($sql, [$payload->destination_branch_id, $payload->max, $payload->current]);
     } else {
-        $sql = $db->generateDynamicQuery("bookings", $payload->fields) . " WHERE branch_id = ? AND destination_branch_id = ? AND manifest_id = null ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+        $sql = "SELECT 
+    b.*, 
+    br.branch_name AS booking_branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id
+ WHERE b.branch_id = ? AND b.destination_branch_id = ?  ORDER BY b.created_at DESC LIMIT ? OFFSET ?;";
         // $sql = $db->modifySelectQueryWithForeignKeys($sql);
         $stmt = $db->query($sql, [$_info->branch_id, $payload->destination_branch_id, $payload->max, $payload->current]);
-    }
-
-    $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    if (!$list) {
-        $list = [];
-    }
-
-    (new ApiResponse(200, "Success", $list))->toJson();
-});
-
-
-// received
-$router->add('POST', '/booking/received', function () {
-    $pageID = 1;
-    $jwt = new JwtHandler();
-    $handler = new Handler();
-    $_info = $jwt->validate();
-    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w"); // Check user permission for this page
-
-    $payload = (object) [
-        "fields" => [],
-        "max" => 10,
-        "current" => 0
-    ];
-
-    $data = json_decode(file_get_contents("php://input"), true);
-    if (!empty($data)) {
-        $payload = (object) $data;
-    }
-
-
-    $db = new Database();
-    if ($isAdmin && $_info->branch_id == null) {
-        $sql = "SELECT 
-    b.*, 
-    br.branch_name AS booking_branch_name, 
-    dbr.branch_name AS destination_branch_name
-FROM public.bookings b
-JOIN public.branches br ON b.branch_id = br.branch_id
-JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
-        $stmt = $db->query($sql, [$payload->max, $payload->current]);
-    } else {
-        $sql = "SELECT 
-    b.*, 
-    br.branch_name AS booking_branch_name, 
-    dbr.branch_name AS destination_branch_name
-FROM public.bookings b
-JOIN public.branches br ON b.branch_id = br.branch_id
-JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE b.destination_branch_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?;";
-        $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -256,10 +219,6 @@ $router->add("POST", "/booking/new", function () {
             $data["declared_value"],
             $data["other_charges"]
         ]);
-
-        // INSET IN tracking table
-        $sql = "INSERT INTO tracking (slip_no, tracking_status, branch_id) VALUES (?, ?, ?)";
-        $stmt = $db->query($sql, [$slip_no, '0', $_info->branch_id]);
         $db->commit();
         (new ApiResponse(200, "Receipt generated successfully", $slip_no, 200))->toJson();
     } catch (Exception $e) {
@@ -267,3 +226,69 @@ $router->add("POST", "/booking/new", function () {
         (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
     }
 });
+
+// cancel booking
+$router->add('POST', '/booking/cancel', function () {
+    $pageID = 1;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "w");
+    $required_fields = [
+        "booking_id",
+    ];
+    $data = json_decode(file_get_contents("php://input"), true);
+    $handler->validateInput($data, $required_fields);
+
+    $db = new Database();
+    try {
+        $db->beginTransaction();
+        $stmt = $db->query("UPDATE bookings SET deleted = TRUE WHERE booking_id = ? RETURNING booking_id", [$data["booking_id"]]);
+        if($stmt->rowCount()== 0){
+            $db->rollBack();
+            (new ApiResponse(500, "Server error"))->toJson();
+            return;
+        }
+        $db->commit();
+        (new ApiResponse(200, "Receipt cancel successfully", $data["booking_id"], 200))->toJson();
+    } catch (Exception $e) {
+        $db->rollBack();
+        (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
+    }
+
+});
+
+// update booking
+$router->add('POST', '/booking/update', function () {
+    $pageID = 1;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "w");
+    $payload = (object) [
+        "conditions" => 'booking_id=0',
+        "updates" => []
+    ];
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
+    $db = new Database();
+    try {
+        $db->beginTransaction();
+        $stmt = $db->$db->generateDynamicUpdate("bookings", $payload->updates, $payload->conditions);
+        if($stmt->rowCount()== 0){
+            $db->rollBack();
+            (new ApiResponse(500, "Server error"))->toJson();
+            return;
+        }
+        $db->commit();
+        (new ApiResponse(200, "Booking updated successfully", $data["booking_id"], 200))->toJson();
+    } catch (Exception $e) {
+        $db->rollBack();
+        (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
+    }
+});
+?>

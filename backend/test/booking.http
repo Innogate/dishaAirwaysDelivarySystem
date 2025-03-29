@@ -24,7 +24,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Get Booking List by destination_branch_id
-POST {{apiUrl}}/booking
+POST {{apiUrl}}/booking/byDestinationBranch
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -34,25 +34,6 @@ Authorization: Bearer {{token}}
     "current": 0,
     "destination_branch_id": 1
 }
-
-
-
-
-### Get Booking List FOR resiver
-POST {{apiUrl}}/booking/received
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    
-}
-
-### ! Get Booking List : HAVE A PROBLEM DON'T USE THAT
-GET {{apiUrl}}/autofill/newBooking
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-
 
 
 #### Add New Booking
@@ -89,7 +70,21 @@ Authorization: Bearer {{token}}
     "other_charges": 200
 }
 
-### SERCH CONSINE
+
+#### UPDATE BOOKING
+POST {{apiUrl}}/booking/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "name": "1234509877"
+    },
+    "conditions":"booking_id=6"
+}
+
+
+### AUTO FILL NEW BOOKING
 POST {{apiUrl}}/autofill/newBooking
 Content-Type: application/json
 Authorization: Bearer {{token}}
