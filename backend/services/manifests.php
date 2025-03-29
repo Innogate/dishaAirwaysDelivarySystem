@@ -160,4 +160,47 @@ $router->add('POST', '/manifests/delete', function () {
         (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
     }
 });
+
+// MANIFESTS LIST OF BOOKINGS //? DONE
+$router->add('POST', '/manifests/bookings', function () {
+    $pageID=7;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "r");
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    $db = new Database();
+    try {
+        $db->beginTransaction();
+        // give all booking list that don't have manifests booking_id in booking_id list on brach_id = $_info->branch_id
+        $sql = "WITH bookings_not_in_manifest AS (
+    SELECT b.*
+    FROM bookings b
+    LEFT JOIN manifests m ON ARRAY[b.booking_id] <@ m.booking_id
+    WHERE b.branch_id = ?
+    AND m.manifest_id IS NULL
+),
+received_bookings_not_in_manifest AS (
+    SELECT b.*
+    FROM received_booking rb
+    JOIN bookings b ON rb.booking_id = b.booking_id
+    LEFT JOIN manifests m ON ARRAY[b.booking_id] <@ m.booking_id
+    WHERE rb.branch_id = ?
+    AND m.manifest_id IS NULL
+)
+SELECT * FROM bookings_not_in_manifest
+UNION 
+SELECT * FROM received_bookings_not_in_manifest;
+";
+        $stmt = $db->query($sql, [$_info->branch_id, $_info->branch_id]);
+        $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $db->commit();
+        (new ApiResponse(200, "Success", $list))->toJson();
+    }
+    catch(Exception $e){
+        $db->rollBack();
+        (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
+    }
+})
 ?>

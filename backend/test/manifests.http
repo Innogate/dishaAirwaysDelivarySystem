@@ -60,3 +60,12 @@ Content-Type: application/json
   "manifest_id": 1
 }
 
+
+### LIST FOR BOOKINGS
+POST {{apiUrl}}/manifests/bookings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+
+}

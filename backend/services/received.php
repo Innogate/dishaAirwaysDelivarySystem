@@ -61,14 +61,19 @@ $router->add("POST", "/booking/received/new", function () {
     $db->beginTransaction();
 
     try {
+        $status = true;
         // checking sleep_no valid or not 
-        $sql = "SELECT booking_id  FROM bookings WHERE slip_no = ?";
+        $sql = "SELECT booking_id, destination_branch_id  FROM bookings WHERE slip_no = ?";
         $stmt = $db->query($sql, [$data["slip_no"]]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
             throw new Exception("Invalid Slip No");
         }
         $booking_id = $result["booking_id"];
+        // check destination branch is current branch or not
+        if ($result["destination_branch_id"] == $_info->branch_id) {
+            $status = false;
+        }
         
         // validate this booking id for this branch
         $sql = "SELECT tracking_id FROM tracking WHERE booking_id = ? AND destination_branch_id = ?";
@@ -78,6 +83,13 @@ $router->add("POST", "/booking/received/new", function () {
             (new ApiResponse(404,"Invalid Slip No"))->toJson();
         }
         $tracking_id = $result["tracking_id"];
+        
+        // INSET IN received_bookings
+        $sql = "INSERT INTO received_bookings (booking_id, branch_id, status) VALUES (?, ?)";
+        $stmt = $db->query($sql, [$booking_id, $_info->branch_id, $status]);
+        if (!$stmt->rowCount()) {
+            (new ApiResponse(404,"Something went wrong"))->toJson();
+        }
         
         // UPDATE tracking  received true
         $sql = "UPDATE tracking SET received = TRUE WHERE tracking_id = ?";
