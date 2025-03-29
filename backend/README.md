@@ -19,7 +19,8 @@
 11. Manifest
 
 
-# TRACKING CODES
-0 -> MANIFEST GENERATED
-1 -> Oder revived by branch
-2- > Forward to other branch
+# BOOKING CODES
+0 -> IN BRANCH
+1 -> OUT FROM BOOKING BRANCH
+2 -> DILLARD
+3 -> CANALED

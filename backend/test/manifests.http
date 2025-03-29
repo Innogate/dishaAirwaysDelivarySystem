@@ -1,0 +1,62 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+
+### Get all manifests
+POST {{apiUrl}}/manifests
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "fields": [],
+  "max": 10,
+  "current": 0
+}
+
+
+### Get manifest by ID
+POST {{apiUrl}}/manifests/byId
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "fields" : [],
+    "manifests_id": 1
+}
+
+
+### Create a new manifest
+POST {{apiUrl}}/manifests/new
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coloader_id": 5,
+  "booking_id": [101, 102, 103],
+  "destination_id": 2
+}
+
+
+### Delete a manifest
+POST {{apiUrl}}/manifests/delete
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "manifest_id": 1
+}
+

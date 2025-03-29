@@ -134,8 +134,8 @@ CREATE TABLE public.branches (
     created_at timestamp without time zone DEFAULT now(),
     created_by integer NOT NULL,
     updated_at timestamp without time zone DEFAULT now(),
-    status boolean DEFAULT true,
-    manifest_sires character varying(255) DEFAULT NULL::character varying
+    manifest_sires character varying(255) DEFAULT NULL::character varying,
+    status integer DEFAULT 0
 );
 
 
@@ -146,6 +146,13 @@ ALTER TABLE public.branches OWNER TO test;
 --
 
 COMMENT ON COLUMN public.branches.manifest_sires IS 'comment';
+
+
+--
+-- Name: COLUMN branches.status; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.branches.status IS 'comment';
 
 
 --
@@ -335,8 +342,9 @@ ALTER SEQUENCE public.employees_employee_id_seq OWNED BY public.employees.employ
 CREATE TABLE public.manifests (
     manifest_id integer NOT NULL,
     coloader_id integer NOT NULL,
-    coloader_transport_mode character varying(20),
-    branch_id integer NOT NULL
+    branch_id integer NOT NULL,
+    booking_id integer[],
+    destination_id integer NOT NULL
 );
 
 
@@ -347,6 +355,20 @@ ALTER TABLE public.manifests OWNER TO test;
 --
 
 COMMENT ON COLUMN public.manifests.branch_id IS 'comment';
+
+
+--
+-- Name: COLUMN manifests.booking_id; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.booking_id IS 'Your comment here';
+
+
+--
+-- Name: COLUMN manifests.destination_id; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.destination_id IS 'comment';
 
 
 --
@@ -466,6 +488,51 @@ ALTER SEQUENCE public.permissions_permission_id_seq OWNER TO test;
 --
 
 ALTER SEQUENCE public.permissions_permission_id_seq OWNED BY public.permissions.permission_id;
+
+
+--
+-- Name: received_booking; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.received_booking (
+    id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    booking_id integer NOT NULL,
+    branch_id integer NOT NULL,
+    destination_id integer NOT NULL,
+    status boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE public.received_booking OWNER TO test;
+
+--
+-- Name: COLUMN received_booking.status; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.received_booking.status IS 'comment';
+
+
+--
+-- Name: received_booking_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.received_booking_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.received_booking_id_seq OWNER TO test;
+
+--
+-- Name: received_booking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.received_booking_id_seq OWNED BY public.received_booking.id;
 
 
 --
@@ -697,6 +764,13 @@ ALTER TABLE ONLY public.permissions ALTER COLUMN permission_id SET DEFAULT nextv
 
 
 --
+-- Name: received_booking id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.received_booking ALTER COLUMN id SET DEFAULT nextval('public.received_booking_id_seq'::regclass);
+
+
+--
 -- Name: representatives representative_id; Type: DEFAULT; Schema: public; Owner: test
 --
 
@@ -826,6 +900,14 @@ ALTER TABLE ONLY public.pages
 
 ALTER TABLE ONLY public.permissions
     ADD CONSTRAINT permissions_pkey PRIMARY KEY (permission_id);
+
+
+--
+-- Name: received_booking received_booking_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.received_booking
+    ADD CONSTRAINT received_booking_pkey PRIMARY KEY (id);
 
 
 --
@@ -1032,6 +1114,30 @@ ALTER TABLE ONLY public.permissions
 
 ALTER TABLE ONLY public.permissions
     ADD CONSTRAINT permissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
+-- Name: received_booking received_booking_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.received_booking
+    ADD CONSTRAINT received_booking_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(booking_id);
+
+
+--
+-- Name: received_booking received_booking_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.received_booking
+    ADD CONSTRAINT received_booking_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(branch_id);
+
+
+--
+-- Name: received_booking received_booking_destination_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.received_booking
+    ADD CONSTRAINT received_booking_destination_id_fkey FOREIGN KEY (destination_id) REFERENCES public.branches(branch_id);
 
 
 --
