@@ -89,3 +89,11 @@ Authorization: Bearer {{token}}
     "other_charges": 200
 }
 
+### SERCH CONSINE
+POST {{apiUrl}}/autofill/newBooking
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "search": "1232345435"
+}
