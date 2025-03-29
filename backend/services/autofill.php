@@ -12,13 +12,13 @@ $router->add('POST', '/autofill/newBooking', function () {
 
 
     $db = new Database();
-    $search = $data["search"];
+    $search = $data["search"]."%";
    
     
     $sql = "SELECT DISTINCT ON (b.consignee_name, b.consignee_mobile, b.consignor_name, b.consignor_mobile) 
     b.consignee_name, 
     b.consignee_mobile, 
-    b.booking_address, 
+    b.destination_city_id, 
     b.consignor_name, 
     b.consignor_mobile, 
     b.destination_branch_id
@@ -31,10 +31,10 @@ WHERE
 LIMIT 30";
     
     $stmt = $db->query($sql, [$search, $search, $search, $search]); 
-    $list = $stmt->fetch(PDO::FETCH_ASSOC);
+    $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     if (!$list) {
-        $list = NULL;
+        $list = [];
     }
     
     $response = new ApiResponse(200, "Success", $list);

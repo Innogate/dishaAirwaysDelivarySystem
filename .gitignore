@@ -8,3 +8,4 @@ composer.lock
 mobile/android
 .git_backup
 TODO.md
+android/app/src/main/assets
