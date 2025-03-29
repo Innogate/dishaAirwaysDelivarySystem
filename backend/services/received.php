@@ -32,7 +32,7 @@ $router->add('POST', '/booking/received', function () {
 
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery("received_bookings", $payload->fields)." WHERE status = TRUE AND branch_id = ? LIMIT ? OFFSET ?";
+    $sql = $db->generateDynamicQuery("received_booking", $payload->fields)." WHERE status = TRUE AND branch_id = ? LIMIT ? OFFSET ?";
     $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     (new ApiResponse(200, "Success", $list))->toJson();
@@ -61,7 +61,7 @@ $router->add("POST", "/booking/received/new", function () {
     $db->beginTransaction();
 
     try {
-        $status = true;
+        $status = (bool) true;
         // checking sleep_no valid or not 
         $sql = "SELECT booking_id, destination_branch_id  FROM bookings WHERE slip_no = ?";
         $stmt = $db->query($sql, [$data["slip_no"]]);
@@ -72,7 +72,7 @@ $router->add("POST", "/booking/received/new", function () {
         $booking_id = $result["booking_id"];
         // check destination branch is current branch or not
         if ($result["destination_branch_id"] == $_info->branch_id) {
-            $status = false;
+            $status = (bool) false;
         }
         
         // validate this booking id for this branch
@@ -85,12 +85,11 @@ $router->add("POST", "/booking/received/new", function () {
         $tracking_id = $result["tracking_id"];
         
         // INSET IN received_bookings
-        $sql = "INSERT INTO received_bookings (booking_id, branch_id, status) VALUES (?, ?)";
-        $stmt = $db->query($sql, [$booking_id, $_info->branch_id, $status]);
+        $sql = "INSERT INTO received_booking (booking_id, branch_id, status) VALUES (?, ?, ?)";
+        $stmt = $db->query($sql, [$booking_id, $_info->branch_id,  (int) $status]);
         if (!$stmt->rowCount()) {
             (new ApiResponse(404,"Something went wrong"))->toJson();
         }
-        
         // UPDATE tracking  received true
         $sql = "UPDATE tracking SET received = TRUE WHERE tracking_id = ?";
         $stmt = $db->query($sql, [$tracking_id]);

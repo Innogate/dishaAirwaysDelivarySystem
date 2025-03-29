@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "1234567890",
-    "passwd": "pass@1234"
+    "id": "2345678901",
+    "passwd": "123456"
 }
 
 
@@ -45,9 +45,9 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "coloader_id": 5,
-  "booking_id": [101, 102, 103],
-  "destination_id": 2
+  "coloader_id": 0,
+  "booking_id": [3],
+  "destination_id": 1
 }
 
 

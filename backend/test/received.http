@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "1234567890",
-    "passwd": "pass@1234"
+    "id": "2345678901",
+    "passwd": "123456"
 }
 
 
@@ -27,7 +27,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "fields": ["booking_id", "status", "branch_id"],
+  "fields": [],
   "max": 10,
   "current": 0
 }
@@ -39,5 +39,5 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "slip_no": "SLP12345"
+  "slip_no": "DDA-5000"
 }

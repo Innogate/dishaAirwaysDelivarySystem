@@ -53,9 +53,9 @@ CREATE TABLE public.bookings (
     created_at timestamp without time zone DEFAULT now(),
     created_by integer NOT NULL,
     manifest_id character varying(255) DEFAULT NULL::character varying,
-    status boolean DEFAULT true,
     other_charges double precision DEFAULT 0.0,
-    declared_value double precision DEFAULT 0.0
+    declared_value double precision DEFAULT 0.0,
+    status integer
 );
 
 
@@ -73,6 +73,13 @@ COMMENT ON COLUMN public.bookings.other_charges IS 'comment';
 --
 
 COMMENT ON COLUMN public.bookings.declared_value IS 'comment';
+
+
+--
+-- Name: COLUMN bookings.status; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.bookings.status IS 'comment';
 
 
 --
@@ -344,7 +351,8 @@ CREATE TABLE public.manifests (
     coloader_id integer NOT NULL,
     branch_id integer NOT NULL,
     booking_id integer[],
-    destination_id integer NOT NULL
+    destination_id integer NOT NULL,
+    deleted boolean DEFAULT false
 );
 
 
@@ -499,7 +507,6 @@ CREATE TABLE public.received_booking (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     booking_id integer NOT NULL,
     branch_id integer NOT NULL,
-    destination_id integer NOT NULL,
     status boolean DEFAULT true NOT NULL
 );
 
@@ -617,10 +624,10 @@ ALTER SEQUENCE public.states_state_id_seq OWNED BY public.states.state_id;
 
 CREATE TABLE public.tracking (
     tracking_id integer NOT NULL,
-    slip_no character varying(50) NOT NULL,
-    tracking_status character varying(255),
-    created_at timestamp without time zone DEFAULT now(),
-    branch_id integer NOT NULL
+    current_branch_id integer NOT NULL,
+    destination_branch_id integer NOT NULL,
+    booking_id integer NOT NULL,
+    received boolean DEFAULT false NOT NULL
 );
 
 
@@ -935,14 +942,6 @@ ALTER TABLE ONLY public.tracking
 
 
 --
--- Name: tracking tracking_slip_no_key; Type: CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.tracking
-    ADD CONSTRAINT tracking_slip_no_key UNIQUE (slip_no);
-
-
---
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -1133,14 +1132,6 @@ ALTER TABLE ONLY public.received_booking
 
 
 --
--- Name: received_booking received_booking_destination_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.received_booking
-    ADD CONSTRAINT received_booking_destination_id_fkey FOREIGN KEY (destination_id) REFERENCES public.branches(branch_id);
-
-
---
 -- Name: representatives representatives_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -1165,11 +1156,27 @@ ALTER TABLE ONLY public.representatives
 
 
 --
--- Name: tracking tracking_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+-- Name: tracking tracking_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
 --
 
 ALTER TABLE ONLY public.tracking
-    ADD CONSTRAINT tracking_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(branch_id) ON DELETE CASCADE;
+    ADD CONSTRAINT tracking_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(booking_id);
+
+
+--
+-- Name: tracking tracking_current_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.tracking
+    ADD CONSTRAINT tracking_current_branch_id_fkey FOREIGN KEY (current_branch_id) REFERENCES public.branches(branch_id);
+
+
+--
+-- Name: tracking tracking_destination_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.tracking
+    ADD CONSTRAINT tracking_destination_branch_id_fkey FOREIGN KEY (destination_branch_id) REFERENCES public.branches(branch_id);
 
 
 --

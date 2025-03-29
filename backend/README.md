@@ -14,8 +14,8 @@
 6. Branch
 7. Employees    
 8. Permission
-9. Booking Sleeps
-10. Coloader
+9. Booking Slips
+10. Co Loader
 11. Manifest
 
 

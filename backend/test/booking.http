@@ -10,8 +10,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "1234567890",
-    "passwd": "pass@1234"
+    "id": "2345678901",
+    "passwd": "123456"
 }
 
 ### Get Booking List
@@ -46,7 +46,7 @@ Authorization: Bearer {{token}}
     "consignee_mobile": "9876543210",
     "consignor_name": "Jane Smith",
     "consignor_mobile": "9876543211",
-    "branch_id": 2,
+    "branch_id": 1,
     "slip_no": 5000,
     "booking_address": "123 Street, City",
     "transport_mode": "Air",
@@ -61,7 +61,7 @@ Authorization: Bearer {{token}}
     "package_contents": "Electronics",
     "shipper_charges": "ABC Logistics",
     "destination_city_id": 1,
-    "destination_branch_id": 2,
+    "destination_branch_id": 1,
     "xp_branch_id": null,
     "created_by": 1,
     "to_pay": "Y",

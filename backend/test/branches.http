@@ -60,7 +60,7 @@ Authorization: Bearer {{token}}
     "branch_name": "Delhi Disha airways",
     "branch_short_name": "DDA",
     "alias_name": "Delhi Airways",
-    "representative_user_id": 2,
+    "representative_id": 2,
     "address": "123 Street, City",
     "city_id": 1,
     "state_id": 1,
