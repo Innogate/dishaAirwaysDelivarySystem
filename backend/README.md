@@ -17,3 +17,9 @@
 9. Booking Sleeps
 10. Coloader
 11. Manifest
+
+
+# TRACKING CODES
+0 -> MANIFEST GENERATED
+1 -> Oder revived by branch
+2- > Forward to other branch

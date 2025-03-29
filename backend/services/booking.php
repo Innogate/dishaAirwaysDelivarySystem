@@ -59,7 +59,6 @@ JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
-// GET ALL BOOKING BY city_id
 $router->add('POST', '/booking/manifest', function () {
     $pageID = 1;
     $jwt = new JwtHandler();
@@ -71,7 +70,7 @@ $router->add('POST', '/booking/manifest', function () {
         "fields" => [],
         "max" => 10,
         "current" => 0,
-        "destination_city_id"=> 0,
+        "destination_branch_id"=> 0,
     ];
 
     $data = json_decode(file_get_contents("php://input"), true);

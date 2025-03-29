@@ -335,11 +335,19 @@ ALTER SEQUENCE public.employees_employee_id_seq OWNED BY public.employees.employ
 CREATE TABLE public.manifests (
     manifest_id integer NOT NULL,
     coloader_id integer NOT NULL,
-    coloader_transport_mode character varying(20)
+    coloader_transport_mode character varying(20),
+    branch_id integer NOT NULL
 );
 
 
 ALTER TABLE public.manifests OWNER TO test;
+
+--
+-- Name: COLUMN manifests.branch_id; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.branch_id IS 'comment';
+
 
 --
 -- Name: manifests_coloader_id_seq; Type: SEQUENCE; Schema: public; Owner: test
