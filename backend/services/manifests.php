@@ -102,7 +102,11 @@ $router->add('POST', '/manifests/new', function () {
         }
         $booking_ids = '{' . implode(',', array_map('intval', $data["booking_id"])) . '}';
         
-        // GET MANIFEST SERIES //! DSOPDASD
+        // GET MANIFEST SERIES from branches manifest_sires
+        $sql = "SELECT manifest_sires FROM branches WHERE branch_id = ?";
+        $stmt = $db->query($sql, [$_info->branch_id]);
+        $manifest_series = $stmt->fetchColumn()[0];
+        (new ApiResponse(200, "Success", $manifest_series))->toJson();
 
         $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id) 
                 VALUES (?, ?, ?, ?)";

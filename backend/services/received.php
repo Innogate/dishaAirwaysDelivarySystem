@@ -114,7 +114,7 @@ $router->add("POST", "/booking/received/new", function () {
         $stmt = $db->query($sql, [$data["slip_no"]]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
-            throw new Exception("Invalid Slip No");
+          (new ApiResponse(404,"Invalid Slip No"))->toJson();
         }
         $booking_id = $result["booking_id"];
         // CHECK BOOKING ID EXIST OR NOT
@@ -124,7 +124,7 @@ $router->add("POST", "/booking/received/new", function () {
         if ($result) {
             (new ApiResponse(400,"Booking already received"))->toJson();
         }
-        
+
         // check destination branch is current branch or not
         if ($result["destination_branch_id"] == $_info->branch_id) {
             $status = (bool) false;
