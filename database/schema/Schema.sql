@@ -352,7 +352,8 @@ CREATE TABLE public.manifests (
     branch_id integer NOT NULL,
     booking_id integer[],
     destination_id integer NOT NULL,
-    deleted boolean DEFAULT false
+    deleted boolean DEFAULT false,
+    manifests_number character varying(255)
 );
 
 
@@ -377,6 +378,13 @@ COMMENT ON COLUMN public.manifests.booking_id IS 'Your comment here';
 --
 
 COMMENT ON COLUMN public.manifests.destination_id IS 'comment';
+
+
+--
+-- Name: COLUMN manifests.manifests_number; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.manifests_number IS 'comment';
 
 
 --

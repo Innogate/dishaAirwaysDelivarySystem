@@ -105,12 +105,12 @@ $router->add('POST', '/manifests/new', function () {
         // GET MANIFEST SERIES from branches manifest_sires
         $sql = "SELECT manifest_sires FROM branches WHERE branch_id = ?";
         $stmt = $db->query($sql, [$_info->branch_id]);
-        $manifest_series = $stmt->fetchColumn()[0];
-        (new ApiResponse(200, "Success", $manifest_series))->toJson();
+        $manifest_series = $stmt->fetchColumn();
+        $manifest_series = splitAndIncrement($manifest_series);
 
-        $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id) 
+        $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number) 
                 VALUES (?, ?, ?, ?)";
-        $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id]);
+        $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id, $manifest_series]);
 
         // Change bookings status
         $db->query("UPDATE bookings SET status = 1 WHERE booking_id = ANY(?)", [$booking_ids]);

@@ -352,7 +352,8 @@ CREATE TABLE public.manifests (
     branch_id integer NOT NULL,
     booking_id integer[],
     destination_id integer NOT NULL,
-    deleted boolean DEFAULT false
+    deleted boolean DEFAULT false,
+    manifests_number character varying(255)
 );
 
 
@@ -377,6 +378,13 @@ COMMENT ON COLUMN public.manifests.booking_id IS 'Your comment here';
 --
 
 COMMENT ON COLUMN public.manifests.destination_id IS 'comment';
+
+
+--
+-- Name: COLUMN manifests.manifests_number; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.manifests_number IS 'comment';
 
 
 --
@@ -810,6 +818,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 --
 
 COPY public.bookings (booking_id, consignee_name, consignee_mobile, consignor_name, consignor_mobile, branch_id, slip_no, booking_address, transport_mode, paid_type, on_account, to_pay, cgst, sgst, igst, total_value, package_count, package_weight, package_value, package_contents, shipper_charges, destination_city_id, destination_branch_id, xp_branch_id, created_at, created_by, manifest_id, other_charges, declared_value, status) FROM stdin;
+1	John Doe	9876543210	Jane Smith	9876543211	1	DDA-5000	123 Street, City	Air	Prepaid	1020034	Y	5	5	0	1000	2	10.5	500	Electronics	ABC Logistics	1	1	\N	2025-03-30 06:35:57.959079	2	\N	200	200	1
 \.
 
 
@@ -826,6 +835,7 @@ COPY public.branch_user (branch_id, user_id) FROM stdin;
 --
 
 COPY public.branches (branch_id, branch_name, branch_short_name, alias_name, address, city_id, state_id, pin_code, contact_no, email, gst_no, cin_no, udyam_no, cgst, sgst, igst, logo, created_at, created_by, updated_at, manifest_sires, status) FROM stdin;
+1	Delhi Disha airways	DDA	Delhi Airways	123 Street, City	1	1	123456	9876543321	branch3@example.com	9090	9090	9090	12	12	12	\N	2025-03-30 06:35:13.286602	1	2025-03-30 06:35:13.286602	GJ000400	t
 \.
 
 
@@ -2080,7 +2090,9 @@ COPY public.employees (employee_id, employee_name, employee_mobile, address, aad
 -- Data for Name: manifests; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.manifests (manifest_id, coloader_id, branch_id, booking_id, destination_id, deleted) FROM stdin;
+COPY public.manifests (manifest_id, coloader_id, branch_id, booking_id, destination_id, deleted, manifests_number) FROM stdin;
+1	0	1	{1}	1	f	\N
+2	0	1	{1}	1	f	\N
 \.
 
 
@@ -2117,6 +2129,8 @@ COPY public.permissions (permission_id, page_id, permission_code, user_id, creat
 8	9	11111	1	2025-03-29 19:19:53.352302	1	2025-03-29 19:19:53.352302	t
 9	10	11111	1	2025-03-29 19:19:53.353535	1	2025-03-29 19:19:53.353535	t
 20	11	11111	1	2025-03-29 19:19:56.75022	1	2025-03-29 19:19:56.75022	t
+21	11	1111	2	2025-03-30 06:35:45.370864	1	2025-03-30 06:35:45.370864	t
+22	1	1111	2	2025-03-30 06:35:50.487753	1	2025-03-30 06:35:50.487753	t
 \.
 
 
@@ -2125,6 +2139,7 @@ COPY public.permissions (permission_id, page_id, permission_code, user_id, creat
 --
 
 COPY public.received_booking (id, created_at, booking_id, branch_id, status) FROM stdin;
+1	2025-03-30 06:39:32.25549	1	1	f
 \.
 
 
@@ -2133,6 +2148,7 @@ COPY public.received_booking (id, created_at, booking_id, branch_id, status) FRO
 --
 
 COPY public.representatives (representative_id, branch_id, user_id, created_at, created_by, updated_at, status) FROM stdin;
+1	1	2	2025-03-30 06:35:13.286602	1	2025-03-30 06:35:13.286602	t
 \.
 
 
@@ -2183,6 +2199,8 @@ COPY public.states (state_id, state_name, status, created_at, updated_at) FROM s
 --
 
 COPY public.tracking (tracking_id, current_branch_id, destination_branch_id, booking_id, received) FROM stdin;
+2	1	1	1	f
+1	1	1	1	t
 \.
 
 
@@ -2192,6 +2210,7 @@ COPY public.tracking (tracking_id, current_branch_id, destination_branch_id, boo
 
 COPY public.users (user_id, mobile, password, first_name, last_name, gender, birth_date, address, email, created_at, created_by, updated_at, status) FROM stdin;
 1	1234567890	pass@1234	super	admin	\N	\N	\N	\N	2025-03-29 19:15:41.886484	1	2025-03-29 19:15:41.886484	t
+2	2345678901	123456	Branch	Manager1	Male	1990-01-01	123 Main St	john.doe@example.com	2025-03-30 06:34:57.944103	1	2025-03-30 06:34:57.944103	t
 \.
 
 
@@ -2199,14 +2218,14 @@ COPY public.users (user_id, mobile, password, first_name, last_name, gender, bir
 -- Name: bookings_booking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.bookings_booking_id_seq', 1, false);
+SELECT pg_catalog.setval('public.bookings_booking_id_seq', 1, true);
 
 
 --
 -- Name: branches_branch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.branches_branch_id_seq', 1, false);
+SELECT pg_catalog.setval('public.branches_branch_id_seq', 1, true);
 
 
 --
@@ -2248,7 +2267,7 @@ SELECT pg_catalog.setval('public.manifests_coloader_id_seq', 1, false);
 -- Name: manifests_manifest_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.manifests_manifest_id_seq', 1, false);
+SELECT pg_catalog.setval('public.manifests_manifest_id_seq', 2, true);
 
 
 --
@@ -2262,21 +2281,21 @@ SELECT pg_catalog.setval('public.pages_page_id_seq', 10, true);
 -- Name: permissions_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.permissions_permission_id_seq', 20, true);
+SELECT pg_catalog.setval('public.permissions_permission_id_seq', 22, true);
 
 
 --
 -- Name: received_booking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.received_booking_id_seq', 1, false);
+SELECT pg_catalog.setval('public.received_booking_id_seq', 1, true);
 
 
 --
 -- Name: representatives_representative_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.representatives_representative_id_seq', 1, false);
+SELECT pg_catalog.setval('public.representatives_representative_id_seq', 1, true);
 
 
 --
@@ -2290,14 +2309,14 @@ SELECT pg_catalog.setval('public.states_state_id_seq', 1, false);
 -- Name: tracking_tracking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.tracking_tracking_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tracking_tracking_id_seq', 2, true);
 
 
 --
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 2, true);
 
 
 --

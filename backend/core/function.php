@@ -22,4 +22,15 @@
     // Format the date into YYYY-MM-DD
     return $date->format('Y-m-d');
 }
+function splitAndIncrement($input) {
+    preg_match('/^([A-Za-z]+)(\d+)$/', $input, $matches);
+    if ($matches) {
+        $word = $matches[1]; // Extract word part
+        $number = $matches[2]; // Extract number part
+        $newNumber = str_pad($number + 1, strlen($number), '0', STR_PAD_LEFT); // Increment and keep leading zeros
+        return $word . $newNumber;
+    }
+    return null; // Return null if format is incorrect
+}
+
 ?>
