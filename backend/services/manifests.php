@@ -109,8 +109,9 @@ $router->add('POST', '/manifests/new', function () {
         $manifest_series = splitAndIncrement($manifest_series);
 
         $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number) 
-                VALUES (?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?)";
         $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id, $manifest_series]);
+        $lastId = $db->pdo->lastInsertId();
 
         // Change bookings status
         $db->query("UPDATE bookings SET status = 1 WHERE booking_id = ANY(?)", [$booking_ids]);
@@ -125,7 +126,24 @@ $router->add('POST', '/manifests/new', function () {
         }
 
         $db->commit();
-        (new ApiResponse(200, "Manifest created successfully.", []))->toJson();
+        $sql_fetch = "SELECT * FROM manifests WHERE manifest_id = ?";
+        $insertedData = $db->query($sql_fetch, [$lastId])->fetch(PDO::FETCH_ASSOC);
+        $insertedData["booking_id"] = str_getcsv(trim($insertedData["booking_id"], "{}"));
+        $insertedData["booking_id"] = array_map('intval', $insertedData["booking_id"]); // Convert to integers
+
+        //  FETCH ALL BOOKING INFO
+        foreach ($insertedData["booking_id"] as $booking_id) {
+            $sql_fetch = "SELECT 
+    b.*, 
+    br.branch_name AS branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  WHERE b.booking_id = ?";
+            $booking = $db->query($sql_fetch, [$booking_id])->fetch(PDO::FETCH_ASSOC);
+            $insertedData["bookings"][] = $booking;
+        }
+        (new ApiResponse(200, "Manifest created successfully.", $insertedData))->toJson();
     } catch (Exception $e) {
         $db->rollBack();
         (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
