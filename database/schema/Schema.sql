@@ -142,7 +142,7 @@ CREATE TABLE public.branches (
     created_by integer NOT NULL,
     updated_at timestamp without time zone DEFAULT now(),
     manifest_sires character varying(255) DEFAULT NULL::character varying,
-    status integer DEFAULT 0
+    status boolean DEFAULT true
 );
 
 
