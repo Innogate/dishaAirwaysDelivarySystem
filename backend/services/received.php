@@ -16,7 +16,7 @@ $router->add('POST', '/booking/received', function () {
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, 'r');
 
     if ($_info->branch_id == null || $isAdmin) {
-        (new ApiResponse(404,'You not login brach account'))->toJson();
+        (new ApiResponse(404, 'You not login brach account'))->toJson();
     }
 
     $payload = (object) [
@@ -92,70 +92,89 @@ $router->add("POST", "/booking/received/new", function () {
     $handler = new Handler();
     $_info = $jwt->validate();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
-   
+
     if ($_info->branch_id == null || $isAdmin) {
-        (new ApiResponse(404,'You not login brach account'))->toJson();
+        (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
+        exit;
     }
 
     $data = json_decode(file_get_contents("php://input"), true);
+    if (!is_array($data)) {
+        (new ApiResponse(400, "Invalid input data"))->toJson();
+        exit;
+    }
 
-    $required_fields = [
-        "slip_no"
-    ];
-
+    $required_fields = ["slip_no"];
     $handler->validateInput($data, $required_fields);
+
     $db = new Database();
     $db->beginTransaction();
 
     try {
-        $status = (bool) true;
-        // checking sleep_no valid or not 
-        $sql = "SELECT booking_id, destination_branch_id  FROM bookings WHERE slip_no = ?";
+        $status = true;
+        
+        // Checking if slip_no is valid
+        $sql = "SELECT booking_id, destination_branch_id FROM bookings WHERE slip_no = ?";
         $stmt = $db->query($sql, [$data["slip_no"]]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
         if (!$result) {
-          (new ApiResponse(404,"Invalid Slip No"))->toJson();
-        }
-        $booking_id = $result["booking_id"];
-        // CHECK BOOKING ID EXIST OR NOT
-        $sql = "SELECT * FROM received_booking WHERE booking_id = ?";
-        $stmt = $db->query($sql, [$booking_id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
-            (new ApiResponse(400,"Booking already received"))->toJson();
+            (new ApiResponse(404, "Invalid Slip No"))->toJson();
+            exit;
         }
 
-        // check destination branch is current branch or not
-        if ($result["destination_branch_id"] == $_info->branch_id) {
-            $status = (bool) false;
+        $booking_id = $result["booking_id"];
+        $destination_branch_id = $result["destination_branch_id"];
+
+        // Check if booking ID already exists in received_booking
+        $sql = "SELECT 1 FROM received_booking WHERE booking_id = ?";
+        $stmt = $db->query($sql, [$booking_id]);
+        if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+            (new ApiResponse(400, "Booking already received"))->toJson();
+            exit;
         }
-        
-        // validate this booking id for this branch
+
+        // Validate if destination branch is the current branch
+        if ($destination_branch_id == $_info->branch_id) {
+            $status = false;
+        }
+
+        // Validate tracking entry for this branch
         $sql = "SELECT tracking_id FROM tracking WHERE booking_id = ? AND destination_branch_id = ?";
         $stmt = $db->query($sql, [$booking_id, $_info->branch_id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$result) {
-            (new ApiResponse(404,"Invalid Slip No"))->toJson();
-        }
-        $tracking_id = $result["tracking_id"];
         
-        // INSET IN received_bookings
-        $sql = "INSERT INTO received_booking (booking_id, branch_id, status) VALUES (?, ?, ?)";
-        $stmt = $db->query($sql, [$booking_id, $_info->branch_id,  (int) $status]);
-        if (!$stmt->rowCount()) {
-            (new ApiResponse(404,"Something went wrong"))->toJson();
+        if (!$result) {
+            (new ApiResponse(404, "Invalid Slip No"))->toJson();
+            exit;
         }
-        // UPDATE tracking  received true
+
+        $tracking_id = $result["tracking_id"];
+
+        // Insert into received_bookings
+        $sql = "INSERT INTO received_booking (booking_id, branch_id, status) VALUES (?, ?, ?)";
+        $stmt = $db->query($sql, [$booking_id, $_info->branch_id, (int) $status]);
+        
+        if ($stmt->rowCount() === 0) {
+            (new ApiResponse(500, "Something went wrong during insertion"))->toJson();
+            exit;
+        }
+
+        // Update tracking to mark received as true
         $sql = "UPDATE tracking SET received = TRUE WHERE tracking_id = ?";
         $stmt = $db->query($sql, [$tracking_id]);
-        if (!$stmt->rowCount()) {
-            (new ApiResponse(404,"Something went wrong"))->toJson();
+        
+        if ($stmt->rowCount() === 0) {
+            (new ApiResponse(500, "Something went wrong during tracking update"))->toJson();
+            exit;
         }
+
         $db->commit();
-        (new ApiResponse(200, "Success", null))->toJson();
+        (new ApiResponse(200, "Success"))->toJson();
     } catch (Exception $e) {
         $db->rollBack();
         (new ApiResponse(400, $e->getMessage()))->toJson();
     }
 });
+
 ?>
