@@ -32,7 +32,7 @@ $router->add('POST', '/booking/received', function () {
 
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery("received_booking", $payload->fields)." WHERE status = TRUE AND branch_id = ? LIMIT ? OFFSET ?";
+    $sql = $db->generateDynamicQuery("received_booking", $payload->fields)." WHERE branch_id = ? LIMIT ? OFFSET ?";
     $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     (new ApiResponse(200, "Success", $list))->toJson();
