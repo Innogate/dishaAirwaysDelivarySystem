@@ -46,7 +46,7 @@ Content-Type: application/json
 
 {
   "coloader_id": 0,
-  "booking_id": [3],
+  "booking_id": [1],
   "destination_id": 1
 }
 

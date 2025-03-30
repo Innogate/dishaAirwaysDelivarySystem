@@ -32,7 +32,54 @@ $router->add('POST', '/booking/received', function () {
 
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery("received_booking", $payload->fields)." WHERE branch_id = ? LIMIT ? OFFSET ?";
+    $sql = "SELECT 
+    b.booking_id,
+    b.slip_no,
+    b.consignee_name,
+    b.consignee_mobile,
+    b.consignor_name,
+    b.consignor_mobile,
+    b.booking_address,
+    b.transport_mode,
+    b.paid_type,
+    b.on_account,
+    b.to_pay,
+    b.cgst,
+    b.sgst,
+    b.igst,
+    b.total_value,
+    b.package_count,
+    b.package_weight,
+    b.package_value,
+    b.package_contents,
+    b.shipper_charges,
+    b.created_at AS booking_created_at,
+
+    -- Branch Details
+    br.branch_id AS booking_branch_id,
+    br.branch_name AS booking_branch_name,
+
+    -- Destination Branch Details
+    db.branch_id AS destination_branch_id,
+    db.branch_name AS destination_branch_name,
+
+    -- Received Booking Details
+    rb.id AS received_booking_id,
+    rb.created_at AS received_booking_created_at,
+    rb.status AS received_booking_status,
+
+    -- Receiving Branch Details
+    rbr.branch_id AS received_branch_id,
+    rbr.branch_name AS received_branch_name
+
+FROM bookings b
+JOIN received_booking rb ON b.booking_id = rb.booking_id
+JOIN branches br ON b.branch_id = br.branch_id
+JOIN branches db ON b.destination_branch_id = db.branch_id
+JOIN branches rbr ON rb.branch_id = rbr.branch_id
+WHERE rb.branch_id = ? 
+LIMIT ? OFFSET ?;
+";
     $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     (new ApiResponse(200, "Success", $list))->toJson();
