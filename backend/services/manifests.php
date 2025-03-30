@@ -60,7 +60,13 @@ $router->add('POST', '/manifests/byId', function () {
     }
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery("manifests", $payload->fields) . " WHERE manifest_id = ?";
+    $sql = "SELECT 
+    b.*, 
+    br.branch_name AS branch_name, 
+    dbr.branch_name AS destination_branch_name
+FROM public.bookings b
+JOIN public.branches br ON b.branch_id = br.branch_id
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  WHERE b.booking_id = ?";
     $stmt = $db->query($sql, [$payload->manifests_id]);
     $list = $stmt->fetch(PDO::FETCH_ASSOC);
     if(!$list){
@@ -114,7 +120,7 @@ $router->add('POST', '/manifests/new', function () {
         $lastId = $db->pdo->lastInsertId();
 
         // Change bookings status
-        $db->query("UPDATE bookings SET status = 1 WHERE booking_id = ANY(?)", [$booking_ids]);
+        $db->query("UPDATE bookings SET status = 1, manifest_id = ? WHERE booking_id = ANY(?)", [$manifest_series, $booking_ids]);
 
         // Update status to false in received_bookings
         $db->query("UPDATE received_booking SET status = FALSE WHERE booking_id = ANY(?)", [$booking_ids]);

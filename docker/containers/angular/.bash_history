@@ -1,0 +1,2 @@
+ls
+ng build

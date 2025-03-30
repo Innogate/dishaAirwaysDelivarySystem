@@ -353,7 +353,8 @@ CREATE TABLE public.manifests (
     booking_id integer[],
     destination_id integer NOT NULL,
     deleted boolean DEFAULT false,
-    manifests_number character varying(255)
+    manifests_number character varying(255),
+    create_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -385,6 +386,13 @@ COMMENT ON COLUMN public.manifests.destination_id IS 'comment';
 --
 
 COMMENT ON COLUMN public.manifests.manifests_number IS 'comment';
+
+
+--
+-- Name: COLUMN manifests.create_at; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.create_at IS 'comment';
 
 
 --
