@@ -60,19 +60,33 @@ $router->add('POST', '/manifests/byId', function () {
     }
 
     $db = new Database();
-    $sql = "SELECT 
-    b.*, 
-    br.branch_name AS branch_name, 
-    dbr.branch_name AS destination_branch_name
+    $sql_fetch = "SELECT 
+    manifests.*, 
+    br.branch_name as origin_branch,
+    dbr.branch_name as destination_branch,
+    coloader.coloader_name as coloader_name
+    FROM manifests 
+    JOIN branches as br ON manifests.branch_id = br.branch_id 
+    JOIN branches as dbr ON manifests.destination_id = dbr.branch_id 
+    JOIN coloader as coloader ON manifests.coloader_id = coloader.coloader_id
+    WHERE manifest_id = ?";
+    $insertedData = $db->query($sql_fetch, [$payload->manifests_id])->fetch(PDO::FETCH_ASSOC);
+    $insertedData["booking_id"] = str_getcsv(trim($insertedData["booking_id"], "{}"));
+    $insertedData["booking_id"] = array_map('intval', $insertedData["booking_id"]); // Convert to integers
+
+    //  FETCH ALL BOOKING INFO
+    foreach ($insertedData["booking_id"] as $booking_id) {
+        $sql_fetch = "SELECT 
+b.*, 
+br.branch_name AS branch_name, 
+dbr.branch_name AS destination_branch_name
 FROM public.bookings b
 JOIN public.branches br ON b.branch_id = br.branch_id
 JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  WHERE b.booking_id = ?";
-    $stmt = $db->query($sql, [$payload->manifests_id]);
-    $list = $stmt->fetch(PDO::FETCH_ASSOC);
-    if(!$list){
-        (new ApiResponse(400, "Invalid manifest ID", "", 400))->toJson();
+        $booking = $db->query($sql_fetch, [$booking_id])->fetch(PDO::FETCH_ASSOC);
+        $insertedData["bookings"][] = $booking;
     }
-    (new ApiResponse(200, "Success", $list))->toJson();
+    (new ApiResponse(200, "Success", $insertedData))->toJson();
 });
 
 // create new manifests // ? DONE
