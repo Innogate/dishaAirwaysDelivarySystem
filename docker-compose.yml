@@ -1,4 +1,18 @@
 services:
+  angular:
+    build:
+      context: .
+      dockerfile: docker/build/Dockerfile.angular
+    container_name: angular
+    restart: unless-stopped
+    volumes:
+      - ./docker/containers/angular:/home/vscode
+      - ./mobile:/app
+    ports:
+      - "4200:4200"
+    working_dir: /app
+    command:  bash start.sh
+    
   db:
     image: postgres
     container_name: db-container
