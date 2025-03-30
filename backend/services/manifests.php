@@ -102,6 +102,8 @@ $router->add('POST', '/manifests/new', function () {
         }
         $booking_ids = '{' . implode(',', array_map('intval', $data["booking_id"])) . '}';
         
+        // GET MANIFEST SERIES //! DSOPDASD
+
         $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id) 
                 VALUES (?, ?, ?, ?)";
         $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id]);
