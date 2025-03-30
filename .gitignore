@@ -1,4 +1,5 @@
 docker/containers/react-native/*
+docker/containers/angular/*
 database/data/*
 database/data
 database/data/.*
