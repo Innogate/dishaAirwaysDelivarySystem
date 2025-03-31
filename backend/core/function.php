@@ -33,4 +33,21 @@ function splitAndIncrement($input) {
     return null; // Return null if format is incorrect
 }
 
+function splitString($inputString) {
+    // Split the input string into the character part and numeric part
+    $prefix = preg_replace('/[0-9]/', '', $inputString); // Extract the letters (e.g., KBS)
+    $numberPart = preg_replace('/\D/', '', $inputString); // Extract the numeric part (e.g., 0001)
+
+    // Ensure both parts are extracted correctly
+    if (empty($prefix) || !is_numeric($numberPart)) {
+        return "Invalid input format.";
+    }
+
+    // Return the character and numeric parts
+    return [
+        'prefix' => $prefix,
+        'number' => $numberPart
+    ];
+}
+
 ?>

@@ -126,6 +126,15 @@ $router->add('POST', '/manifests/new', function () {
         $sql = "SELECT manifest_sires FROM branches WHERE branch_id = ?";
         $stmt = $db->query($sql, [$_info->branch_id]);
         $manifest_series = $stmt->fetchColumn();
+        
+        $splitResult = splitString($manifest_series);
+        $prefix = $splitResult['prefix']."%";
+        $sql = "SELECT manifests_number FROM manifests WHERE manifests_number LIKE ? ORDER BY manifest_id DESC LIMIT 1";
+        $stmt = $db->query($sql, [$prefix]);
+        if ($stmt->rowCount() > 0) {
+            $manifest_series = $stmt->fetchColumn();
+        }
+
         $manifest_series = splitAndIncrement($manifest_series);
 
         $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number) 
