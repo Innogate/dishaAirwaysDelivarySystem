@@ -20,7 +20,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "slip_no": 2
+    "slip_no": "TES-10003"
 }
 
 ### TRACKING GET

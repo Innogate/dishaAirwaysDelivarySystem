@@ -643,11 +643,27 @@ CREATE TABLE public.tracking (
     current_branch_id integer NOT NULL,
     destination_branch_id integer NOT NULL,
     booking_id integer NOT NULL,
-    received boolean DEFAULT false NOT NULL
+    received boolean DEFAULT false NOT NULL,
+    arrived_at timestamp without time zone DEFAULT now(),
+    departed_at timestamp without time zone
 );
 
 
 ALTER TABLE public.tracking OWNER TO test;
+
+--
+-- Name: COLUMN tracking.arrived_at; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.tracking.arrived_at IS 'comment';
+
+
+--
+-- Name: COLUMN tracking.departed_at; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.tracking.departed_at IS 'comment';
+
 
 --
 -- Name: tracking_tracking_id_seq; Type: SEQUENCE; Schema: public; Owner: test
@@ -2198,7 +2214,7 @@ COPY public.states (state_id, state_name, status, created_at, updated_at) FROM s
 -- Data for Name: tracking; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.tracking (tracking_id, current_branch_id, destination_branch_id, booking_id, received) FROM stdin;
+COPY public.tracking (tracking_id, current_branch_id, destination_branch_id, booking_id, received, arrived_at, departed_at) FROM stdin;
 \.
 
 

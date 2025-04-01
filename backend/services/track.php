@@ -13,11 +13,40 @@
         $data = json_decode(file_get_contents("php://input"), true);
         $required_fields = ["slip_no"];
         $handler->validateInput($data, $required_fields);
-        
-        // Prepare database query
         $db = new Database();
-        $sql = "SELECT * FROM tracking WHERE slip_no = ?";
-        $stmt = $db->query($sql , [$data["slip_no"]]);
+        
+        // GET BOOKING ID BY SLIP ID
+        $sql = "SELECT  consignee_name,
+        consignor_name,
+        slip_no,
+        package_count,
+        package_weight,
+        booking_address,
+        paid_type,
+        total_value,
+        created_at as booking_date, booking_id FROM bookings WHERE slip_no = ?";
+        $stmt = $db->query($sql, [$data["slip_no"]]);
+        $booking = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$booking) {
+            $response = new ApiResponse(404, "Invalid Slip No");
+            $response->toJson();
+            exit;
+            
+        }
+        $booking_id = $booking["booking_id"];
+        // Prepare database query
+       
+        $sql = "SELECT 
+        received,
+        arrived_at,
+        departed_at,
+        b.branch_name as source_branch_name, 
+        bb.branch_name as destination_branch_name
+        FROM tracking
+        JOIN branches b ON current_branch_id = b.branch_id 
+        JOIN branches bb ON destination_branch_id = bb.branch_id  
+        WHERE booking_id = ?";
+        $stmt = $db->query($sql , [$booking_id]);
 
         // Fetch and handle result
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -25,8 +54,12 @@
             $list = [];  // Return an empty array if no results
         }
 
+        // remove booking_id from result
+        unset($booking["booking_id"]);
+
         // Send response
-        $response = new ApiResponse(200, "Success", $list);
+        $data = ["status" => $list, "booking"=> $booking];
+        $response = new ApiResponse(200, "Success", $data);
         $response->toJson();
     });
     

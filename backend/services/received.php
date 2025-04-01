@@ -162,7 +162,7 @@ $router->add("POST", "/booking/received/new", function () {
         }
 
         // Update tracking to mark received as true
-        $sql = "UPDATE tracking SET received = TRUE WHERE tracking_id = ?";
+        $sql = "UPDATE tracking SET received = TRUE, arrived_at = NOW() WHERE tracking_id = ?";
         $stmt = $db->query($sql, [$tracking_id]);
         
         if ($stmt->rowCount() === 0) {
