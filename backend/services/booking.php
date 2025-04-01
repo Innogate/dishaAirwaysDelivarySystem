@@ -244,7 +244,7 @@ $router->add('POST', '/booking/cancel', function () {
     $db = new Database();
     try {
         $db->beginTransaction();
-        $stmt = $db->query("UPDATE bookings SET deleted = TRUE WHERE booking_id = ? RETURNING booking_id", [$data["booking_id"]]);
+        $stmt = $db->query("UPDATE bookings SET status = '4' WHERE booking_id = ? RETURNING booking_id", [$data["booking_id"]]);
         if($stmt->rowCount()== 0){
             $db->rollBack();
             (new ApiResponse(500, "Server error"))->toJson();

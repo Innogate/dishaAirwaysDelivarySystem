@@ -237,7 +237,7 @@ $router->add('POST', '/manifests/bookings', function () {
     FROM bookings b
     LEFT JOIN manifests m ON ARRAY[b.booking_id] <@ m.booking_id
     WHERE b.branch_id = ?
-    AND m.manifest_id IS NULL  AND NOT b.status = '4'
+    AND m.manifest_id IS NULL  AND NOT b.status = '4' AND NOT b.status = '3'
 ),
 received_bookings_not_in_manifest AS (
     SELECT b.*
