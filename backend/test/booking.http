@@ -71,16 +71,13 @@ Authorization: Bearer {{token}}
 }
 
 
-#### UPDATE BOOKING
-POST {{apiUrl}}/booking/update
+#### Cancle BOOKING
+POST {{apiUrl}}/booking/cancel
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "updates": {
-        "name": "1234509877"
-    },
-    "conditions":"booking_id=6"
+    "booking_id": 1
 }
 
 

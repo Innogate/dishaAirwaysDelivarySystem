@@ -35,7 +35,7 @@ $router->add('POST', '/booking', function () {
     dbr.branch_name AS destination_branch_name
 FROM public.bookings b
 JOIN public.branches br ON b.branch_id = br.branch_id
-JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE NOT b.status = '4'  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
         $sql = "SELECT 
@@ -45,7 +45,7 @@ JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  ORDER BY cr
 FROM public.bookings b
 JOIN public.branches br ON b.branch_id = br.branch_id
 JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id
- WHERE b.branch_id = ?  ORDER BY b.created_at DESC LIMIT ? OFFSET ?;";
+ WHERE b.branch_id = ? AND NOT b.status = '4'  ORDER BY b.created_at DESC LIMIT ? OFFSET ?;";
         // $sql = $db->modifySelectQueryWithForeignKeys($sql);
         $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
@@ -257,39 +257,5 @@ $router->add('POST', '/booking/cancel', function () {
         (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
     }
 
-});
-
-// update booking
-$router->add('POST', '/booking/update', function () {
-    $pageID = 1;
-    $jwt = new JwtHandler();
-    $handler = new Handler();
-    $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "w");
-    $payload = (object) [
-        "conditions" => 'booking_id=0',
-        "updates" => []
-    ];
-
-    $data = json_decode(file_get_contents("php://input"), true);
-    if (!empty($data)) {
-        $payload = (object) $data;
-    }
-
-    $db = new Database();
-    try {
-        $db->beginTransaction();
-        $stmt = $db->$db->generateDynamicUpdate("bookings", $payload->updates, $payload->conditions);
-        if($stmt->rowCount()== 0){
-            $db->rollBack();
-            (new ApiResponse(500, "Server error"))->toJson();
-            return;
-        }
-        $db->commit();
-        (new ApiResponse(200, "Booking updated successfully", $data["booking_id"], 200))->toJson();
-    } catch (Exception $e) {
-        $db->rollBack();
-        (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
-    }
 });
 ?>
