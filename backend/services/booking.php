@@ -186,9 +186,9 @@ $router->add("POST", "/booking/new", function () {
             slip_no, booking_address, transport_mode, paid_type, cgst, sgst, igst, 
             total_value, package_count, package_weight, package_value, package_contents, 
             shipper_charges, destination_city_id, destination_branch_id, xp_branch_id, 
-            created_by, on_account, to_pay, declared_value, other_charges
+            created_by, on_account, to_pay, declared_value, other_charges, status
         ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )";
         
         $stmt = $db->query($sql, [
@@ -217,7 +217,8 @@ $router->add("POST", "/booking/new", function () {
             $data["on_account"],
             $data["to_pay"],
             $data["declared_value"],
-            $data["other_charges"]
+            $data["other_charges"],
+            "0"
         ]);
         $db->commit();
         (new ApiResponse(200, "Receipt generated successfully", $slip_no, 200))->toJson();
