@@ -644,8 +644,8 @@ CREATE TABLE public.tracking (
     destination_branch_id integer NOT NULL,
     booking_id integer NOT NULL,
     received boolean DEFAULT false NOT NULL,
-    arrived_at timestamp without time zone DEFAULT now(),
-    departed_at timestamp without time zone
+    arrived_at timestamp without time zone,
+    departed_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -821,13 +821,6 @@ ALTER TABLE ONLY public.representatives ALTER COLUMN representative_id SET DEFAU
 --
 
 ALTER TABLE ONLY public.states ALTER COLUMN state_id SET DEFAULT nextval('public.states_state_id_seq'::regclass);
-
-
---
--- Name: tracking tracking_id; Type: DEFAULT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.tracking ALTER COLUMN tracking_id SET DEFAULT nextval('public.tracking_tracking_id_seq'::regclass);
 
 
 --
@@ -2461,14 +2454,6 @@ ALTER TABLE ONLY public.states
 
 
 --
--- Name: tracking tracking_pkey; Type: CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.tracking
-    ADD CONSTRAINT tracking_pkey PRIMARY KEY (tracking_id);
-
-
---
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: test
 --
 
@@ -2680,30 +2665,6 @@ ALTER TABLE ONLY public.representatives
 
 ALTER TABLE ONLY public.representatives
     ADD CONSTRAINT representatives_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
-
-
---
--- Name: tracking tracking_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.tracking
-    ADD CONSTRAINT tracking_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(booking_id);
-
-
---
--- Name: tracking tracking_current_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.tracking
-    ADD CONSTRAINT tracking_current_branch_id_fkey FOREIGN KEY (current_branch_id) REFERENCES public.branches(branch_id);
-
-
---
--- Name: tracking tracking_destination_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: test
---
-
-ALTER TABLE ONLY public.tracking
-    ADD CONSTRAINT tracking_destination_branch_id_fkey FOREIGN KEY (destination_branch_id) REFERENCES public.branches(branch_id);
 
 
 --

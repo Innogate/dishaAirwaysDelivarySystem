@@ -4,10 +4,10 @@
     require_once __DIR__ .'/../core/Handler.php';
 
     // GET BY SLIP ID
-    $router->add("POST", '/track/bySlipId', function () {
+    $router->add("POST", '/api/status/booking', function () {
         $jwt = new JwtHandler();
         $handler = new Handler();
-        $_info = $jwt->validate();
+        // $_info = $jwt->validate();
 
         // Get and validate input
         $data = json_decode(file_get_contents("php://input"), true);
@@ -63,7 +63,7 @@
         $response->toJson();
     });
     
-    // Update tracking status
+    // Update tracking status //! DO't Use it
     $router->add("POST","/track/update", function () {
         $jwt = new JwtHandler();
         $handler = new Handler();

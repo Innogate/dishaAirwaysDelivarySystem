@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### TRACKING GET
-POST {{apiUrl}}/track/bySlipId
+POST {{apiUrl}}/api/status/booking
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
