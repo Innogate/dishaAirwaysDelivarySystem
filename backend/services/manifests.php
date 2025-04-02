@@ -79,10 +79,10 @@ $router->add('POST', '/manifests/byId', function () {
         $sql_fetch = "SELECT 
 b.*, 
 br.branch_name AS branch_name, 
-dbr.branch_name AS destination_branch_name
+dbr.city_name AS destination_city_name
 FROM public.bookings b
 JOIN public.branches br ON b.branch_id = br.branch_id
-JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  WHERE b.booking_id = ?";
+JOIN public.cities dbr ON b.destination_city_id = dbr.city_id  WHERE b.booking_id = ?";
         $booking = $db->query($sql_fetch, [$booking_id])->fetch(PDO::FETCH_ASSOC);
         $insertedData["bookings"][] = $booking;
     }
