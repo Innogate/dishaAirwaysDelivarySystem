@@ -150,8 +150,8 @@ $router->add('POST', '/manifests/new', function () {
 
         // Add tracking entries
         foreach ($data["booking_id"] as $booking_id) {
-            $db->query("INSERT INTO tracking (current_branch_id, destination_branch_id, booking_id, departed_at 
-                        VALUES (?, ?, ?, NOW())", [$_info->branch_id, $data["destination_id"], $booking_id]);
+            $db->query("INSERT INTO tracking (current_branch_id, destination_branch_id, booking_id, departed_at)
+VALUES (?, ?, ?, NOW());", [$_info->branch_id, $data["destination_id"], $booking_id]);
         }
 
         $db->commit();
