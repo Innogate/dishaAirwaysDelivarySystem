@@ -6,7 +6,7 @@ require_once __DIR__ . '/../core/Handler.php';
 global $router;
 // get all manifests // ? DONE
 $router->add('POST', '/manifests', function () {
-    $pageID=11;
+    $pageID = 11;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -23,7 +23,7 @@ $router->add('POST', '/manifests', function () {
     }
 
     $db = new Database();
-    if ($isAdmin && $_info->branch_id==null) {
+    if ($isAdmin && $_info->branch_id == null) {
         $sql = $db->generateDynamicQuery("manifests", $payload->fields) . " WHERE deleted = FALSE  LIMIT    ?    OFFSET     ?";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
@@ -43,7 +43,7 @@ $router->add('POST', '/manifests', function () {
 
 // get manifests by id // ? DONE
 $router->add('POST', '/manifests/byId', function () {
-    $pageID=11;
+    $pageID = 11;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -100,20 +100,21 @@ $router->add('POST', '/manifests/new', function () {
     $data = json_decode(file_get_contents("php://input"), true);
 
     $requiredFields = [
-        "coloader_id", 
+        "coloader_id",
         "booking_id",
         "destination_id",
+        "bag_no"
     ];
-    
+
     $handler->validateInput($data, $requiredFields);
-    
+
     $db = new Database();
 
     if ($_info->branch_id == null) {
         (new ApiResponse(400, "It's not a branch account", "", 400))->toJson();
         return;
     }
-    
+
     try {
         $db->beginTransaction();
         // convert booking_id to array
@@ -121,14 +122,14 @@ $router->add('POST', '/manifests/new', function () {
             $data["booking_id"] = [$data["booking_id"]];
         }
         $booking_ids = '{' . implode(',', array_map('intval', $data["booking_id"])) . '}';
-        
+
         // GET MANIFEST SERIES from branches manifest_sires
         $sql = "SELECT manifest_sires FROM branches WHERE branch_id = ?";
         $stmt = $db->query($sql, [$_info->branch_id]);
         $manifest_series = $stmt->fetchColumn();
-        
+
         $splitResult = splitString($manifest_series);
-        $prefix = $splitResult['prefix']."%";
+        $prefix = $splitResult['prefix'] . "%";
         $sql = "SELECT manifests_number FROM manifests WHERE manifests_number LIKE ? ORDER BY manifest_id DESC LIMIT 1";
         $stmt = $db->query($sql, [$prefix]);
         if ($stmt->rowCount() > 0) {
@@ -137,9 +138,9 @@ $router->add('POST', '/manifests/new', function () {
 
         $manifest_series = splitAndIncrement($manifest_series);
 
-        $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number) 
-                VALUES (?, ?, ?, ?, ?)";
-        $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id, $manifest_series]);
+        $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number, bag_no) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id, $manifest_series, $data["bag_no"]]);
         $lastId = $db->pdo->lastInsertId();
 
         // Change bookings status
@@ -182,7 +183,7 @@ JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id  WHERE b.boo
 
 // DELETE manifests // ? DONE
 $router->add('POST', '/manifests/delete', function () {
-    $pageID=11;
+    $pageID = 11;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -193,14 +194,14 @@ $router->add('POST', '/manifests/delete', function () {
     $requiredFields = [
         "manifest_id",
     ];
-    
+
     $handler->validateInput($data, $requiredFields);
     $db = new Database();
 
     try {
         $db->beginTransaction();
         $stmt = $db->query("UPDATE manifests SET deleted = TRUE WHERE manifest_id = ? RETURNING booking_id", [$data["manifest_id"]]);
-        if($stmt->rowCount()== 0){
+        if ($stmt->rowCount() == 0) {
             $db->rollBack();
             (new ApiResponse(500, "Server error"))->toJson();
             return;
@@ -209,11 +210,10 @@ $router->add('POST', '/manifests/delete', function () {
         $booking_id = $stmt->fetch(PDO::FETCH_ASSOC)["booking_id"];
 
         //  delete tracking
-        $db->query("DELETE FROM tracking WHERE branch_id = ? AND booking_id in ?", [$_info->branch_id,$booking_id]);
+        $db->query("DELETE FROM tracking WHERE branch_id = ? AND booking_id in ?", [$_info->branch_id, $booking_id]);
         $db->commit();
         (new ApiResponse(200, "Manifest deleted successfully."))->toJson();
-    }
-    catch(Exception $e){
+    } catch (Exception $e) {
         $db->rollBack();
         (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
     }
@@ -221,7 +221,7 @@ $router->add('POST', '/manifests/delete', function () {
 
 // MANIFESTS LIST OF BOOKINGS //? DONE
 $router->add('POST', '/manifests/bookings', function () {
-    $pageID=11;
+    $pageID = 11;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -255,10 +255,10 @@ SELECT * FROM received_bookings_not_in_manifest;
         $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $db->commit();
         (new ApiResponse(200, "Success", $list))->toJson();
-    }
-    catch(Exception $e){
+    } catch (Exception $e) {
         $db->rollBack();
         (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
     }
 })
+
 ?>

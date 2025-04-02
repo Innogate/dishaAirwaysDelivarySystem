@@ -354,7 +354,8 @@ CREATE TABLE public.manifests (
     destination_id integer NOT NULL,
     deleted boolean DEFAULT false,
     manifests_number character varying(255),
-    create_at timestamp without time zone DEFAULT now() NOT NULL
+    create_at timestamp without time zone DEFAULT now() NOT NULL,
+    bag_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -393,6 +394,13 @@ COMMENT ON COLUMN public.manifests.manifests_number IS 'comment';
 --
 
 COMMENT ON COLUMN public.manifests.create_at IS 'comment';
+
+
+--
+-- Name: COLUMN manifests.bag_count; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.bag_count IS 'comment';
 
 
 --
