@@ -824,6 +824,13 @@ ALTER TABLE ONLY public.states ALTER COLUMN state_id SET DEFAULT nextval('public
 
 
 --
+-- Name: tracking tracking_id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.tracking ALTER COLUMN tracking_id SET DEFAULT nextval('public.tracking_tracking_id_seq'::regclass);
+
+
+--
 -- Name: users user_id; Type: DEFAULT; Schema: public; Owner: test
 --
 
@@ -956,6 +963,14 @@ ALTER TABLE ONLY public.representatives
 
 ALTER TABLE ONLY public.states
     ADD CONSTRAINT states_pkey PRIMARY KEY (state_id);
+
+
+--
+-- Name: tracking tracking_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.tracking
+    ADD CONSTRAINT tracking_pkey PRIMARY KEY (tracking_id);
 
 
 --
