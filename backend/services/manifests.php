@@ -103,7 +103,7 @@ $router->add('POST', '/manifests/new', function () {
         "coloader_id",
         "booking_id",
         "destination_id",
-        "bag_no"
+        "bag_count"
     ];
 
     $handler->validateInput($data, $requiredFields);
@@ -138,9 +138,9 @@ $router->add('POST', '/manifests/new', function () {
 
         $manifest_series = splitAndIncrement($manifest_series);
 
-        $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number, bag_no) 
+        $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number, bag_count) 
                 VALUES (?, ?, ?, ?, ?, ?)";
-        $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id, $manifest_series, $data["bag_no"]]);
+        $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id, $manifest_series, $data["bag_count"]]);
         $lastId = $db->pdo->lastInsertId();
 
         // Change bookings status
