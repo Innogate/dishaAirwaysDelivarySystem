@@ -35,7 +35,7 @@ $router->add('POST', '/booking', function () {
     dbr.branch_name AS destination_branch_name
 FROM public.bookings b
 JOIN public.branches br ON b.branch_id = br.branch_id
-JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE NOT b.status = '4'  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
+JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE NOT b.status = '4'  AND b.manifests_number = null ORDER BY created_at DESC LIMIT ? OFFSET ?;";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
         $sql = "SELECT 
