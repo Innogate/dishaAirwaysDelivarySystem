@@ -45,7 +45,7 @@ JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE NOT b.
 FROM public.bookings b
 JOIN public.branches br ON b.branch_id = br.branch_id
 JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id
-WHERE b.branch_id = ? 
+WHERE b.branch_id = ?
   AND ((NOT b.status = '4') OR (b.status = '5')) AND ((b.manifest_id IS NULL) OR (b.status = '5'))
 ORDER BY b.created_at DESC 
 LIMIT ? OFFSET ?;";
@@ -255,6 +255,37 @@ $router->add('POST', '/booking/cancel', function () {
         }
         $db->commit();
         (new ApiResponse(200, "Receipt cancel successfully", $data["booking_id"], 200))->toJson();
+    } catch (Exception $e) {
+        $db->rollBack();
+        (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
+    }
+
+});
+
+// booking 
+$router->add('POST', '/booking/forward', function () {
+    $pageID = 1;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+
+    $required_fields = [
+        "booking_id",
+    ];
+    $data = json_decode(file_get_contents("php://input"), true);
+    $handler->validateInput($data, $required_fields);
+
+    $db = new Database();
+    try {
+        $db->beginTransaction();
+        $stmt = $db->query("UPDATE bookings SET status = 5 WHERE booking_id = ? RETURNING booking_id", [$data["booking_id"]]);
+        if($stmt->rowCount()== 0){
+            $db->rollBack();
+            (new ApiResponse(500, "Server error"))->toJson();
+            return;
+        }
+        $db->commit();
+        (new ApiResponse(200, "Receipt forward successfully", $data["booking_id"], 200))->toJson();
     } catch (Exception $e) {
         $db->rollBack();
         (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();

@@ -246,7 +246,7 @@ received_bookings_not_in_manifest AS (
     JOIN bookings b ON rb.booking_id = b.booking_id
     LEFT JOIN manifests m ON ARRAY[b.booking_id] <@ m.booking_id
     WHERE rb.branch_id = ?
-    AND m.manifest_id IS NULL
+    AND b.status = 5
 )
 SELECT * FROM bookings_not_in_manifest
 UNION 

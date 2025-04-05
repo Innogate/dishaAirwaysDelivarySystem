@@ -77,7 +77,7 @@ JOIN received_booking rb ON b.booking_id = rb.booking_id
 JOIN branches br ON b.branch_id = br.branch_id
 JOIN branches db ON b.destination_branch_id = db.branch_id
 JOIN branches rbr ON rb.branch_id = rbr.branch_id
-WHERE rb.branch_id = ?
+WHERE rb.branch_id = ? AND NOT b.status = 5
 ORDER BY rb.created_at DESC
 LIMIT ? OFFSET ?;
 ";

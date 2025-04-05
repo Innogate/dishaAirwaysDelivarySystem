@@ -89,3 +89,14 @@ Authorization: Bearer {{token}}
 {
     "search": "1232345435"
 }
+
+
+
+#### BOOKING FORWARD
+POST {{apiUrl}}/booking/forward
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "booking_id":2
+}
