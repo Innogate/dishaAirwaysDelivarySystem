@@ -9,7 +9,7 @@ global $pageID;
 $pageID = 4;
 
 $router->add('POST', '/master/users', function () {
-    $pageID=4;
+    $pageID = 4;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -29,13 +29,21 @@ $router->add('POST', '/master/users', function () {
 
 
     $db = new Database();
-    $sqlQuery = $db->generateDynamicQuery("users",  $payload->fields);
-
     if ($isAdmin && $_info->branch_id == null) {
-        $sqlQuery = $sqlQuery . " WHERE status = TRUE ORDER BY first_name     LIMIT  ?  OFFSET  ?;";
+        $sqlQuery = "SELECT 
+    u.*,
+    COALESCE(bu.branch_id, r.branch_id) AS branch_id,
+    b.branch_name,
+    bu.branch_id AS branch_from_branch_user,
+    r.branch_id AS branch_from_representatives
+FROM users u
+LEFT JOIN branch_user bu ON u.user_id = bu.user_id
+LEFT JOIN representatives r ON u.user_id = r.user_id
+LEFT JOIN branches b ON b.branch_id = COALESCE(bu.branch_id, r.branch_id) LIMIT ? OFFSET ?;
+";
         $stmt = $db->query($sqlQuery, [$payload->max, $payload->current]);
     } else {
-        $sqlQuery .= " WHERE created_by IN (
+        $sqlQuery = "SELECT * FROM users WHERE created_by IN (
     SELECT user_id FROM representatives 
     WHERE branch_id = (
         SELECT branch_id FROM representatives 
@@ -52,7 +60,7 @@ $router->add('POST', '/master/users', function () {
 
 
 $router->add('POST', '/master/users/deleted', function () {
-    $pageID=4;
+    $pageID = 4;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -100,7 +108,7 @@ $router->add('GET', '/master/users/myInfo', function () {
     $_info = $jwt->validate();
 
     $db = new Database();
-    $sqlQuery = $db->generateDynamicQuery("users",  []). " WHERE user_id = ?";
+    $sqlQuery = $db->generateDynamicQuery("users",  []) . " WHERE user_id = ?";
     $stmt = $db->query($sqlQuery, [$_info->user_id]);
     $list = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
     (new ApiResponse(200, "Success", $list))->toJson();
@@ -109,7 +117,7 @@ $router->add('GET', '/master/users/myInfo', function () {
 
 // CREATE NEW USER
 $router->add('POST', '/master/users/new', function () {
-    $pageID=4;
+    $pageID = 4;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -145,7 +153,6 @@ $router->add('POST', '/master/users/new', function () {
                 [$_info->branch_id, $user_id]
             );
         }
-       
     } catch (Exception $e) {
         $db->pdo->rollBack();
         (new ApiResponse(500, "Server error: " . $e->getMessage()))->toJson();
@@ -156,7 +163,7 @@ $router->add('POST', '/master/users/new', function () {
 
 // DELETE USER
 $router->add('POST', '/master/users/delete', function () {
-    $pageID=4;
+    $pageID = 4;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
@@ -208,7 +215,7 @@ $router->add('POST', '/master/users/update', function () {
     if (!empty($data)) {
         $payload = (object) $data;
     }
-    
+
     $db = new Database();
     $sql = $db->generateDynamicUpdate("users", $payload->updates, $payload->conditions);
     try {
