@@ -132,8 +132,8 @@ $router->add("POST", "/booking/received/new", function () {
         $destination_branch_id = $result["destination_branch_id"];
 
         // Check if booking ID already exists in received_booking
-        $sql = "SELECT 1 FROM received_booking WHERE booking_id = ?";
-        $stmt = $db->query($sql, [$booking_id]);
+        $sql = "SELECT 1 FROM received_booking WHERE booking_id = ? AND branch_id = ?";
+        $stmt = $db->query($sql, [$booking_id, $_info->branch_id]);
         if ($stmt->fetch(PDO::FETCH_ASSOC)) {
             (new ApiResponse(400, "Booking already received"))->toJson();
             exit;
