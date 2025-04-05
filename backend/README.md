@@ -25,3 +25,4 @@
 2 -> OUT FOR DELIVERY
 3 -> DIETARY COMPLETE
 4 -> CANALED
+5 -> forward wait

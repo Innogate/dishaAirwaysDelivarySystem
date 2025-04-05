@@ -45,7 +45,10 @@ JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id WHERE NOT b.
 FROM public.bookings b
 JOIN public.branches br ON b.branch_id = br.branch_id
 JOIN public.branches dbr ON b.destination_branch_id = dbr.branch_id
- WHERE b.branch_id = ? AND NOT b.status = '4' AND b.manifest_id IS NULL ORDER BY b.created_at DESC LIMIT ? OFFSET ?;";
+WHERE b.branch_id = ? 
+  AND ((NOT b.status = '4') OR (b.status = '5')) AND ((b.manifest_id IS NULL) OR (b.status = '5'))
+ORDER BY b.created_at DESC 
+LIMIT ? OFFSET ?;";
         // $sql = $db->modifySelectQueryWithForeignKeys($sql);
         $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
