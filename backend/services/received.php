@@ -70,13 +70,17 @@ $router->add('POST', '/booking/received', function () {
 
     -- Receiving Branch Details
     rbr.branch_id AS received_branch_id,
-    rbr.branch_name AS received_branch_name
+    rbr.branch_name AS received_branch_name,
+
+    -- Destination City
+    c.city_name AS destination_city_name
 
 FROM bookings b
 JOIN received_booking rb ON b.booking_id = rb.booking_id
 JOIN branches br ON b.branch_id = br.branch_id
 JOIN branches db ON b.destination_branch_id = db.branch_id
 JOIN branches rbr ON rb.branch_id = rbr.branch_id
+JOIN cities c ON b.destination_city_id = c.city_id
 WHERE rb.branch_id = ? AND NOT b.status = 5
 ORDER BY rb.created_at DESC
 LIMIT ? OFFSET ?;
