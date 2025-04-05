@@ -140,7 +140,7 @@ $router->add('POST', '/manifests/new', function () {
         $manifest_series = splitAndIncrement($manifest_series);
 
         $sql = "INSERT INTO manifests (coloader_id, booking_id, destination_id, branch_id, manifests_number, bag_count, destination_city_id) 
-                VALUES (?, ?, ?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
         $db->query($sql, [$data["coloader_id"], $booking_ids, $data["destination_id"], $_info->branch_id, $manifest_series, $data["bag_count"], $data["destination_city_id"]]);
         $lastId = $db->pdo->lastInsertId();
 
