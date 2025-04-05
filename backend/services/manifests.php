@@ -145,7 +145,7 @@ $router->add('POST', '/manifests/new', function () {
         $lastId = $db->pdo->lastInsertId();
 
         // Change bookings status
-        $db->query("UPDATE bookings SET status = 1, manifest_id = ? WHERE booking_id = ANY(?)", [$manifest_series, $booking_ids]);
+        $db->query("UPDATE bookings SET status = 2, manifest_id = ? WHERE booking_id = ANY(?)", [$manifest_series, $booking_ids]);
 
         // Update status to false in received_bookings
         $db->query("UPDATE received_booking SET status = FALSE WHERE booking_id = ANY(?)", [$booking_ids]);
