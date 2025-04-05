@@ -299,6 +299,111 @@ ALTER SEQUENCE public.credit_node_credit_node_id_seq OWNED BY public.credit_node
 
 
 --
+-- Name: delivery_list; Type: TABLE; Schema: public; Owner: test
+--
+
+CREATE TABLE public.delivery_list (
+    delivery_id integer NOT NULL,
+    booking_id integer NOT NULL,
+    branch_id integer NOT NULL,
+    employee_id integer,
+    created_at timestamp without time zone DEFAULT now(),
+    created_by integer NOT NULL,
+    name character varying(255)
+);
+
+
+ALTER TABLE public.delivery_list OWNER TO test;
+
+--
+-- Name: delivery_list_booking_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.delivery_list_booking_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.delivery_list_booking_id_seq OWNER TO test;
+
+--
+-- Name: delivery_list_booking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.delivery_list_booking_id_seq OWNED BY public.delivery_list.booking_id;
+
+
+--
+-- Name: delivery_list_branch_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.delivery_list_branch_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.delivery_list_branch_id_seq OWNER TO test;
+
+--
+-- Name: delivery_list_branch_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.delivery_list_branch_id_seq OWNED BY public.delivery_list.branch_id;
+
+
+--
+-- Name: delivery_list_created_by_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.delivery_list_created_by_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.delivery_list_created_by_seq OWNER TO test;
+
+--
+-- Name: delivery_list_created_by_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.delivery_list_created_by_seq OWNED BY public.delivery_list.created_by;
+
+
+--
+-- Name: delivery_list_delivery_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.delivery_list_delivery_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.delivery_list_delivery_id_seq OWNER TO test;
+
+--
+-- Name: delivery_list_delivery_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.delivery_list_delivery_id_seq OWNED BY public.delivery_list.delivery_id;
+
+
+--
 -- Name: employees; Type: TABLE; Schema: public; Owner: test
 --
 
@@ -806,6 +911,34 @@ ALTER TABLE ONLY public.credit_node ALTER COLUMN credit_node_id SET DEFAULT next
 
 
 --
+-- Name: delivery_list delivery_id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.delivery_list ALTER COLUMN delivery_id SET DEFAULT nextval('public.delivery_list_delivery_id_seq'::regclass);
+
+
+--
+-- Name: delivery_list booking_id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.delivery_list ALTER COLUMN booking_id SET DEFAULT nextval('public.delivery_list_booking_id_seq'::regclass);
+
+
+--
+-- Name: delivery_list branch_id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.delivery_list ALTER COLUMN branch_id SET DEFAULT nextval('public.delivery_list_branch_id_seq'::regclass);
+
+
+--
+-- Name: delivery_list created_by; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.delivery_list ALTER COLUMN created_by SET DEFAULT nextval('public.delivery_list_created_by_seq'::regclass);
+
+
+--
 -- Name: employees employee_id; Type: DEFAULT; Schema: public; Owner: test
 --
 
@@ -944,6 +1077,14 @@ ALTER TABLE ONLY public.coloader
 
 ALTER TABLE ONLY public.credit_node
     ADD CONSTRAINT credit_node_pkey PRIMARY KEY (credit_node_id);
+
+
+--
+-- Name: delivery_list delivery_list_pkey; Type: CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.delivery_list
+    ADD CONSTRAINT delivery_list_pkey PRIMARY KEY (delivery_id);
 
 
 --
