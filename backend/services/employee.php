@@ -24,7 +24,8 @@ $router->add('POST', '/master/employees', function () {
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id==null) {
-        $sql = $db->generateDynamicQuery("employees", $payload->fields) . "  LIMIT    ?    OFFSET     ?";
+        $sql = "SELECT e.*,br.branch_name FROM employees as e 
+        JOIN branches as br ON br.branch_id = e.branch_id  LIMIT    ?    OFFSET     ?";
         $stmt = $db->query($sql, [$payload->max, $payload->current]);
     } else {
         $sql = $db->generateDynamicQuery("employees", $payload->fields) . " WHERE branch_id = ?  LIMIT    ?    OFFSET     ?";
