@@ -355,7 +355,8 @@ CREATE TABLE public.manifests (
     deleted boolean DEFAULT false,
     manifests_number character varying(255),
     create_at timestamp without time zone DEFAULT now() NOT NULL,
-    bag_count integer DEFAULT 0 NOT NULL
+    bag_count integer DEFAULT 0 NOT NULL,
+    destination_city_id integer NOT NULL
 );
 
 
@@ -404,6 +405,13 @@ COMMENT ON COLUMN public.manifests.bag_count IS 'comment';
 
 
 --
+-- Name: COLUMN manifests.destination_city_id; Type: COMMENT; Schema: public; Owner: test
+--
+
+COMMENT ON COLUMN public.manifests.destination_city_id IS 'comment';
+
+
+--
 -- Name: manifests_coloader_id_seq; Type: SEQUENCE; Schema: public; Owner: test
 --
 
@@ -423,6 +431,28 @@ ALTER SEQUENCE public.manifests_coloader_id_seq OWNER TO test;
 --
 
 ALTER SEQUENCE public.manifests_coloader_id_seq OWNED BY public.manifests.coloader_id;
+
+
+--
+-- Name: manifests_destination_city_id_seq; Type: SEQUENCE; Schema: public; Owner: test
+--
+
+CREATE SEQUENCE public.manifests_destination_city_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.manifests_destination_city_id_seq OWNER TO test;
+
+--
+-- Name: manifests_destination_city_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: test
+--
+
+ALTER SEQUENCE public.manifests_destination_city_id_seq OWNED BY public.manifests.destination_city_id;
 
 
 --
@@ -794,6 +824,13 @@ ALTER TABLE ONLY public.manifests ALTER COLUMN manifest_id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY public.manifests ALTER COLUMN coloader_id SET DEFAULT nextval('public.manifests_coloader_id_seq'::regclass);
+
+
+--
+-- Name: manifests destination_city_id; Type: DEFAULT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.manifests ALTER COLUMN destination_city_id SET DEFAULT nextval('public.manifests_destination_city_id_seq'::regclass);
 
 
 --
@@ -2120,7 +2157,7 @@ COPY public.employees (employee_id, employee_name, employee_mobile, address, aad
 -- Data for Name: manifests; Type: TABLE DATA; Schema: public; Owner: test
 --
 
-COPY public.manifests (manifest_id, coloader_id, branch_id, booking_id, destination_id, deleted, manifests_number, create_at, bag_count) FROM stdin;
+COPY public.manifests (manifest_id, coloader_id, branch_id, booking_id, destination_id, deleted, manifests_number, create_at, bag_count, destination_city_id) FROM stdin;
 \.
 
 
@@ -2282,6 +2319,13 @@ SELECT pg_catalog.setval('public.employees_employee_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.manifests_coloader_id_seq', 1, false);
+
+
+--
+-- Name: manifests_destination_city_id_seq; Type: SEQUENCE SET; Schema: public; Owner: test
+--
+
+SELECT pg_catalog.setval('public.manifests_destination_city_id_seq', 1, false);
 
 
 --
@@ -2624,6 +2668,14 @@ ALTER TABLE ONLY public.employees
 
 ALTER TABLE ONLY public.employees
     ADD CONSTRAINT employees_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(user_id) ON DELETE SET NULL;
+
+
+--
+-- Name: manifests fk_manifests_destination_city; Type: FK CONSTRAINT; Schema: public; Owner: test
+--
+
+ALTER TABLE ONLY public.manifests
+    ADD CONSTRAINT fk_manifests_destination_city FOREIGN KEY (destination_city_id) REFERENCES public.cities(city_id);
 
 
 --
