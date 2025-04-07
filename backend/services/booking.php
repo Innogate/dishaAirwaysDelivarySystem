@@ -27,6 +27,9 @@ $router->add('POST', '/booking', function () {
     }
 
     $db = new Database();
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
+
     if ($isAdmin && $_info->branch_id == null) {
         $sql = "SELECT 
     b.*, 
@@ -37,8 +40,8 @@ JOIN branches br ON b.branch_id = br.branch_id
 JOIN branches dbr ON b.destination_branch_id = dbr.branch_id 
 WHERE NOT b.status = '4' AND b.manifest_id IS NULL 
 ORDER BY created_at DESC 
-LIMIT ? OFFSET ?;";
-        $stmt = $db->query($sql, [$payload->max, $payload->current]);
+LIMIT $limit OFFSET $offset;";
+        $stmt = $db->query($sql);
     } else {
         $sql = "SELECT 
     b.*, 
@@ -50,8 +53,8 @@ JOIN branches dbr ON b.destination_branch_id = dbr.branch_id
 WHERE b.branch_id = ?
   AND ((NOT b.status = '4')) AND ((b.manifest_id IS NULL) OR (b.status = '5' AND NOT b.branch_id = ?))
 ORDER BY b.created_at DESC 
-LIMIT ? OFFSET ?;";
-        $stmt = $db->query($sql, [$_info->branch_id, $_info->branch_id, $payload->max, $payload->current]);
+LIMIT $limit OFFSET $offset;";
+        $stmt = $db->query($sql, [$_info->branch_id]);
     }
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -80,6 +83,8 @@ $router->add('POST', '/booking/byDestinationBranch', function () {
     }
 
     $db = new Database();
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
     if ($isAdmin && $_info->branch_id == null) {
         $sql = "SELECT 
     b.*, 
@@ -90,8 +95,8 @@ JOIN branches br ON b.branch_id = br.branch_id
 JOIN branches dbr ON b.destination_branch_id = dbr.branch_id 
 WHERE b.destination_branch_id = ? 
 ORDER BY created_at DESC 
-LIMIT ? OFFSET ?;";
-        $stmt = $db->query($sql, [$payload->destination_branch_id, $payload->max, $payload->current]);
+LIMIT $limit OFFSET $offset;";
+        $stmt = $db->query($sql, [$payload->destination_branch_id]);
     } else {
         $sql = "SELECT 
     b.*, 
@@ -102,8 +107,8 @@ JOIN branches br ON b.branch_id = br.branch_id
 JOIN branches dbr ON b.destination_branch_id = dbr.branch_id
 WHERE b.branch_id = ? AND b.destination_branch_id = ? 
 ORDER BY b.created_at DESC 
-LIMIT ? OFFSET ?;";
-        $stmt = $db->query($sql, [$_info->branch_id, $payload->destination_branch_id, $payload->max, $payload->current]);
+LIMIT $limit OFFSET $offset;";
+        $stmt = $db->query($sql, [$_info->branch_id, $payload->destination_branch_id]);
     }
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);

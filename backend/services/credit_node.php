@@ -12,21 +12,25 @@ $router->add('POST', '/credit/token', function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-
+    $payload = (object)[
+        "fields" => [],
+        "max" => 10,
+        "current" => 0,
+    ];
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w"); // Check permission
     $data = json_decode(file_get_contents("php://input"), true);
     $handler->validateInput($data, [ "max", "current" ]);
 
-    $limit = intval($data["max"]);
-    $offset = intval($data["current"]);
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
 
     $sql = "SELECT credit_node.*, branches.branch_name as branch_name, cities.city_name as city_name 
             FROM credit_node 
             JOIN branches ON credit_node.branch_id = branches.branch_id 
             JOIN cities ON branches.city_id = cities.city_id 
-            LIMIT ? OFFSET ?";
+            LIMIT $limit OFFSET $offset";
     
-    $stmt = $db->query($sql, [$limit, $offset]);
+    $stmt = $db->query($sql, [$limit]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();

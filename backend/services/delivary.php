@@ -33,8 +33,8 @@ $router->add('POST', '/delivery', function () {
         exit;
     }
 
-    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
-    $stmt = $db->query($sql, [$_info->branch_id, $limit, $offset]);
+    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 

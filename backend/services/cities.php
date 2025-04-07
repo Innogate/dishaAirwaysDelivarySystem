@@ -19,11 +19,12 @@ $router->add('POST', '/master/cities', function () {
     if (!empty($data)) {
         $payload = (object) $data; 
     }
-
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
     $db = new Database();
     $offset = ($payload->current - 1) * $payload->max;
-    $sql = $db->generateDynamicQuery("cities", $payload->fields) . " WHERE status = 1 ORDER BY city_name ASC LIMIT ? OFFSET ?";
-    $stmt = $db->query($sql, [$payload->max, $offset]);
+    $sql = $db->generateDynamicQuery("cities", $payload->fields) . " WHERE status = 1 ORDER BY city_name ASC LIMIT $limit OFFSET $offset";
+    $stmt = $db->query($sql);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!$list) {
         $list = [];
@@ -81,11 +82,12 @@ $router->add('POST', '/master/cities/byStateId', function () {
     if (!empty($data)) {
         $payload = (object) $data; 
     }
-
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
     $db = new Database();
     $offset = ($payload->current - 1) * $payload->max;
-    $sql = $db->generateDynamicQuery("cities", $payload->fields) . " WHERE state_id = ? AND status = 1 ORDER BY city_name ASC LIMIT ? OFFSET ?";
-    $stmt = $db->query($sql, [$payload->state_id, $payload->max, $offset]);
+    $sql = $db->generateDynamicQuery("cities", $payload->fields) . " WHERE state_id = ? AND status = 1 ORDER BY city_name ASC LIMIT $limit OFFSET $offset";
+    $stmt = $db->query($sql, [$payload->state_id]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!$list) {
         $list = [];

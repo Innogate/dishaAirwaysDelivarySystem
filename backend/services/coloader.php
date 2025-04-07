@@ -21,10 +21,11 @@ $router->add('POST', '/master/coloader', function () {
     if (!empty($data)) {
         $payload = (object) $data;
     }
-
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
     $db = new Database();
-    $sql = $db->generateDynamicQuery("coloader", $payload->fields) . " WHERE coloader_branch = ? ORDER BY coloader_city ASC LIMIT ? OFFSET ?";
-    $stmt = $db->query($sql, [$_info->branch_id, $payload->max, ($payload->current - 1) * $payload->max]);
+    $sql = $db->generateDynamicQuery("coloader", $payload->fields) . " WHERE coloader_branch = ? ORDER BY coloader_city ASC LIMIT $limit OFFSET $offset";
+    $stmt = $db->query($sql, [$_info->branch_id]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $response = new ApiResponse(200, "Success", $list ?: []);

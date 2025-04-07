@@ -24,19 +24,19 @@ $router->add('POST', '/master/employees', function () {
         $payload = (object)$data;
     }
 
-    $limit = intval($payload->max);
-    $offset = intval($payload->current);
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id == null) {
         $sql = "SELECT e.*, br.branch_name 
                 FROM employees AS e 
                 JOIN branches AS br ON br.branch_id = e.branch_id 
-                LIMIT ? OFFSET ?";
-        $stmt = $db->query($sql, [$limit, $offset]);
+                LIMIT $limit OFFSET $offset";
+        $stmt = $db->query($sql, [$limit]);
     } else {
-        $sql = $db->generateDynamicQuery("employees", $payload->fields) . " WHERE branch_id = ? LIMIT ? OFFSET ?";
-        $stmt = $db->query($sql, [$_info->branch_id, $limit, $offset]);
+        $sql = $db->generateDynamicQuery("employees", $payload->fields) . " WHERE branch_id =  LIMIT $limit OFFSET $offset";
+        $stmt = $db->query($sql, [$_info->branch_id]);
     }
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];

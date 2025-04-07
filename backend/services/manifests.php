@@ -21,16 +21,17 @@ $router->add('POST', '/manifests', function () {
 
     $data = json_decode(file_get_contents("php://input"), true);
     if (!empty($data)) $payload = (object) $data;
-
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
     $db = new Database();
     $baseQuery = $db->generateDynamicQuery("manifests", $payload->fields) . " WHERE deleted = FALSE ";
     $sql = $baseQuery . ($isAdmin && $_info->branch_id == null 
-        ? "LIMIT ? OFFSET ?" 
-        : "AND branch_id = ? LIMIT ? OFFSET ?");
+        ? "LIMIT $limit OFFSET $offset" 
+        : "AND branch_id = ? LIMIT $limit OFFSET $offset");
 
     $params = ($isAdmin && $_info->branch_id == null)
-        ? [$payload->max, $payload->current]
-        : [$_info->branch_id, $payload->max, $payload->current];
+        ? []
+        : [$_info->branch_id];
 
     $stmt = $db->query($sql, $params);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];

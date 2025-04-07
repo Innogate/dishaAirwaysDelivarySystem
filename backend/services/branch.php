@@ -21,8 +21,10 @@ $router->add('POST', '/master/branches', function () {
     }
 
     $db = new Database();
-    $sql = $db->generateDynamicQuery("branches", $payload->fields) . " JOIN representatives ON representatives.branch_id = branches.branch_id WHERE branches.status = TRUE LIMIT ? OFFSET ?";
-    $stmt = $db->query($sql, [$payload->max, $payload->current]);
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
+    $sql = $db->generateDynamicQuery("branches", $payload->fields) . " JOIN representatives ON representatives.branch_id = branches.branch_id WHERE branches.status = TRUE LIMIT $limit OFFSET $offset";
+    $stmt = $db->query($sql);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -72,10 +74,11 @@ $router->add('POST', '/master/branches/byCityId', function () {
         "city_id" => 0,
     ];
     $data = json_decode(file_get_contents("php://input"), true);
-
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
     $db = new Database();
-    $sql = $db->generateDynamicQuery("branches", $payload->fields) . " WHERE city_id = ? AND status = TRUE LIMIT ? OFFSET ?";
-    $stmt = $db->query($sql, [$payload->city_id, $payload->max, $payload->current]);
+    $sql = $db->generateDynamicQuery("branches", $payload->fields) . " WHERE city_id = ? AND status = TRUE LIMIT $limit OFFSET $offset";
+    $stmt = $db->query($sql, [$payload->city_id]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!$list) {
         (new ApiResponse(400, "Invalid BRANCH ID", "", 400))->toJson();

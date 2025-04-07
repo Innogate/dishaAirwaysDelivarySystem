@@ -21,8 +21,8 @@ $router->add('POST', '/booking/received', function () {
     }
 
     $payload = json_decode(file_get_contents("php://input"), true) ?? [];
-    $max = $payload['max'] ?? 10;
-    $offset = $payload['current'] ?? 0;
+    $limit = (int) $payload->max;
+    $offset = (int) $payload->current;
 
     $db = new Database();
     $sql = "SELECT 
@@ -71,9 +71,9 @@ $router->add('POST', '/booking/received', function () {
     JOIN cities c ON b.destination_city_id = c.city_id
     WHERE rb.branch_id = ? AND b.status != 5
     ORDER BY rb.created_at DESC
-    LIMIT ? OFFSET ?";
+    LIMIT $limit OFFSET $offset";
 
-    $stmt = $db->query($sql, [$_info->branch_id, (int)$max, (int)$offset]);
+    $stmt = $db->query($sql, [$_info->branch_id]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     (new ApiResponse(200, "Success", $list))->toJson();
 });

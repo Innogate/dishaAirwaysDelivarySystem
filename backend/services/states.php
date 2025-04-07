@@ -13,7 +13,7 @@ $router->add('POST', '/master/states', function () {
     $current = $data["current"] ?? 0;
 
     $db = new Database();
-    $stmt = $db->query("SELECT * FROM states ORDER BY state_name ASC LIMIT ? OFFSET ?", [$max, $current]);
+    $stmt = $db->query("SELECT * FROM states ORDER BY state_name ASC LIMIT $max OFFSET $current");
     (new ApiResponse(200, "Success", $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []))->toJson();
 });
 
