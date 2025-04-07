@@ -167,6 +167,16 @@ CREATE TABLE delivery_list (
     name VARCHAR(255)
 );
 
+-- Create the table with auto-incrementing ID
+CREATE TABLE received_booking (
+    id INT NOT NULL AUTO_INCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    booking_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    status BOOLEAN DEFAULT TRUE NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE manifests (
     manifest_id INT AUTO_INCREMENT PRIMARY KEY,
     coloader_id INT NOT NULL,
