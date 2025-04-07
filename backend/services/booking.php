@@ -16,7 +16,6 @@ $router->add('POST', '/booking', function () {
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
 
     $payload = (object) [
-        "fields" => [],
         "max" => 10,
         "current" => 0
     ];
@@ -32,29 +31,28 @@ $router->add('POST', '/booking', function () {
 
     if ($isAdmin && $_info->branch_id == null) {
         $sql = "SELECT 
-    b.*, 
-    br.branch_name AS branch_name, 
-    dbr.branch_name AS destination_branch_name
-FROM bookings b
-JOIN branches br ON b.branch_id = br.branch_id
-JOIN branches dbr ON b.destination_branch_id = dbr.branch_id 
-WHERE NOT b.status = '4' AND b.manifest_id IS NULL 
-ORDER BY created_at DESC 
-LIMIT $limit OFFSET $offset;";
+            b.*, 
+            br.branch_name AS branch_name, 
+            dbr.branch_name AS destination_branch_name
+        FROM bookings b
+        JOIN branches br ON b.branch_id = br.branch_id
+        JOIN branches dbr ON b.destination_branch_id = dbr.branch_id 
+        WHERE NOT b.status = '4' AND b.manifest_id IS NULL 
+        ORDER BY created_at DESC 
+        LIMIT $limit OFFSET $offset;";
         $stmt = $db->query($sql);
     } else {
         $sql = "SELECT 
-    b.*, 
-    br.branch_name AS booking_branch_name, 
-    dbr.branch_name AS destination_branch_name
-FROM bookings b
-JOIN branches br ON b.branch_id = br.branch_id
-JOIN branches dbr ON b.destination_branch_id = dbr.branch_id
-WHERE b.branch_id = ?
-  AND ((NOT b.status = '4')) AND ((b.manifest_id IS NULL) OR (b.status = '5' AND NOT b.branch_id = ?))
-ORDER BY b.created_at DESC 
-LIMIT $limit OFFSET $offset;";
-        $stmt = $db->query($sql, [$_info->branch_id]);
+            b.*, 
+            br.branch_name AS booking_branch_name, 
+            dbr.branch_name AS destination_branch_name
+        FROM bookings b
+        JOIN branches br ON b.branch_id = br.branch_id
+        JOIN branches dbr ON b.destination_branch_id = dbr.branch_id
+        WHERE b.branch_id = ? AND ((NOT b.status = '4')) AND ((b.manifest_id IS NULL) OR (b.status = '5' AND NOT b.branch_id = ?))
+        ORDER BY b.created_at DESC 
+        LIMIT $limit OFFSET $offset;";
+        $stmt = $db->query($sql, [$_info->branch_id, $_info->branch_id]);
     }
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -130,10 +128,22 @@ $router->add("POST", "/booking/new", function () {
     $data = json_decode(file_get_contents("php://input"), true);
 
     $required_fields = [
-        "consignee_name", "consignee_mobile", "consignor_name", "consignor_mobile",
-        "slip_no", "transport_mode", "paid_type", "cgst", "sgst", "igst",
-        "total_value", "package_count", "package_weight", "package_value",
-        "to_pay", "on_account",
+        "consignee_name",
+        "consignee_mobile",
+        "consignor_name",
+        "consignor_mobile",
+        "slip_no",
+        "transport_mode",
+        "paid_type",
+        "cgst",
+        "sgst",
+        "igst",
+        "total_value",
+        "package_count",
+        "package_weight",
+        "package_value",
+        "to_pay",
+        "on_account",
     ];
 
     $handler->validateInput($data, $required_fields);
@@ -162,13 +172,33 @@ $router->add("POST", "/booking/new", function () {
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )";
         $db->query($sql, [
-            $data["consignee_name"], $data["consignee_mobile"], $data["consignor_name"],
-            $data["consignor_mobile"], $_info->branch_id, $slip_no, $data["booking_address"],
-            $data["transport_mode"], $data["paid_type"], $data["cgst"], $data["sgst"], $data["igst"],
-            $data["total_value"], $data["package_count"], $data["package_weight"], $data["package_value"],
-            $data["package_contents"], $data["shipper_charges"], $data["destination_city_id"],
-            $data["destination_branch_id"], $data["xp_branch_id"], $_info->user_id, $data["on_account"],
-            $data["to_pay"], $data["declared_value"], $data["other_charges"], "0"
+            $data["consignee_name"],
+            $data["consignee_mobile"],
+            $data["consignor_name"],
+            $data["consignor_mobile"],
+            $_info->branch_id,
+            $slip_no,
+            $data["booking_address"],
+            $data["transport_mode"],
+            $data["paid_type"],
+            $data["cgst"],
+            $data["sgst"],
+            $data["igst"],
+            $data["total_value"],
+            $data["package_count"],
+            $data["package_weight"],
+            $data["package_value"],
+            $data["package_contents"],
+            $data["shipper_charges"],
+            $data["destination_city_id"],
+            $data["destination_branch_id"],
+            $data["xp_branch_id"],
+            $_info->user_id,
+            $data["on_account"],
+            $data["to_pay"],
+            $data["declared_value"],
+            $data["other_charges"],
+            "0"
         ]);
 
         $db->commit();
@@ -231,4 +261,3 @@ $router->add('POST', '/booking/forward', function () {
         (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
     }
 });
-?>
