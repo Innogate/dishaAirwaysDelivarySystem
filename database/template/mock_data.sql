@@ -1526,6 +1526,15 @@ commit;
 --
 -- Table structure for table `manifests`
 --
+-- Create the table with auto-incrementing ID
+CREATE TABLE received_booking (
+    id INT NOT NULL AUTO_INCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    booking_id INT NOT NULL,
+    branch_id INT NOT NULL,
+    status BOOLEAN DEFAULT TRUE NOT NULL,
+    PRIMARY KEY (id)
+);
 
 DROP TABLE IF EXISTS `manifests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
