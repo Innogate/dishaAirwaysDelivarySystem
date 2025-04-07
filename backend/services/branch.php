@@ -4,6 +4,7 @@ require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Handler.php';
 
 global $router;
+
 // ** GET ALL BRANCH
 $router->add('POST', '/master/branches', function () {
     $jwt = new JwtHandler();
@@ -18,7 +19,6 @@ $router->add('POST', '/master/branches', function () {
     if (!empty($data)) {
         $payload = (object) $data;
     }
-
 
     $db = new Database();
     $sql = $db->generateDynamicQuery("branches", $payload->fields) . " JOIN representatives ON representatives.branch_id = branches.branch_id WHERE branches.status = TRUE LIMIT ? OFFSET ?";
@@ -35,7 +35,6 @@ $router->add('POST', '/master/branches/byId', function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    // $handler->validatePermission($pageID, $_info->user_id, "r");
 
     $payload = (object) [
         "fields" => [],
@@ -111,8 +110,6 @@ $router->add('POST', '/master/branches/new', function () {
 
     try {
         $db->beginTransaction();
-        // check brach name already exists
-        // convert to lower case
         $lowerBranchName = strtolower($data["branch_name"]);
         $stmt = $db->query("SELECT branch_id FROM branches WHERE branch_name = ?", [$lowerBranchName]);
         if ($stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -120,38 +117,36 @@ $router->add('POST', '/master/branches/new', function () {
             return;
         }
 
-        // check short name already exists
         $lowerShortName = strtolower($data["branch_short_name"]);
         $stmt = $db->query("SELECT branch_id FROM branches WHERE branch_short_name = ?", [$lowerShortName]);
         if ($stmt->fetch(PDO::FETCH_ASSOC)) {
             (new ApiResponse(400, "Branch short name already exists."))->toJson();
             return;
         }
-        
+
         $data["cgst"] = $data["cgst"] ?? 0;
         $data["sgst"] = $data["sgst"] ?? 0;
         $data["igst"] = $data["igst"] ?? 0;
-        
-        // INSERT BRANCH
+
         $stmt = $db->query("INSERT INTO branches (
-        branch_name, 
-        branch_short_name, 
-        alias_name, 
-        address, 
-        city_id, 
-        state_id, 
-        pin_code, 
-        contact_no, 
-        email, 
-        gst_no, 
-        cin_no, 
-        udyam_no, 
-        cgst, 
-        sgst, 
-        igst, 
-        logo,
-        manifest_sires,
-        created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING branch_id", [
+            branch_name, 
+            branch_short_name, 
+            alias_name, 
+            address, 
+            city_id, 
+            state_id, 
+            pin_code, 
+            contact_no, 
+            email, 
+            gst_no, 
+            cin_no, 
+            udyam_no, 
+            cgst, 
+            sgst, 
+            igst, 
+            logo,
+            manifest_sires,
+            created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [
             $data["branch_name"],
             $data["branch_short_name"],
             $data["alias_name"],
@@ -170,18 +165,16 @@ $router->add('POST', '/master/branches/new', function () {
             $data["logo"],
             $data["manifest_sires"],
             $_info->user_id
-            
         ]);
 
-        $branch_id = $stmt->fetchColumn();
+        $branch_id = $db->pdo->lastInsertId();
 
         if (!$branch_id){
             $db->rollBack();
             (new ApiResponse(400,"Failed to create branch"))->toJson();
             return;    
         }
-        
-        // INSERT REPRESENTATIVE
+
         $stmt = $db->query("INSERT INTO representatives (branch_id, user_id, created_by) VALUES (?,?,?)", [
             $branch_id,
             $data["representative_id"],
@@ -213,7 +206,6 @@ $router->add('POST', '/master/branches/delete', function () {
     try {
         $db->beginTransaction();
 
-        // Check if branch exists
         $stmt = $db->query("SELECT branch_id FROM branches WHERE branch_id = ?", [$branch_id]);
         if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
             (new ApiResponse(404, "Branch not found."))->toJson();
@@ -230,60 +222,50 @@ $router->add('POST', '/master/branches/delete', function () {
     }
 });
 
+// UPDATE BRANCH
 $router->add('POST', '/master/branches/update', function () {
-    // Define the page ID for permissions check
     $pageID = 6;
-    
-    // Create instances of JwtHandler and Handler for authentication and permission validation
+
     $jwt = new JwtHandler();
     $handler = new Handler();
-
-    // Validate JWT and permissions
     $_info = $jwt->validate();
-    $handler->validatePermission($pageID, $_info->user_id, "u"); // "u" for update permission
+    $handler->validatePermission($pageID, $_info->user_id, "u");
 
-    // Decode the JSON payload from the incoming request
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Define a default payload structure
     $payload = (object) [
         "conditions" => 'branch_id=0',
         "updates" => []
     ];
 
-    // If the payload data is not empty, overwrite the default payload with the incoming data
     if (!empty($data)) {
         $payload = (object) $data;
     } else {
-        // If payload is empty, return an error response
         (new ApiResponse(400, "Invalid payload", $data))->toJson();
         return;
     }
-    // pop fild from from payload upates
-     $representative_id = $payload->updates["representative_id"];
-     unset($payload->updates["representative_id"]);
-    // Initialize Database connection
+
+    $representative_id = null;
+    if (isset($payload->updates["representative_id"])) {
+        $representative_id = $payload->updates["representative_id"];
+        unset($payload->updates["representative_id"]);
+    }
+
     $db = new Database();
     $db->pdo->beginTransaction();
     try {
-
-        // Update the branch in the database
         $sql = $db->generateDynamicUpdate("branches", $payload->updates, $payload->conditions);
-        // (new ApiResponse(200,$sql[1]))->toJson();
         $stmt = $db->query($sql[0], $sql[1]);
 
-        // upate representative
-        $sql = "UPDATE representatives SET user_id = ? WHERE branch_id = ?";
-        $db->query($sql, [$representative_id, $payload->updates["branch_id"]]);
+        if ($representative_id !== null && isset($payload->updates["branch_id"])) {
+            $sql = "UPDATE representatives SET user_id = ? WHERE branch_id = ?";
+            $db->query($sql, [$representative_id, $payload->updates["branch_id"]]);
+        }
 
-        // Commit the transaction and return a success response
         $db->pdo->commit();
         (new ApiResponse(200, "Branch updated successfully", null))->toJson();
     } catch (Exception $e) {
-        // Handle any errors and respond with the error message
+        $db->rollBack();
         (new ApiResponse(500, "Update failed", $e->getMessage()))->toJson();
     }
 });
-
-
-

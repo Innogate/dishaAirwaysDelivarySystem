@@ -3,8 +3,10 @@
 require_once __DIR__ . '/../core/JwtHandler.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Handler.php';
+
 global $router;
-// GET ALL BOOKING
+
+// GET ALL DELIVERIES
 $router->add('POST', '/delivery', function () {
     $pageID = 12;
     $jwt = new JwtHandler();
@@ -12,7 +14,7 @@ $router->add('POST', '/delivery', function () {
     $_info = $jwt->validate();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
 
-    $payload = (object) [
+    $payload = (object)[
         "max" => 10,
         "current" => 0
     ];
@@ -22,27 +24,24 @@ $router->add('POST', '/delivery', function () {
         $payload = (object) $data;
     }
 
+    $limit = intval($payload->max);
+    $offset = intval($payload->current);
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id == null) {
         (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
         exit;
-    } else {
-        $sql = "SELECT * FROM delivery_list WHERE branch_id = ?  ORDER BY created_at DESC LIMIT ? OFFSET ?;";
-        // $sql = $db->modifySelectQueryWithForeignKeys($sql);
-        $stmt = $db->query($sql, [$_info->branch_id, $payload->max, $payload->current]);
     }
 
-    $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?";
+    $stmt = $db->query($sql, [$_info->branch_id, $limit, $offset]);
 
-    if (!$list) {
-        $list = [];
-    }
+    $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();
 });
 
-// ENTRY NEW BOOKING
+// ENTRY NEW DELIVERY
 $router->add('POST', '/delivery/new', function () {
     $pageID = 12;
     $jwt = new JwtHandler();
@@ -65,7 +64,8 @@ $router->add('POST', '/delivery/new', function () {
     $db = new Database();
 
     foreach ($data['booking_list'] as $booking_id) {
-        $sql = "INSERT INTO delivery_list (booking_id, branch_id, employee_id, created_by, name) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO delivery_list (booking_id, branch_id, employee_id, created_by, name)
+                VALUES (?, ?, ?, ?, ?)";
         $bookingName = "Booking #$booking_id";
         $db->query($sql, [
             $booking_id,

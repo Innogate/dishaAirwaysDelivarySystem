@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     tar \
     unzip \
+    php-mysql \
     && docker-php-ext-install pdo_pgsql
 
 WORKDIR /app

@@ -74,10 +74,9 @@ Authorization: Bearer {{token}}
 
 {
     "updates": {
-        "mobile": "1234567890",
-        "last_name": "admin"
+        "last_name": "MANAGER"
     },
-    "conditions":"user_id=1"
+    "conditions":"user_id=2"
     
 }
 
@@ -87,5 +86,5 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "user_id": "4"
+    "user_id": "2"
 }

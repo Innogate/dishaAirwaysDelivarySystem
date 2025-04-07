@@ -14,19 +14,21 @@ services:
     command:  bash start.sh
     
   db:
-    image: postgres
+    image: mariadb:latest
     container_name: db-container
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       PRODUCTION: ${PRODUCTION}
     volumes:
-      - ./database/data:/var/lib/postgresql/data
+      - ./database/data:/var/lib/mysql
       - ./database/template:/docker-entrypoint-initdb.d
+
 
   php:
     build:

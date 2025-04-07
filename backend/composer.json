@@ -1,6 +1,8 @@
 {
     "require": {
         "firebase/php-jwt": "^6.3",
-        "doctrine/dbal": "^4.2"
+        "doctrine/dbal": "^4.2",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*"
     }
 }

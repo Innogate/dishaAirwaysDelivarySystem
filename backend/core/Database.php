@@ -8,7 +8,7 @@ class Database {
     public function __construct() {
         // Load configuration
         $config = require __DIR__ . '/../config/config.php';
-        $dsn = "pgsql:host={$config['db']['host']};dbname={$config['db']['dbname']}";
+        $dsn = "mysql:host={$config['db']['host']};dbname={$config['db']['dbname']};charset=utf8mb4";
 
         try {
             $this->pdo = new PDO($dsn, $config['db']['user'], $config['db']['password']);
@@ -18,19 +18,17 @@ class Database {
         }
     }
 
-    // Execute a query with optional parameters
     public function query($sql, $params = []) {
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            $this->logDatabaseActivity($sql, $params, "Query failed: " . $e->getMessage()); // Log error
+            $this->logDatabaseActivity($sql, $params, "Query failed: " . $e->getMessage());
             die((new ApiResponse(500, "Query failed", $e->getMessage()))->toJson());
         }
     }
 
-    // Log database activity to a file
     private function logDatabaseActivity($query, $params, $message = "Query executed") {
         $logFile = __DIR__ . '/db_activity.log';
         $logEntry = [
@@ -42,77 +40,59 @@ class Database {
         file_put_contents($logFile, json_encode($logEntry) . PHP_EOL, FILE_APPEND);
     }
 
-    // Fetch foreign key relationships
     private function getForeignKeys() {
-        $stmt = $this->pdo->query(
-            "SELECT 
-                kcu.table_name, kcu.column_name, 
-                ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name 
-             FROM information_schema.key_column_usage AS kcu
-             JOIN information_schema.constraint_column_usage AS ccu
-             ON kcu.constraint_name = ccu.constraint_name
-             WHERE kcu.table_schema = 'public';"
-        );
+        $stmt = $this->pdo->query("
+            SELECT 
+                TABLE_NAME, COLUMN_NAME, 
+                REFERENCED_TABLE_NAME AS foreign_table_name, 
+                REFERENCED_COLUMN_NAME AS foreign_column_name 
+            FROM information_schema.KEY_COLUMN_USAGE 
+            WHERE TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL;
+        ");
 
         $foreignKeys = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $foreignKeys[$row['table_name']][$row['foreign_table_name']] =
-                "{$row['table_name']}.{$row['column_name']} = {$row['foreign_table_name']}.{$row['foreign_column_name']}";
+            $foreignKeys[$row['TABLE_NAME']][$row['foreign_table_name']] =
+                "{$row['TABLE_NAME']}.{$row['COLUMN_NAME']} = {$row['foreign_table_name']}.{$row['foreign_column_name']}";
         }
         return $foreignKeys;
     }
 
-    // Generate dynamic SELECT query
     public function generateDynamicQuery($table, $fields) {
-        // Validate input
         if (empty($table)) {
             throw new InvalidArgumentException("Invalid table name");
         }
-        
-        // If fields are empty, select all (*)
-        if (empty($fields) || !is_array($fields)) {
-            $fieldsString = "*";
-        } else {
-            // Escape field names to prevent SQL injection
+
+        $fieldsString = "*";
+        if (!empty($fields) && is_array($fields)) {
             $escapedFields = array_map(function($field) {
-                return str_replace("\"", "", $field); // Remove double quotes for PostgreSQL
+                return str_replace("`", "", $field);
             }, $fields);
-            
-            // Convert array to string
             $fieldsString = implode(", ", $escapedFields);
         }
-        
-        // Generate query
-        $query = "SELECT $fieldsString FROM $table";
-        
-        return $query;
+
+        return "SELECT $fieldsString FROM $table";
     }
-    
-    
-    // Example Usage
+
     public function generateDynamicUpdate($table, $data, $condition) {
-        // Validate input
         if (empty($table) || empty($data) || !is_array($data)) {
             throw new InvalidArgumentException("Invalid table name or data");
         }
-        
-        // Prepare set statements
+
         $setStatements = [];
         $values = [];
         foreach ($data as $column => $value) {
-            $escapedColumn = str_replace("\"", "", $column); // Remove double quotes for PostgreSQL
-            $setStatements[] = "$escapedColumn = ?";
+            $escapedColumn = str_replace("`", "", $column);
+            $setStatements[] = "`$escapedColumn` = ?";
             $values[] = $value;
         }
-        
+
         $setString = implode(", ", $setStatements);
-        
-        // Generate query
-        $query = "UPDATE $table SET $setString WHERE $condition";
-        
+        $query = "UPDATE `$table` SET $setString WHERE $condition";
+
         return [$query, $values];
     }
-    // Transaction management
+
     public function rollback() {
         $this->pdo->rollBack();
     }
@@ -125,7 +105,6 @@ class Database {
         $this->pdo->beginTransaction();
     }
 
-    // Generate database activity report
     public function generateDbReport() {
         $logFile = __DIR__ . '/db_activity.log';
         $logs = file($logFile, FILE_IGNORE_NEW_LINES);
@@ -138,61 +117,55 @@ class Database {
     }
 
     public function modifySelectQueryWithForeignKeys($sql) {
-        // Extract the table name from the query
         preg_match('/FROM\s+(\w+)/i', $sql, $matches);
         if (!isset($matches[1])) {
-            return $sql; // Return original query if no table is found
+            return $sql;
         }
-    
+
         $table = $matches[1];
         $foreignKeys = $this->getForeignKeys();
-    
-        // If the table has foreign keys, modify the query
+
         if (isset($foreignKeys[$table])) {
             $joins = [];
             $selectFields = [];
-    
-            // Extract selected fields
+
             preg_match('/SELECT\s+(.+?)\s+FROM/i', $sql, $fieldMatches);
             $selectedFields = isset($fieldMatches[1]) ? explode(',', $fieldMatches[1]) : ['*'];
             $selectedFields = array_map('trim', $selectedFields);
-    
+
             foreach ($selectedFields as $key => $field) {
-                // If selecting all fields, replace with explicit field list
-                if ($field == '*') {
-                    $stmt = $this->pdo->query("SELECT column_name FROM information_schema.columns WHERE table_name = '$table'");
+                if ($field === '*') {
+                    $stmt = $this->pdo->query("SHOW COLUMNS FROM `$table`");
                     $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
                     $selectedFields = array_merge($selectedFields, $columns);
                     unset($selectedFields[$key]);
                     continue;
                 }
             }
-    
-            // Modify the query to join foreign key tables
+
             foreach ($foreignKeys[$table] as $foreignTable => $joinCondition) {
-                $joins[] = "LEFT JOIN $foreignTable ON $joinCondition";
-    
-                // Extract the foreign key column name
+                $joins[] = "LEFT JOIN `$foreignTable` ON $joinCondition";
+
                 preg_match('/\.(\w+) = /', $joinCondition, $fkMatches);
                 if (isset($fkMatches[1])) {
                     $foreignColumn = $fkMatches[1];
-    
-                    // Replace the foreign key column with the related table’s data
                     if (in_array("$table.$foreignColumn", $selectedFields) || in_array($foreignColumn, $selectedFields)) {
-                        $selectedFields[] = "$foreignTable.*"; // Select all columns from the foreign table
+                        $selectedFields[] = "$foreignTable.*";
                         unset($selectedFields[array_search("$table.$foreignColumn", $selectedFields)]);
                     }
                 }
             }
-    
-            // Rebuild the query
+
             $newFields = implode(", ", array_unique($selectedFields));
             $newJoins = implode(" ", $joins);
             $sql = preg_replace('/SELECT\s+.+?\s+FROM/i', "SELECT $newFields FROM", $sql);
             $sql .= " " . $newJoins;
         }
-    
+
         return $sql;
     }
-    
+
+    public function lastInsertId(){
+        return $this->pdo->lastInsertId();
+    }
 }

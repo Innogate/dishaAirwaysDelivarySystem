@@ -43,3 +43,12 @@ Authorization: Bearer {{token}}
         1, 2, 3, 4
     ]
 }
+
+#### DELIVERY
+POST {{apiUrl}}/delivery/new/booking
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "booking_id":1
+}

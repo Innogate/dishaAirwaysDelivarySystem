@@ -10,7 +10,7 @@
 2. States
 3. Cities
 4. Users
-5. Companies
+<!-- 5. Companies -->
 6. Branch
 7. Employees    
 8. Permission
