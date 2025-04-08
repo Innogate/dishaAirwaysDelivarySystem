@@ -17,7 +17,6 @@ $router->add('POST', '/booking/received', function () {
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, 'r');
 
     $payload = (object)[
-        "fields" => [],
         "max" => 10,
         "current" => 1
     ];
@@ -26,7 +25,7 @@ $router->add('POST', '/booking/received', function () {
         (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
     }
 
-    // $payload = json_decode(file_get_contents("php://input"), true);
+    $payload = (object)json_decode(file_get_contents("php://input"), true);
     
     $limit = (int) $payload->max;
     $offset = (int) $payload->current;

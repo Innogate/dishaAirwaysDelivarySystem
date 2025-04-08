@@ -27,6 +27,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
+  "fields": [],
   "max": 10,
   "current": 0
 }
