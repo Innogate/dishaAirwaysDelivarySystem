@@ -27,3 +27,4 @@
 3 -> DIETARY COMPLETE
 4 -> CANALED
 5 -> forward wait
+6 -> outfordelivary
