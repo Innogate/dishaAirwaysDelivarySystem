@@ -123,11 +123,6 @@ $router->add("GET", "/delivery/new/list", function () {
     $_info = $jwt->validate();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
 
-    $payload = (object)[
-        "max" => 10,
-        "current" => 0
-    ];
-
     $data = json_decode(file_get_contents("php://input"), true);
     if (!empty($data)) {
         $payload = (object) $data;
@@ -142,7 +137,7 @@ $router->add("GET", "/delivery/new/list", function () {
         exit;
     }
 
-    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NULL ORDER BY created_at DESC";
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
