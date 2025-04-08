@@ -33,9 +33,9 @@ $router->add('POST', '/master/employees', function () {
                 FROM employees AS e 
                 JOIN branches AS br ON br.branch_id = e.branch_id 
                 LIMIT $limit OFFSET $offset";
-        $stmt = $db->query($sql, [$limit]);
+        $stmt = $db->query($sql);
     } else {
-        $sql = $db->generateDynamicQuery("employees", $payload->fields) . " WHERE branch_id =  LIMIT $limit OFFSET $offset";
+        $sql = $db->generateDynamicQuery("employees", $payload->fields) . " WHERE branch_id = ? LIMIT $limit OFFSET $offset";
         $stmt = $db->query($sql, [$_info->branch_id]);
     }
 

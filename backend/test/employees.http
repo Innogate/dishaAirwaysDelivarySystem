@@ -47,8 +47,8 @@ Authorization: Bearer {{token}}
   "employee_name": "2",
   "employee_mobile": "123 Main St",
   "address": "123456789012",
-  "aadhar_no": "2025-02-28",
-  "joining_date": "1",
+  "aadhar_no": "123456789001",
+  "joining_date": "2025-02-28",
   "designation": null
 }
 
