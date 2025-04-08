@@ -11,8 +11,8 @@ POST {{ apiUrl }}/login
 Content-Type: application/json
 
 {
-    "id": "1234567890",
-    "passwd": "pass@1234"
+    "id": "2345678901",
+    "passwd": "123456"
 }
 
 
@@ -40,12 +40,12 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "coloader_name":"", 
-    "coloader_contuct":"", 
-    "coloader_address":"",    
-    "coloader_postal_code":"",
-    "coloader_email":"",
-    "coloader_city":"" 
+    "coloader_name":"Coloader TEST", 
+    "coloader_contact":"8907654312", 
+    "coloader_address":"ABC",    
+    "coloader_postal_code":"223312",
+    "coloader_email":"coloader@email.com",
+    "coloader_city":"2" 
 }
 
 #### UPDATE CITY
@@ -57,7 +57,7 @@ Authorization: Bearer {{token}}
     "updates": {
         "coloader_name": "WPC"
     },
-    "conditions":"cploader_id=1"
+    "conditions":"coloader_id=1"
 }
 
 

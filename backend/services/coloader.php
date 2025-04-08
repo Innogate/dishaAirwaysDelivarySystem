@@ -50,7 +50,7 @@ $router->add('POST', '/master/coloader/new', function () {
     }
 
     $db = new Database();
-    $stmt = $db->query("INSERT INTO coloader (coloader_name, coloader_contact, coloader_address, coloader_postal_code, coloader_email, coloader_city, coloader_branch) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+    $stmt = $db->query("INSERT INTO coloader (coloader_name, coloader_contuct, coloader_address, coloader_postal_code, coloader_email, coloader_city, coloader_branch) VALUES (?, ?, ?, ?, ?, ?, ?)", [
         $data["coloader_name"],
         $data["coloader_contact"],
         $data["coloader_address"],
