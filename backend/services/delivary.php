@@ -33,7 +33,7 @@ $router->add('POST', '/delivery', function () {
         exit;
     }
 
-    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NOT NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $sql = "SELECT d.*, b.slip_no as slip_no FROM delivery_list as d JOIN bookings as b ON d.booking_id = b.booking_id WHERE d.branch_id = ? AND d.employee_id IS NOT NULL ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset";
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];

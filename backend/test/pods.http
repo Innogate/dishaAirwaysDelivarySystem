@@ -1,0 +1,44 @@
+@apiUrl = http://localhost:8000
+@token = {{login.response.body.body.token}}
+### VERSION AND CHECK SERVER CONNECTION
+GET {{apiUrl}}/version
+Content-Type: application/json
+
+### ? Login with the created user
+# @name login
+POST {{ apiUrl }}/login
+Content-Type: application/json
+
+{
+    "id": "1234567890",
+    "passwd": "pass@1234"
+}
+
+
+### VERIFY
+GET {{apiUrl}}/verify
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+
+### PODS GET
+POST {{apiUrl}}/pods
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+
+}
+
+
+### PODS GET
+POST {{apiUrl}}/pods
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "booking_id":1,
+    "pod_data": "blob,with,file_data"
+}

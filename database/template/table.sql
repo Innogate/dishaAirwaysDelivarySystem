@@ -220,3 +220,15 @@ CREATE TABLE tracking (
     arrived_at DATETIME,
     departed_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE pods (
+    pod_id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT NOT NULL,
+    pod_data BLOB NOT NULL,
+    data_formate VARCHAR,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by INT NOT NULL,
+    status TINYINT(1) DEFAULT 1,
+    FOREIGN KEY (created_by) REFERENCES users(user_id),
+    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id)
+);
