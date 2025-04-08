@@ -16,11 +16,18 @@ $router->add('POST', '/booking/received', function () {
     $_info = $jwt->validate();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, 'r');
 
-    if (empty($_info->branch_id) || !$isAdmin) {
+    $payload = (object)[
+        "fields" => [],
+        "max" => 10,
+        "current" => 1
+    ];
+
+    if (empty($_info->branch_id)) {
         (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
     }
 
-    $payload = json_decode(file_get_contents("php://input"), true) ?? [];
+    // $payload = json_decode(file_get_contents("php://input"), true);
+    
     $limit = (int) $payload->max;
     $offset = (int) $payload->current;
 
@@ -87,7 +94,7 @@ $router->add("POST", "/booking/received/new", function () {
     $_info = $jwt->validate();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
 
-    if (empty($_info->branch_id) || !$isAdmin) {
+    if (empty($_info->branch_id)) {
         (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
     }
 
