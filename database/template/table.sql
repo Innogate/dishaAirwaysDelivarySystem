@@ -225,7 +225,7 @@ CREATE TABLE pods (
     pod_id INT AUTO_INCREMENT PRIMARY KEY,
     booking_id INT NOT NULL,
     pod_data BLOB NOT NULL,
-    data_formate VARCHAR,
+    data_formate VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_by INT NOT NULL,
     status TINYINT(1) DEFAULT 1,
