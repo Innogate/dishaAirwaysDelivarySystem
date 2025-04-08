@@ -52,3 +52,13 @@ Authorization: Bearer {{token}}
 {
     "booking_id":1
 }
+
+##### GET ALL BOOKING
+#### DELIVERY
+GET {{apiUrl}}/delivery/new/list
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+
+}

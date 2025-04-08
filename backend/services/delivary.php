@@ -33,7 +33,7 @@ $router->add('POST', '/delivery', function () {
         exit;
     }
 
-    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -113,5 +113,41 @@ $router->add("POST", "/delivery/new/booking", function () {
         (new ApiResponse(200,"Booking added for delivery"))->toJson();
     }
     (new ApiResponse(200,"Something went roang pls try again."))->toJson();
+});
+
+// LIST OFF BOOKING
+$router->add("GET", "/delivery/new/list", function () {
+    $pageID = 12;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
+
+    $payload = (object)[
+        "max" => 10,
+        "current" => 0
+    ];
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!empty($data)) {
+        $payload = (object) $data;
+    }
+
+    $limit = intval($payload->max);
+    $offset = intval($payload->current);
+
+    $db = new Database();
+    if ($isAdmin && $_info->branch_id == null) {
+        (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
+        exit;
+    }
+
+    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NOT NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $stmt = $db->query($sql, [$_info->branch_id]);
+
+    $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    (new ApiResponse(200, "Success", $list))->toJson();
+
 });
 ?>
