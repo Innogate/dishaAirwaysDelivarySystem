@@ -33,7 +33,7 @@ $router->add('POST', '/delivery', function () {
         exit;
     }
 
-    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NOT NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -142,7 +142,7 @@ $router->add("GET", "/delivery/new/list", function () {
         exit;
     }
 
-    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NOT NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $sql = "SELECT * FROM delivery_list WHERE branch_id = ? AND employee_id IS NULL ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
