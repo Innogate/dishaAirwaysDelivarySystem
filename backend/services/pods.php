@@ -68,8 +68,8 @@ $router->add("POST", "/pods/new", function () {
     $podBlob = file_get_contents($podFile);
 
     // Insert including data_formate
-    $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by) VALUES (?, ?, ?, ?)";
-    $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id]);
+    $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id) VALUES (?, ?, ?, ?, ?)";
+    $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id]);
 
     if ($db->lastInsertId() > 0) {
         (new ApiResponse(200, "POD uploaded successfully"))->toJson();
