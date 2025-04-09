@@ -23,8 +23,19 @@ $router->add('POST', '/pods', function () {
     }
 
     $pods = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Base64 encode the pod_data before sending the response
+    foreach ($pods as &$pod) {
+        // Check if pod_data exists and is not empty
+        if (!empty($pod['pod_data'])) {
+            $pod['pod_data'] = base64_encode($pod['pod_data']);
+        }
+    }
+
+    // Send the response with Base64-encoded pod_data
     (new ApiResponse(200, "Success", $pods))->toJson();
 });
+
 
 $router->add("POST", "/pods/new", function () {
     $pageID = 13;
@@ -33,33 +44,27 @@ $router->add("POST", "/pods/new", function () {
     $handler = new Handler();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
 
+    // If the user is not an admin or is not logged into a branch account, deny access
     if ($isAdmin || $_info->branch_id == null) {
         (new ApiResponse(403, "Access denied, not logged into a branch account"))->toJson();
     }
 
-    
-    if (!isset($_FILES["pod_data"])) {
-        (new ApiResponse(400, "Missing pod_data file"))->toJson();
-        exit;
+    $required_fields = ["booking_id", "pod_data", "data_formate"];
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!empty($data)) {
+        $data = (array) $data;
     }
 
-    if (!isset($_POST["booking_id"])) {
-        (new ApiResponse(400, "Missing booking_id or file"))->toJson();
-        exit;
-    }
+    $handler->validateInput($data, $required_fields);
 
-    $booking_id = $_POST["booking_id"];
-    $podFile = $_FILES["pod_data"]["tmp_name"];
-    $fileType = $_FILES["pod_data"]["type"];
+    $booking_id = $data["booking_id"];
+    $base64PodData = $data["pod_data"];
+    $fileType = $data["data_formate"];
 
-    if (!file_exists($podFile)) {
-        (new ApiResponse(400, "File upload failed"))->toJson();
-        exit;
-    }
-
-    $db = new Database();
+    $podBlob = base64_decode($base64PodData);
 
     // Validate booking
+    $db = new Database();
     $sql = "SELECT b.booking_id FROM bookings AS b
             JOIN received_booking AS rb ON b.booking_id = rb.booking_id
             WHERE b.status != 6 AND b.booking_id = ? AND rb.branch_id = ? LIMIT 1";
@@ -71,12 +76,11 @@ $router->add("POST", "/pods/new", function () {
         exit;
     }
 
-    $podBlob = file_get_contents($podFile);
-
-    // Insert including data_formate
+    // Insert the pod data (binary file) into the database
     $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id) VALUES (?, ?, ?, ?, ?)";
     $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id]);
 
+    // Check if the insertion was successful
     if ($db->lastInsertId() > 0) {
         (new ApiResponse(200, "POD uploaded successfully"))->toJson();
     } else {
