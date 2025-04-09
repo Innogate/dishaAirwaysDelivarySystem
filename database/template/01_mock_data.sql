@@ -1651,12 +1651,12 @@ DROP TABLE IF EXISTS `pods`;
 CREATE TABLE `pods` (
   `pod_id` int(11) NOT NULL AUTO_INCREMENT,
   `booking_id` int(11) NOT NULL,
-  `pod_data` blob NOT NULL,
   `data_formate` varchar(255) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL,
   `status` tinyint(1) DEFAULT 1,
   `branch_id` int(11) NOT NULL,
+  `pod_data` longblob DEFAULT NULL,
   PRIMARY KEY (`pod_id`),
   KEY `created_by` (`created_by`),
   KEY `booking_id` (`booking_id`),
@@ -1874,4 +1874,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-04-09  3:00:41
+-- Dump completed on 2025-04-09  6:21:54
