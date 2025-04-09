@@ -1534,7 +1534,7 @@ CREATE TABLE `manifests` (
   `manifest_id` int(11) NOT NULL AUTO_INCREMENT,
   `coloader_id` int(11) NOT NULL,
   `branch_id` int(11) NOT NULL,
-  `booking_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`booking_id`)),
+  `booking_id` varchar(2000) DEFAULT NULL,
   `destination_id` int(11) NOT NULL,
   `deleted` tinyint(1) DEFAULT 0,
   `manifests_number` varchar(255) DEFAULT NULL,

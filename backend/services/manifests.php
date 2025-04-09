@@ -119,6 +119,7 @@ $router->add('POST', '/manifests/new', function () {
         $booking_ids_array = is_array($data["booking_id"]) ? $data["booking_id"] : [$data["booking_id"]];
         $booking_ids_string = implode(",", array_map('intval', $booking_ids_array));
 
+        // GENERATE MANIFEST NUMBER
         $sql = "SELECT manifest_sires FROM branches WHERE branch_id = ?";
         $manifest_series = $db->query($sql, [$_info->branch_id])->fetchColumn();
         $splitResult = splitString($manifest_series);

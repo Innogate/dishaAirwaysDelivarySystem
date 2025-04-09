@@ -1,7 +1,7 @@
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19-11.8.1-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: 127.0.0.1    Database: test
+-- Host: localhost    Database: test
 -- ------------------------------------------------------
 -- Server version	11.7.2-MariaDB-ubu2404
 
@@ -20,7 +20,6 @@
 -- Table structure for table `bookings`
 --
 
-DROP TABLE IF EXISTS `bookings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bookings` (
@@ -73,7 +72,6 @@ CREATE TABLE `bookings` (
 -- Table structure for table `branch_user`
 --
 
-DROP TABLE IF EXISTS `branch_user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `branch_user` (
@@ -90,7 +88,6 @@ CREATE TABLE `branch_user` (
 -- Table structure for table `branches`
 --
 
-DROP TABLE IF EXISTS `branches`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `branches` (
@@ -133,7 +130,6 @@ CREATE TABLE `branches` (
 -- Table structure for table `cities`
 --
 
-DROP TABLE IF EXISTS `cities`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cities` (
@@ -152,7 +148,6 @@ CREATE TABLE `cities` (
 -- Table structure for table `coloader`
 --
 
-DROP TABLE IF EXISTS `coloader`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `coloader` (
@@ -172,7 +167,6 @@ CREATE TABLE `coloader` (
 -- Table structure for table `credit_node`
 --
 
-DROP TABLE IF EXISTS `credit_node`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `credit_node` (
@@ -191,7 +185,6 @@ CREATE TABLE `credit_node` (
 -- Table structure for table `delivery_list`
 --
 
-DROP TABLE IF EXISTS `delivery_list`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `delivery_list` (
@@ -210,7 +203,6 @@ CREATE TABLE `delivery_list` (
 -- Table structure for table `employees`
 --
 
-DROP TABLE IF EXISTS `employees`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `employees` (
@@ -239,14 +231,13 @@ CREATE TABLE `employees` (
 -- Table structure for table `manifests`
 --
 
-DROP TABLE IF EXISTS `manifests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `manifests` (
   `manifest_id` int(11) NOT NULL AUTO_INCREMENT,
   `coloader_id` int(11) NOT NULL,
   `branch_id` int(11) NOT NULL,
-  `booking_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`booking_id`)),
+  `booking_id` varchar(2000) DEFAULT NULL,
   `destination_id` int(11) NOT NULL,
   `deleted` tinyint(1) DEFAULT 0,
   `manifests_number` varchar(255) DEFAULT NULL,
@@ -263,7 +254,6 @@ CREATE TABLE `manifests` (
 -- Table structure for table `pages`
 --
 
-DROP TABLE IF EXISTS `pages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pages` (
@@ -278,7 +268,6 @@ CREATE TABLE `pages` (
 -- Table structure for table `permissions`
 --
 
-DROP TABLE IF EXISTS `permissions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `permissions` (
@@ -304,18 +293,17 @@ CREATE TABLE `permissions` (
 -- Table structure for table `pods`
 --
 
-DROP TABLE IF EXISTS `pods`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pods` (
   `pod_id` int(11) NOT NULL AUTO_INCREMENT,
   `booking_id` int(11) NOT NULL,
-  `pod_data` blob NOT NULL,
   `data_formate` varchar(255) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL,
   `status` tinyint(1) DEFAULT 1,
   `branch_id` int(11) NOT NULL,
+  `pod_data` longblob DEFAULT NULL,
   PRIMARY KEY (`pod_id`),
   KEY `created_by` (`created_by`),
   KEY `booking_id` (`booking_id`),
@@ -328,7 +316,6 @@ CREATE TABLE `pods` (
 -- Table structure for table `received_booking`
 --
 
-DROP TABLE IF EXISTS `received_booking`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `received_booking` (
@@ -345,7 +332,6 @@ CREATE TABLE `received_booking` (
 -- Table structure for table `representatives`
 --
 
-DROP TABLE IF EXISTS `representatives`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `representatives` (
@@ -370,7 +356,6 @@ CREATE TABLE `representatives` (
 -- Table structure for table `states`
 --
 
-DROP TABLE IF EXISTS `states`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `states` (
@@ -387,7 +372,6 @@ CREATE TABLE `states` (
 -- Table structure for table `tracking`
 --
 
-DROP TABLE IF EXISTS `tracking`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tracking` (
@@ -406,7 +390,6 @@ CREATE TABLE `tracking` (
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
@@ -442,4 +425,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-04-09  3:00:50
+-- Dump completed on 2025-04-09 11:22:41
