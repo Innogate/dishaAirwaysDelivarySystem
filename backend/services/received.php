@@ -52,6 +52,7 @@ $router->add('POST', '/booking/received', function () {
         b.package_value,
         b.package_contents,
         b.shipper_charges,
+        b.status,
         b.created_at AS booking_created_at,
 
         br.branch_id AS booking_branch_id,
@@ -75,9 +76,10 @@ $router->add('POST', '/booking/received', function () {
     JOIN branches db ON b.destination_branch_id = db.branch_id
     JOIN branches rbr ON rb.branch_id = rbr.branch_id
     JOIN cities c ON b.destination_city_id = c.city_id
-    WHERE rb.branch_id = ? AND b.status != 5 AND b.status != 6
+    WHERE rb.branch_id = ? AND b.status = 5623
     ORDER BY rb.created_at DESC
     LIMIT $limit OFFSET $offset";
+
 
     $stmt = $db->query($sql, [$_info->branch_id]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
