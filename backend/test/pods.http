@@ -34,7 +34,7 @@ Authorization: Bearer {{token}}
 
 
 ### PODS GET
-POST {{apiUrl}}/pods
+POST {{apiUrl}}/pods/new
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
