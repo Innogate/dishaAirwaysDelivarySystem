@@ -26,5 +26,7 @@
 2 -> OUT FOR DELIVERY
 3 -> DIETARY COMPLETE
 4 -> CANALED
+
 5 -> forward wait
-6 -> outfordelivary
+6 -> outfordelivary wait
+7 -> IN REIVING PROCESS

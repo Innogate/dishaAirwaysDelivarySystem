@@ -76,7 +76,7 @@ $router->add('POST', '/booking/received', function () {
     JOIN branches db ON b.destination_branch_id = db.branch_id
     JOIN branches rbr ON rb.branch_id = rbr.branch_id
     JOIN cities c ON b.destination_city_id = c.city_id
-    WHERE rb.branch_id = ? AND NOT b.status IN (5, 6, 3)
+    WHERE rb.branch_id = ? AND b.status = 7
     ORDER BY rb.created_at DESC
     LIMIT $limit OFFSET $offset";
 
@@ -144,6 +144,13 @@ $router->add("POST", "/booking/received/new", function () {
         ]);
         if ($stmt->rowCount() === 0) {
             throw new Exception("Failed to insert received booking");
+        }
+
+        // Update booking status 7
+
+        $stmt = $db->query("UPDATE bookings SET status = 7 WHERE booking_id = ?", [$booking_id]);
+        if ($stmt->rowCount() === 0) {
+            throw new Exception("Failed to update booking status");
         }
 
         // Update tracking
