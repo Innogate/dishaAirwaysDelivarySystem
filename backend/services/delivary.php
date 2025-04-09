@@ -121,6 +121,9 @@ $router->add("POST", "/delivery/new/booking", function () {
     $sql = "INSERT INTO delivery_list(booking_id, branch_id, created_by) VALUES (? , ?, ?);";
     $db->query($sql, [$booking["booking_id"], $_info->branch_id, $_info->user_id]);
     if($db->lastInsertId() > 0){
+        // set booking status 6
+        $sql = "UPDATE bookings SET status = 6 WHERE booking_id = ?";
+        $db->query($sql, [$booking["booking_id"]]);
         (new ApiResponse(200,"Booking added for delivery"))->toJson();
     }
     (new ApiResponse(200,"Something went roang pls try again."))->toJson();
