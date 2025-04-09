@@ -76,7 +76,7 @@ $router->add('POST', '/booking/received', function () {
     JOIN branches db ON b.destination_branch_id = db.branch_id
     JOIN branches rbr ON rb.branch_id = rbr.branch_id
     JOIN cities c ON b.destination_city_id = c.city_id
-    WHERE rb.branch_id = ? AND b.status = 5623
+    WHERE rb.branch_id = ? AND NOT b.status IN (5, 6, 3)
     ORDER BY rb.created_at DESC
     LIMIT $limit OFFSET $offset";
 
