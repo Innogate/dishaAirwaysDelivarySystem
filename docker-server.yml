@@ -1,5 +1,5 @@
 services:
-    db:
+  db:
     image: mariadb:latest
     container_name: db-container
     restart: unless-stopped
