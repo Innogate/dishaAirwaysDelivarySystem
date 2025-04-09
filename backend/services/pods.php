@@ -37,7 +37,13 @@ $router->add("POST", "/pods/new", function () {
         (new ApiResponse(403, "Access denied, not logged into a branch account"))->toJson();
     }
 
-    if (!isset($_POST["booking_id"]) || !isset($_FILES["pod_data"])) {
+    
+    if (!isset($_FILES["pod_data"])) {
+        (new ApiResponse(400, "Missing pod_data file"))->toJson();
+        exit;
+    }
+
+    if (!isset($_POST["booking_id"])) {
         (new ApiResponse(400, "Missing booking_id or file"))->toJson();
         exit;
     }
