@@ -30,7 +30,7 @@ $router->add('POST', '/credit/token', function () {
             JOIN cities ON branches.city_id = cities.city_id 
             LIMIT $limit OFFSET $offset";
     
-    $stmt = $db->query($sql, [$limit]);
+    $stmt = $db->query($sql);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     (new ApiResponse(200, "Success", $list))->toJson();
