@@ -191,7 +191,7 @@ $router->add('POST', '/master/users/delete', function () {
 
 // UPDATE USER
 $router->add('POST', '/master/users/update', function () {
-    $pageID = 2;
+    $pageID = 4;
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
