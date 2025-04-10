@@ -180,3 +180,26 @@ $router->add('POST', '/master/cities/delete', function () {
     $response = new ApiResponse(200, "City deleted successfully.");
     $response->toJson();
 });
+
+// UPDATE STATE
+$router->add('POST', '/master/cities/update', function () {
+    $jwt = new JwtHandler(); $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission(2, $_info->user_id, "u");
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    $updates = $data["updates"] ?? [];
+    $conditions = $data["conditions"] ?? "";
+
+    $db = new Database();
+    $sql = $db->generateDynamicUpdate("cities", $updates, $conditions);
+
+    try {
+        $stmt = $db->query($sql[0], $sql[1]);
+        (new ApiResponse($stmt->rowCount() > 0 ? 200 : 500, $stmt->rowCount() > 0 ? "Update successful" : "No rows updated"))->toJson();
+    } catch (Exception $e) {
+        (new ApiResponse(500, "Update failed", $e->getMessage()))->toJson();
+    }
+});
+
+?>
