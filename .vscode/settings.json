@@ -13,5 +13,26 @@
     ],
     "cSpell.words": [
         "outfordelivary"
+    ],
+    "dbcode.connections": [
+        {
+            "connectionId": "BORNyv0uCAQxY5f1J7zL2",
+            "name": "dishaAirwayDev",
+            "driver": "mariadb",
+            "color": "#004A37",
+            "connectionType": "host",
+            "host": "localhost",
+            "port": 3306,
+            "ssl": false,
+            "username": "test",
+            "password": "test",
+            "savePassword": "yes",
+            "database": "test",
+            "readOnly": false,
+            "connectionTimeout": 30,
+            "driverOptions": {
+                "retrievePublickey": true
+            }
+        }
     ]
 }

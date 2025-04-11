@@ -1,7 +1,7 @@
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19-11.8.1-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: 127.0.0.1    Database: test
+-- Host: localhost    Database: test
 -- ------------------------------------------------------
 -- Server version	11.7.2-MariaDB-ubu2404
 
@@ -73,9 +73,11 @@ CREATE TABLE `bookings` (
 -- Dumping data for table `bookings`
 --
 
+LOCK TABLES `bookings` WRITE;
 /*!40000 ALTER TABLE `bookings` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `bookings` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -99,9 +101,11 @@ CREATE TABLE `branch_user` (
 -- Dumping data for table `branch_user`
 --
 
+LOCK TABLES `branch_user` WRITE;
 /*!40000 ALTER TABLE `branch_user` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `branch_user` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -151,9 +155,11 @@ CREATE TABLE `branches` (
 -- Dumping data for table `branches`
 --
 
+LOCK TABLES `branches` WRITE;
 /*!40000 ALTER TABLE `branches` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `branches` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -179,6 +185,7 @@ CREATE TABLE `cities` (
 -- Dumping data for table `cities`
 --
 
+LOCK TABLES `cities` WRITE;
 /*!40000 ALTER TABLE `cities` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `cities` VALUES
@@ -1398,6 +1405,7 @@ INSERT INTO `cities` VALUES
 (1214,'Asarganj',5,'2025-04-08 09:33:59',1),
 (1215,'Sarsod',12,'2025-04-08 09:33:59',1);
 /*!40000 ALTER TABLE `cities` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1424,9 +1432,11 @@ CREATE TABLE `coloader` (
 -- Dumping data for table `coloader`
 --
 
+LOCK TABLES `coloader` WRITE;
 /*!40000 ALTER TABLE `coloader` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `coloader` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1452,9 +1462,11 @@ CREATE TABLE `credit_node` (
 -- Dumping data for table `credit_node`
 --
 
+LOCK TABLES `credit_node` WRITE;
 /*!40000 ALTER TABLE `credit_node` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `credit_node` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1480,9 +1492,11 @@ CREATE TABLE `delivery_list` (
 -- Dumping data for table `delivery_list`
 --
 
+LOCK TABLES `delivery_list` WRITE;
 /*!40000 ALTER TABLE `delivery_list` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `delivery_list` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1518,9 +1532,11 @@ CREATE TABLE `employees` (
 -- Dumping data for table `employees`
 --
 
+LOCK TABLES `employees` WRITE;
 /*!40000 ALTER TABLE `employees` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `employees` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1551,9 +1567,11 @@ CREATE TABLE `manifests` (
 -- Dumping data for table `manifests`
 --
 
+LOCK TABLES `manifests` WRITE;
 /*!40000 ALTER TABLE `manifests` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `manifests` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1575,6 +1593,7 @@ CREATE TABLE `pages` (
 -- Dumping data for table `pages`
 --
 
+LOCK TABLES `pages` WRITE;
 /*!40000 ALTER TABLE `pages` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `pages` VALUES
@@ -1591,6 +1610,7 @@ INSERT INTO `pages` VALUES
 (12,'Delivery','2025-04-08 09:36:12'),
 (13,'PODS','2025-04-08 09:36:12');
 /*!40000 ALTER TABLE `pages` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1623,6 +1643,7 @@ CREATE TABLE `permissions` (
 -- Dumping data for table `permissions`
 --
 
+LOCK TABLES `permissions` WRITE;
 /*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `permissions` VALUES
@@ -1639,6 +1660,7 @@ INSERT INTO `permissions` VALUES
 (11,12,'11111',1,'2025-04-08 09:38:53',1,'2025-04-08 09:38:53',1),
 (12,13,'11111',1,'2025-04-08 09:38:53',1,'2025-04-08 09:38:53',1);
 /*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1657,6 +1679,7 @@ CREATE TABLE `pods` (
   `status` tinyint(1) DEFAULT 1,
   `branch_id` int(11) NOT NULL,
   `pod_data` longblob DEFAULT NULL,
+  `city_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`pod_id`),
   KEY `created_by` (`created_by`),
   KEY `booking_id` (`booking_id`),
@@ -1669,9 +1692,11 @@ CREATE TABLE `pods` (
 -- Dumping data for table `pods`
 --
 
+LOCK TABLES `pods` WRITE;
 /*!40000 ALTER TABLE `pods` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `pods` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1695,9 +1720,11 @@ CREATE TABLE `received_booking` (
 -- Dumping data for table `received_booking`
 --
 
+LOCK TABLES `received_booking` WRITE;
 /*!40000 ALTER TABLE `received_booking` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `received_booking` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1729,9 +1756,11 @@ CREATE TABLE `representatives` (
 -- Dumping data for table `representatives`
 --
 
+LOCK TABLES `representatives` WRITE;
 /*!40000 ALTER TABLE `representatives` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `representatives` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1755,6 +1784,7 @@ CREATE TABLE `states` (
 -- Dumping data for table `states`
 --
 
+LOCK TABLES `states` WRITE;
 /*!40000 ALTER TABLE `states` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `states` VALUES
@@ -1793,6 +1823,7 @@ INSERT INTO `states` VALUES
 (33,'Uttarakhand',1,'2025-04-08 09:33:58','2025-04-08 09:33:58'),
 (34,'West Bengal',1,'2025-04-08 09:33:58','2025-04-08 09:33:58');
 /*!40000 ALTER TABLE `states` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1818,9 +1849,11 @@ CREATE TABLE `tracking` (
 -- Dumping data for table `tracking`
 --
 
+LOCK TABLES `tracking` WRITE;
 /*!40000 ALTER TABLE `tracking` DISABLE KEYS */;
 set autocommit=0;
 /*!40000 ALTER TABLE `tracking` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1854,11 +1887,13 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
+LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `users` VALUES
 (1,'1234567890','123456','super','user','m',NULL,NULL,NULL,'2025-04-08 09:37:21',1,'2025-04-08 09:37:21',1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
 commit;
 
 --
@@ -1874,4 +1909,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-04-09  6:21:54
+-- Dump completed on 2025-04-11 15:59:01

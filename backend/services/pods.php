@@ -6,6 +6,38 @@ require_once __DIR__ . '/../core/Handler.php';
 
 global $router;
 $router->add('POST', '/pods', function () {
+    $jwt = new JwtHandler();
+    $_info = $jwt->validate();
+    $handler = new Handler();
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "r");
+    $required_fields = ["limit", "offset"];
+    $data = json_decode(file_get_contents("php://input"), true);
+    $handler->validateInput($data, $required_fields);
+    if (!empty($data)) {
+        $data = (array) $data;
+    }
+
+    $db = new Database();
+    if ($isAdmin && $_info->branch_id == null) {
+        $sql = "SELECT * FROM bookings JOIN pods ON bookings.booking_id = pods.booking_id LIMIT $limit OFFSET $offset";
+        $stmt = $db->query($sql, []);
+    }
+    else{
+        $sql = "SELECT * FROM bookings JOIN pods ON bookings.booking_id = pods.booking_id  WHERE bookings.branch_id = ? LIMIT $limit OFFSET $offset";
+        $stmt = $db->query($sql, [$_info->branch_id]);
+    }
+   
+    $pods = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+    if (!empty($pod['pod_data'])) {
+        $pod['pod_data'] = base64_encode($pod['pod_data']);
+    }
+
+    // Send the response with Base64-encoded pod_data
+    (new ApiResponse(200, "Success", $pods))->toJson();
+});
+
+$router->add('POST', '/pods/byId', function () {
     $pageID = 1;
     $jwt = new JwtHandler();
     $_info = $jwt->validate();
@@ -14,28 +46,18 @@ $router->add('POST', '/pods', function () {
 
     $db = new Database();
 
-    if ($isAdmin) {
-        $sql = "SELECT * FROM pods ORDER BY created_at DESC";
-        $stmt = $db->query($sql);
-    } else {
-        $sql = "SELECT * FROM pods WHERE branch_id = ? ORDER BY created_at DESC";
-        $stmt = $db->query($sql, [$_info->branch_id]);
-    }
+    $sql = "SELECT * FROM pods WHERE pod_id = ? ";
+    $stmt = $db->query($sql, [$data["pod_id"]]);
 
-    $pods = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $pods = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    // Base64 encode the pod_data before sending the response
-    foreach ($pods as &$pod) {
-        // Check if pod_data exists and is not empty
-        if (!empty($pod['pod_data'])) {
-            $pod['pod_data'] = base64_encode($pod['pod_data']);
-        }
+    if (!empty($pod['pod_data'])) {
+        $pod['pod_data'] = base64_encode($pod['pod_data']);
     }
 
     // Send the response with Base64-encoded pod_data
     (new ApiResponse(200, "Success", $pods))->toJson();
 });
-
 
 $router->add("POST", "/pods/new", function () {
     $pageID = 13;
@@ -77,8 +99,8 @@ $router->add("POST", "/pods/new", function () {
     }
 
     // Insert the pod data (binary file) into the database
-    $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id) VALUES (?, ?, ?, ?, ?)";
-    $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id]);
+    $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id, city_id) VALUES (?, ?, ?, ?, ?, ?)";
+    $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id, $data["city_id"]]);
 
     // Check if the insertion was successful
     if ($db->lastInsertId() > 0) {
