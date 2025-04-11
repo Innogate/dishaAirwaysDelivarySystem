@@ -144,6 +144,7 @@ $router->add("POST", "/booking/new", function () {
         "package_value",
         "to_pay",
         "on_account",
+        "package_amount",
     ];
 
     $handler->validateInput($data, $required_fields);
@@ -167,9 +168,9 @@ $router->add("POST", "/booking/new", function () {
             slip_no, booking_address, transport_mode, paid_type, cgst, sgst, igst, 
             total_value, package_count, package_weight, package_value, package_contents, 
             shipper_charges, destination_city_id, destination_branch_id, xp_branch_id, 
-            created_by, on_account, to_pay, declared_value, other_charges, status
+            created_by, on_account, to_pay, declared_value, other_charges, status, package_amount
         ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, package_amount
         )";
         $db->query($sql, [
             $data["consignee_name"],
@@ -198,7 +199,8 @@ $router->add("POST", "/booking/new", function () {
             $data["to_pay"],
             $data["declared_value"],
             $data["other_charges"],
-            "0"
+            "0",
+            $data["package_amount"],
         ]);
 
         $db->commit();

@@ -54,6 +54,7 @@ CREATE TABLE `bookings` (
   `other_charges` double DEFAULT 0,
   `declared_value` double DEFAULT 0,
   `status` int(11) DEFAULT NULL,
+  `package_amount` double DEFAULT NULL,
   PRIMARY KEY (`booking_id`),
   UNIQUE KEY `slip_no` (`slip_no`),
   KEY `branch_id` (`branch_id`),
@@ -1909,4 +1910,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-04-11 15:59:01
+-- Dump completed on 2025-04-11 17:18:50

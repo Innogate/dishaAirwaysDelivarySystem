@@ -67,7 +67,8 @@ Authorization: Bearer {{token}}
     "to_pay": "Y",
     "on_account": "1020034",
     "declared_value": 200,
-    "other_charges": 200
+    "other_charges": 200,
+    "package_amount": 2999
 }
 
 
