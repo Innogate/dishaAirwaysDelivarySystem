@@ -46,8 +46,8 @@ $router->add('POST', '/pods/byId', function () {
 
     $db = new Database();
 
-    $sql = "SELECT * FROM pods WHERE pod_id = ? ";
-    $stmt = $db->query($sql, [$data["pod_id"]]);
+    $sql = "SELECT * FROM pods WHERE booking = ? ";
+    $stmt = $db->query($sql, [$data["booking_id"]]);
 
     $pods = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
@@ -95,6 +95,19 @@ $router->add("POST", "/pods/new", function () {
 
     if (!$booking) {
         (new ApiResponse(404, "Invalid or unauthorized booking ID"))->toJson();
+        exit;
+    }
+
+    // Check if the pod already exists
+    $sql = "SELECT pod_id FROM pods WHERE booking_id = ? LIMIT 1";
+    $stmt = $db->query($sql, [$booking_id]);
+    $existingPod = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existingPod) {
+        //    Update pod
+        $sql = "UPDATE pods SET pod_data = ?, data_formate = ?, created_by = ?, branch_id = ?, city_id = ? WHERE pod_id = ?";
+        $db->query($sql, [$podBlob, $fileType, $_info->user_id, $_info->branch_id, $data["city_id"], $existingPod["pod_id"]]);
+        (new ApiResponse(200, "POD updated successfully"))->toJson();
         exit;
     }
 
