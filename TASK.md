@@ -1,1 +1,2 @@
-# ADD BOOKING SLIP PRINT OPTION ON BOOKING LIST
+# Fix logo upload branch
+# fix co-loader second time inset

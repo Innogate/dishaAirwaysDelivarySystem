@@ -11,7 +11,7 @@ Content-Type: application/json
 
 {
     "id": "1234567890",
-    "passwd": "pass@1234"
+    "passwd": "123456"
 }
 
 
@@ -57,14 +57,14 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "mobile": "2345678901",
+    "mobile": "1234567893",
     "password": "123456",
-    "first_name": "Branch",
-    "last_name": "Manager1",
+    "first_name": "Surat",
+    "last_name": "Manager",
     "gender": "Male",
     "birth_date": "1990-01-01",
     "address": "123 Main St",
-    "email": "john.doe@example.com"
+    "email": "john3.doe@example.com"
 }
 
 #### UPDATE USERS
