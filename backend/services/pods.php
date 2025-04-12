@@ -43,7 +43,7 @@ $router->add('POST', '/pods/byId', function () {
     $_info = $jwt->validate();
     $handler = new Handler();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "r");
-    $required_fields = ["booking_id",];
+    $required_fields = ["booking_id"];
     $data = json_decode(file_get_contents("php://input"), true);
     $handler->validateInput($data, $required_fields);
     $db = new Database();
