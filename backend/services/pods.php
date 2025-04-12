@@ -46,7 +46,7 @@ $router->add('POST', '/pods/byId', function () {
 
     $db = new Database();
 
-    $sql = "SELECT * FROM pods WHERE booking = ? ";
+    $sql = "SELECT * FROM pods WHERE booking_id = ? ";
     $stmt = $db->query($sql, [$data["booking_id"]]);
 
     $pods = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
