@@ -33,9 +33,12 @@ $router->add('POST', '/delivery', function () {
         exit;
     }
     $sql ="SELECT d.*, 
-    b.slip_no as slip_no
+    b.slip_no as slip_no,
+    b.booking_id,
+    pod.pod_id
     FROM delivery_list as d 
-    JOIN bookings as b ON d.booking_id = b.booking_id  
+    JOIN bookings as b ON d.booking_id = b.booking_id
+    LEFT JOIN pods as pod ON d.booking_id = pod.booking_id
     WHERE d.branch_id = ? 
     ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset" ;
     $stmt = $db->query($sql, [$_info->branch_id]);
@@ -74,9 +77,9 @@ $router->add('POST', '/delivery/new', function () {
 
     // Build placeholders like (?, ?, ?)
     $placeholders = implode(',', array_fill(0, count($booking_ids), '?'));
-    $params = array_merge([$data['employee_id']], $booking_ids);
+    $params = array_merge([$data['employee_id'], $data['city_id']], $booking_ids);
 
-    $sql = "UPDATE delivery_list SET employee_id = ? WHERE booking_id IN ($placeholders)";
+    $sql = "UPDATE delivery_list SET employee_id = ?, city_id = ? WHERE booking_id IN ($placeholders)";
 
     $db = new Database();
     $db->query($sql, $params);
@@ -86,8 +89,8 @@ $router->add('POST', '/delivery/new', function () {
 
     // Run loop booking_ids take one by on as booking_id
     foreach ($booking_ids as $booking_id) {
-        $db->query("INSERT INTO tracking (current_branch_id, destination_branch_id, booking_id, city_id, departed_at)
-                        VALUES (?, ?, ?, ?, NOW())", [$_info->branch_id, 0, $booking_id, $data["city_id"]]);
+        $db->query("INSERT INTO tracking (current_branch_id, destination_branch_id, booking_id, departed_at)
+                        VALUES (?, ?, ?, NOW())", [$_info->branch_id, 0, $booking_id]);
     }
 
     (new ApiResponse(200, "Delivery entries created successfully"))->toJson();
