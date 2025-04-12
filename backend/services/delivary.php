@@ -62,7 +62,7 @@ $router->add('POST', '/delivery/new', function () {
     $jwt = new JwtHandler();
     $handler = new Handler();
     $_info = $jwt->validate();
-    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w";
+    $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
     $required_filed = ["employee_id", "booking_lists"];
     $data = json_decode(file_get_contents("php://input"), true);
     $handler->validateInput($data, $required_filed);
