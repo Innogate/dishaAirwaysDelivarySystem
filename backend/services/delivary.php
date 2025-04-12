@@ -32,7 +32,7 @@ $router->add('POST', '/delivery', function () {
         (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
         exit;
     }
-    $sql ="SELECT d.*, b.slip_no as slip_no, b.destination_city_id, b.booking_id FROM delivery_list as d JOIN bookings as b ON d.booking_id = b.booking_id  WHERE (d.branch_id = ?) ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset" ;
+    $sql ="SELECT d.*, b.slip_no as slip_no, b.destination_city_id, b.booking_id FROM delivery_list as d JOIN bookings as b ON d.booking_id = b.booking_id  WHERE d.branch_id = ? ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset" ;
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
