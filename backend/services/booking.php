@@ -170,7 +170,7 @@ $router->add("POST", "/booking/new", function () {
             shipper_charges, destination_city_id, destination_branch_id, xp_branch_id, 
             created_by, on_account, to_pay, declared_value, other_charges, status, package_amount
         ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, package_amount
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )";
         $db->query($sql, [
             $data["consignee_name"],
