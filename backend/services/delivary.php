@@ -32,7 +32,12 @@ $router->add('POST', '/delivery', function () {
         (new ApiResponse(404, 'You are not logged into a branch account'))->toJson();
         exit;
     }
-    $sql ="SELECT d.*, b.slip_no as slip_no, b.destination_city_id, b.booking_id FROM delivery_list as d JOIN bookings as b ON d.booking_id = b.booking_id  WHERE d.branch_id = ? ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset" ;
+    $sql ="SELECT d.*, 
+    b.slip_no as slip_no
+    FROM delivery_list as d 
+    JOIN bookings as b ON d.booking_id = b.booking_id  
+    WHERE d.branch_id = ? 
+    ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset" ;
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -47,7 +52,7 @@ $router->add('POST', '/delivery/new', function () {
     $handler = new Handler();
     $_info = $jwt->validate();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "w");
-    $required_filed = ["employee_id", "booking_lists"];
+    $required_filed = ["employee_id", "booking_lists", "city_id"];
     $data = json_decode(file_get_contents("php://input"), true);
     $handler->validateInput($data, $required_filed);
 
@@ -81,8 +86,8 @@ $router->add('POST', '/delivery/new', function () {
 
     // Run loop booking_ids take one by on as booking_id
     foreach ($booking_ids as $booking_id) {
-        $db->query("INSERT INTO tracking (current_branch_id, destination_branch_id, booking_id, departed_at)
-                        VALUES (?, ?, ?, NOW())", [$_info->branch_id, 0, $booking_id]);
+        $db->query("INSERT INTO tracking (current_branch_id, destination_branch_id, booking_id, city_id, departed_at)
+                        VALUES (?, ?, ?, ?, NOW())", [$_info->branch_id, 0, $booking_id, $data["city_id"]]);
     }
 
     (new ApiResponse(200, "Delivery entries created successfully"))->toJson();

@@ -114,8 +114,8 @@ $router->add("POST", "/pods/new", function () {
     }
 
     // Insert the pod data (binary file) into the database
-    $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id, city_id) VALUES (?, ?, ?, ?, ?, ?)";
-    $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id, $data["city_id"]]);
+    $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id) VALUES (?, ?, ?, ?, ?)";
+    $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id]);
 
     // Check if the insertion was successful
     if ($db->lastInsertId() > 0) {

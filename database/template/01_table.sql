@@ -202,7 +202,7 @@ CREATE TABLE `delivery_list` (
   `employee_id` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
+  `city_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`delivery_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -317,7 +317,6 @@ CREATE TABLE `pods` (
   `status` tinyint(1) DEFAULT 1,
   `branch_id` int(11) NOT NULL,
   `pod_data` longblob DEFAULT NULL,
-  `city_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`pod_id`),
   KEY `created_by` (`created_by`),
   KEY `booking_id` (`booking_id`),
