@@ -43,6 +43,7 @@ CREATE TABLE `bookings` (
   `package_count` int(11) NOT NULL,
   `package_weight` double NOT NULL,
   `package_value` double NOT NULL,
+  `package_amount` double NOT NULL,
   `package_contents` text DEFAULT NULL,
   `shipper_charges` varchar(255) DEFAULT NULL,
   `destination_city_id` int(11) NOT NULL,
