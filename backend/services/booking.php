@@ -263,3 +263,33 @@ $router->add('POST', '/booking/forward', function () {
         (new ApiResponse(500, $e->getMessage(), "", 500))->toJson();
     }
 });
+$router->add("POST","/bookings/update", function (){
+    $pageID = 1;
+    $jwt = new JwtHandler();
+    $handler = new Handler();
+    $_info = $jwt->validate();
+    $handler->validatePermission($pageID, $_info->user_id, "u");
+
+    $payload = (object)[
+        "updates" => [],
+        "conditions" => 'bookings=0'
+    ];
+
+    $data = json_decode(file_get_contents("php://input"), true);
+    if (!empty($data)) {
+        $payload = (object)$data;
+    }
+
+    $db = new Database();
+    $sql = $db->generateDynamicUpdate("bookings", $payload->updates, $payload->conditions);
+    try {
+        $stmt = $db->query($sql[0], $sql[1]);
+        if ($stmt->rowCount() > 0) {
+            (new ApiResponse(200, "Update successful"))->toJson();
+        } else {
+            (new ApiResponse(500, "No rows updated"))->toJson();
+        }
+    } catch (Exception $e) {
+        (new ApiResponse(500, "Update failed", $e->getMessage()))->toJson();
+    }
+});
