@@ -101,3 +101,16 @@ Authorization: Bearer {{token}}
 {
     "booking_id":2
 }
+
+#### UPDATE Booking
+POST {{apiUrl}}/bookings/update
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "updates": {
+        "slip_no": "abc-102"
+    },
+    "conditions":"booking_id=2"
+    
+}
