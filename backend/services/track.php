@@ -46,7 +46,7 @@ $router->add("POST", '/api/status/booking', function () {
             arrived_at,
             departed_at,
             b.branch_name AS source_branch_name,
-            COALESCE(bb.branch_name, 'Out for delivery') AS destination_branch_name
+            bb.branch_name AS destination_branch_name
         FROM tracking t
         JOIN branches b ON t.current_branch_id = b.branch_id
         LEFT JOIN branches bb ON t.destination_branch_id = bb.branch_id
@@ -60,6 +60,18 @@ $router->add("POST", '/api/status/booking', function () {
     }
 
     unset($booking["booking_id"]);
+
+    foreach ($list as &$step) {
+        if ($step['received'] == 1) {
+            $step['status'] = 'Completed Delivery';
+        } else {
+            $step['status'] = 'Wait for Completed Delivery';
+        }
+    
+        $step['message'] = "Departed from {$step['destination_branch_name']} : {$step['status']}";
+    }
+    unset($step); // break the reference
+    
 
     $data = ["status" => $list, "booking" => $booking];
     $response = new ApiResponse(200, "Success", $data);
