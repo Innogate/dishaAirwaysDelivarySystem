@@ -28,7 +28,7 @@ $router->add("POST", '/api/status/booking', function () {
                     created_at AS booking_date,
                     booking_id
                 FROM bookings
-                WHERE slip_no = ?";
+                WHERE slip_no = ? AND NOT status = 4";
     $stmt = $db->query($sql, [$data["slip_no"]]);
     $booking = $stmt->fetch(PDO::FETCH_ASSOC);
 
