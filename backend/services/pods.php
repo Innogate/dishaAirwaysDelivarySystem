@@ -38,7 +38,6 @@ $router->add('POST', '/pods', function () {
     if (!empty($pod['pod_data'])) {
         $pod['pod_data'] = base64_encode($pod['pod_data']);
     }
-
     // Send the response with Base64-encoded pod_data
     (new ApiResponse(200, "Success", $pods))->toJson();
 });
@@ -133,13 +132,20 @@ $router->add("POST", "/pods/new", function () {
         // Update
         $sql = "UPDATE pods SET pod_data = ?, data_formate = ?, created_by = ?, branch_id = ?  WHERE pod_id = ?";
         $db->query($sql, [$podBlob, $fileType, $_info->user_id, $_info->branch_id, $existingPod["pod_id"]]);
+
+        // update tracking status
+        $sql = "UPDATE tracking SET arrived_at = NOW(), received = 1  WHERE current_branch_id = ? AND booking_id = ?";
+        $db->query($sql, [$_info->branch_id, $booking_id]);
+
         (new ApiResponse(200, "POD updated successfully"))->toJson();
     } else {
         // Insert
         $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id)
                 VALUES (?, ?, ?, ?, ?)";
         $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id]);
-
+        // update tracking status
+        $sql = "UPDATE tracking SET arrived_at = NOW(), received = 1  WHERE current_branch_id = ? AND booking_id = ?";
+        $db->query($sql, [$_info->branch_id, $booking_id]);
         if ($db->lastInsertId() > 0) {
             (new ApiResponse(200, "POD uploaded successfully"))->toJson();
         } else {
