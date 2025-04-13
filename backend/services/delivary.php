@@ -36,8 +36,18 @@ $router->add('POST', '/delivery', function () {
     FROM delivery_list as d 
     JOIN bookings as b ON d.booking_id = b.booking_id
     LEFT JOIN pods as pod ON d.booking_id = pod.booking_id
-    WHERE d.branch_id = ? OR $isAdmin
+    WHERE d.branch_id = ?
     ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset" ;
+    if ($isAdmin && $_info->branch_id == null) {
+        $sql ="SELECT d.*, 
+    b.slip_no as slip_no,
+    b.booking_id,
+    pod.pod_id
+    FROM delivery_list as d 
+    JOIN bookings as b ON d.booking_id = b.booking_id
+    LEFT JOIN pods as pod ON d.booking_id = pod.booking_id 
+    ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset" ;
+    }
     $stmt = $db->query($sql, [$_info->branch_id]);
 
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
