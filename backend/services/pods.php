@@ -6,29 +6,35 @@ require_once __DIR__ . '/../core/Handler.php';
 
 global $router;
 $router->add('POST', '/pods', function () {
+    $pageID=13;
     $jwt = new JwtHandler();
     $_info = $jwt->validate();
     $handler = new Handler();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "r");
-    $required_fields = ["limit", "offset"];
+    $required_fields = ["limit", "current"];
     $data = json_decode(file_get_contents("php://input"), true);
     $handler->validateInput($data, $required_fields);
     if (!empty($data)) {
         $data = (array) $data;
     }
+    $limit = $data["limit"];
+    $current = $data["current"];
 
     $db = new Database();
     if ($isAdmin && $_info->branch_id == null) {
-        $sql = "SELECT * FROM bookings JOIN pods ON bookings.booking_id = pods.booking_id LIMIT $limit OFFSET $offset";
+        $sql = "SELECT b.*
+        FROM bookings as b
+        JOIN pods as pod ON b.booking_id = pod.booking_id 
+        LIMIT $limit OFFSET $current";
         $stmt = $db->query($sql, []);
     }
     else{
         $sql = "SELECT * FROM bookings JOIN pods ON bookings.booking_id = pods.booking_id  WHERE bookings.branch_id = ? LIMIT $limit OFFSET $offset";
         $stmt = $db->query($sql, [$_info->branch_id]);
     }
+    
    
     $pods = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-
     if (!empty($pod['pod_data'])) {
         $pod['pod_data'] = base64_encode($pod['pod_data']);
     }
@@ -38,28 +44,30 @@ $router->add('POST', '/pods', function () {
 });
 
 $router->add('POST', '/pods/byId', function () {
-    $pageID = 1;
+    $pageID = 13;
     $jwt = new JwtHandler();
     $_info = $jwt->validate();
     $handler = new Handler();
     $isAdmin = $handler->validatePermission($pageID, $_info->user_id, "r");
+
     $required_fields = ["booking_id"];
     $data = json_decode(file_get_contents("php://input"), true);
     $handler->validateInput($data, $required_fields);
-    $db = new Database();
 
-    $sql = "SELECT * FROM pods WHERE booking_id = ? ";
+    $db = new Database();
+    $sql = "SELECT * FROM pods WHERE booking_id = ?";
     $stmt = $db->query($sql, [$data["booking_id"]]);
 
-    $pods = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    $pod = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
+    // Encode blob if exists
     if (!empty($pod['pod_data'])) {
         $pod['pod_data'] = base64_encode($pod['pod_data']);
     }
 
-    // Send the response with Base64-encoded pod_data
-    (new ApiResponse(200, "Success", $pods))->toJson();
+    (new ApiResponse(200, "Success", $pod))->toJson();
 });
+
 
 $router->add("POST", "/pods/new", function () {
     $pageID = 13;
