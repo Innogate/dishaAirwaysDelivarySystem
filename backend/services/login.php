@@ -15,7 +15,7 @@ $router->add('POST', '/login', function () {
     $handler->validateInput($data, $required_fields);
 
     // Fetch user
-    $stmt = $db->query("SELECT user_id, password FROM users WHERE mobile = ?", [ $data['id'] ]);
+    $stmt = $db->query("SELECT user_id, password FROM users WHERE mobile = ? AND `status` = 1", [ $data['id'] ]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
