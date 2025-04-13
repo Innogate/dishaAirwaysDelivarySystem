@@ -74,8 +74,6 @@ $router->add('POST', '/pods/byId', function () {
         $mimeType = $mimeTypeMap[$format] ?? 'application/octet-stream';
 
         $pod['pod_data'] = "data:$mimeType;base64,$base64";
-    } else {
-        $pod['pod_data'] = null;
     }
 
     (new ApiResponse(200, "Success", $pod ?: []))->toJson();
@@ -138,9 +136,9 @@ $router->add("POST", "/pods/new", function () {
         (new ApiResponse(200, "POD updated successfully"))->toJson();
     } else {
         // Insert
-        $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id, city_id)
-                VALUES (?, ?, ?, ?, ?, ?)";
-        $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id, $city_id]);
+        $sql = "INSERT INTO pods (booking_id, pod_data, data_formate, created_by, branch_id)
+                VALUES (?, ?, ?, ?, ?)";
+        $db->query($sql, [$booking_id, $podBlob, $fileType, $_info->user_id, $_info->branch_id]);
 
         if ($db->lastInsertId() > 0) {
             (new ApiResponse(200, "POD uploaded successfully"))->toJson();
