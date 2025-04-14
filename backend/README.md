@@ -8,12 +8,15 @@
 ```conf
 RewriteEngine On
 
+# Allow Authorization header
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 # Skip rewriting if it's an existing file or directory
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Rewrite everything to index.php, but preserve the full original URI
+# Rewrite everything to index.php
 RewriteRule ^ index.php [QSA,L]
 
 ```
