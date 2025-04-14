@@ -4,6 +4,19 @@
 # Permition: 300
 # Booking: 400
 
+# ADD .htaccess
+```conf
+RewriteEngine On
+
+# Skip rewriting if it's an existing file or directory
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Rewrite everything to index.php, but preserve the full original URI
+RewriteRule ^ index.php [QSA,L]
+
+```
 
 # PAGE IDS
 1. Booking
