@@ -19,6 +19,25 @@ RewriteRule ^ - [L]
 # Rewrite everything to index.php
 RewriteRule ^ index.php [QSA,L]
 
+; angular
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Don't rewrite requests to /control
+  RewriteCond %{REQUEST_URI} ^/control [NC]
+  RewriteRule ^ - [L]
+
+  # Don't rewrite existing files or folders
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Rewrite all other requests to index.html
+  RewriteRule . /index.html [L]
+</IfModule>
+
+
+
 ```
 
 # PAGE IDS
