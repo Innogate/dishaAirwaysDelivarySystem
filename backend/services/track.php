@@ -17,6 +17,7 @@ $router->add("POST", '/api/status/booking', function () {
 
     // GET BOOKING ID BY SLIP ID
     $sql = "SELECT 
+                    booking_id,
                     consignee_name,
                     consignor_name,
                     slip_no,
