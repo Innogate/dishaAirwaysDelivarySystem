@@ -17,7 +17,6 @@ $router->add("POST", '/api/status/booking', function () {
 
     // GET BOOKING ID BY SLIP ID
     $sql = "SELECT 
-                    booking_id,
                     consignee_name,
                     consignor_name,
                     slip_no,
@@ -60,7 +59,7 @@ $router->add("POST", '/api/status/booking', function () {
         $list = [];
     }
 
-    unset($booking["booking_id"]);
+    // unset($booking["booking_id"]);
 
     foreach ($list as &$step) {
         if ($step['received'] == 1) {
