@@ -32,6 +32,7 @@ $router->add('POST', '/booking', function () {
     if ($isAdmin && $_info->branch_id == null) {
         $sql = "SELECT 
             b.*, 
+            br.branch_name AS booking_branch_name, 
             br.branch_name AS branch_name, 
             dbr.branch_name AS destination_branch_name
         FROM bookings b
