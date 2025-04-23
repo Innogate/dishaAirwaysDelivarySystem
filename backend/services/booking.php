@@ -156,7 +156,7 @@ $router->add("POST", "/booking/new", function () {
         $sql = "SELECT branch_short_name FROM branches WHERE branch_id = ?;";
         $stmt = $db->query($sql, [$_info->branch_id]);
         $branch = $stmt->fetch(PDO::FETCH_ASSOC);
-        $slip_no = $branch["branch_short_name"] . "-" . $data["slip_no"];
+        $slip_no = $branch["branch_short_name"] . $data["slip_no"];
 
         $stmt = $db->query("SELECT * FROM bookings WHERE slip_no = ?", [$slip_no]);
         if ($stmt->fetch(PDO::FETCH_ASSOC)) {

@@ -24,10 +24,12 @@ $router->add('POST', '/manifests', function () {
     $limit = (int) $payload->max;
     $offset = (int) $payload->current;
     $db = new Database();
-    $baseQuery = $db->generateDynamicQuery("manifests", $payload->fields) . " WHERE deleted = FALSE ";
+    $baseQuery = "SELECT m.*, b.branch_name as destination_branch_name FROM manifests as m JOIN branches as b ON m.destination_id = b.branch_id WHERE deleted = FALSE";
+
     $sql = $baseQuery . ($isAdmin && $_info->branch_id == null 
-        ? "LIMIT $limit OFFSET $offset" 
-        : "AND branch_id = ? LIMIT $limit OFFSET $offset");
+        ? " ORDER BY create_at DESC LIMIT $limit OFFSET $offset" 
+        : " AND m.branch_id = ? ORDER BY create_at DESC LIMIT $limit OFFSET $offset");
+    
 
     $params = ($isAdmin && $_info->branch_id == null)
         ? []
