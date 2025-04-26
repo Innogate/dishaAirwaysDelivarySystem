@@ -14,37 +14,39 @@ $router->add('POST', '/autofill/newBooking', function () {
     $search = $data["search"] . "%";
 
     $sql = "
-        SELECT 
-            b.consignee_name, 
-            b.consignee_mobile, 
-            b.destination_city_id, 
-            b.consignor_name, 
-            b.consignor_mobile, 
-            b.destination_branch_id
-        FROM bookings b
-        WHERE 
-            LOWER(b.consignee_name) LIKE LOWER(?) 
-            OR b.consignee_mobile LIKE ? 
-            OR LOWER(b.consignor_name) LIKE LOWER(?) 
-            OR b.consignor_mobile LIKE ?
-        GROUP BY 
-            b.consignee_name, 
-            b.consignee_mobile, 
-            b.consignor_name, 
-            b.consignor_mobile, 
-            b.destination_city_id, 
-            b.destination_branch_id
-        LIMIT 30
+    SELECT 
+        LOWER(b.consignee_name) AS consignee_name,
+        b.consignee_mobile,
+        b.destination_city_id,
+        LOWER(b.consignor_name) AS consignor_name,
+        b.consignor_mobile,
+        b.destination_branch_id
+    FROM bookings b
+    WHERE 
+        LOWER(b.consignee_name) LIKE LOWER(?) 
+        OR b.consignee_mobile LIKE ? 
+        OR LOWER(b.consignor_name) LIKE LOWER(?) 
+        OR b.consignor_mobile LIKE ?
+    ORDER BY consignee_name ASC
+    LIMIT 100
     ";
 
     $stmt = $db->query($sql, [$search, $search, $search, $search]);
     $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (!$list) {
-        $list = [];
+    // Deduplicate purely by consignee_name + consignor_name in PHP
+    $unique = [];
+    $finalList = [];
+
+    foreach ($list as $row) {
+        $key = strtolower(trim($row['consignee_name'])) . "|" . strtolower(trim($row['consignor_name']));
+        if (!isset($unique[$key])) {
+            $unique[$key] = true;
+            $finalList[] = $row;
+        }
     }
 
-    $response = new ApiResponse(200, "Success", $list);
+    $response = new ApiResponse(200, "Success", $finalList);
     $response->toJson();
 });
 ?>
